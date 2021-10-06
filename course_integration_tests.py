@@ -1,7 +1,7 @@
 import unittest
 import flask_testing
 import json
-from course_app import app, db, Course
+from app import app, db, Course
 
 
 class TestApp(flask_testing.TestCase):
@@ -15,7 +15,6 @@ class TestApp(flask_testing.TestCase):
 
 
     def setUp(self):
-        # self.e1 = Engineer(name='Team04', password='Team04rocks', phone='99999999', email= 'team04@gmail.com', address='81 Victoria St, Singapore 188065')
         self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='', trainers='')
         self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500', trainers='')
         
@@ -23,13 +22,12 @@ class TestApp(flask_testing.TestCase):
 
 
     def tearDown(self):
-        self.e1 = None
         self.c1 = None
         self.c2 = None
         db.session.remove()
         db.drop_all()
 
-### COURSE TEST CASES###
+### COURSE TEST CASES ###
 class TestViewCourses(TestApp):
     def test_view_all_courses(self):
         # adding two courses to database
@@ -193,7 +191,7 @@ class TestDeleteCourse(TestApp):
         self.assertEqual(response.json, {
             'message': f'{self.c2.CID} has been deleted successfully from the database'
         })
-### COURSE TEST CASES###
+### COURSE TEST CASES ###
 
 if __name__ == '__main__':
     unittest.main()
