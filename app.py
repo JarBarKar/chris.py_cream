@@ -48,8 +48,9 @@ class Course(db.Model):
 ### Course Class ###
 
 ### Course Detail Class ###
-class Course_detail(db.Model):
-    __tablename__ = 'course_detail'
+### Academic record ####
+class Academic_record(db.Model):
+    __tablename__ = 'academic_record'
     EID = db.Column(db.Integer(), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
@@ -209,7 +210,7 @@ def view_eligible_courses():
     final_result = {"eligible":[],"non_eligible":[]}
     try:
         #retrieve all completed course by EID
-        completed_courses_retrieved = Course_detail.query.filter_by(EID=data["EID"], status="completed")
+        completed_courses_retrieved = Academic_record.query.filter_by(EID=data["EID"], status="completed")
         completed_courses = [course.json()['CID'] for course in completed_courses_retrieved]
         all_courses_retrieved = Course.query.all()
         for course in all_courses_retrieved:
@@ -404,14 +405,14 @@ def hr_view_signup():
 def hr_assign_engineer():
     data = request.get_json()
     try:
-        course_detail = Course_detail(EID = data["EID"], SID = data["SID"], CID = data["CID"], QID = data["QID"], status = "ongoing", quiz_result = 0)
-        db.session.add(course_detail)
+        academic_record = Academic_record(EID = data["EID"], SID = data["SID"], CID = data["CID"], QID = data["QID"], status = "ongoing", quiz_result = 0)
+        db.session.add(academic_record)
         db.session.commit()
 
         return jsonify(
             {
                 "message": f"{data['EID']} has been inserted successfully into the course details",
-                "data": course_detail.to_dict()
+                "data": academic_record.to_dict()
             }
         ), 200
     except Exception as e:
@@ -427,7 +428,7 @@ def hr_withdraw_engineer():
     data = request.get_json()
     
     try:
-        Course_detail.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
+        Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
         db.session.commit()
         return jsonify(
             {
@@ -446,14 +447,14 @@ def hr_withdraw_engineer():
 def hr_approve_signup():
     data = request.get_json()
     try:
-        course_detail = Course_detail(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
+        academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
         Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
-        db.session.add(course_detail)
+        db.session.add(academic_record)
         db.session.commit()
         return jsonify(
         {
-            "message": f"{data['EID']} prerequisites has been moved successfully from Enrollment to course_detail",
-            "data": course_detail.to_dict()
+            "message": f"{data['EID']} prerequisites has been moved successfully from Enrollment to academic_record",
+            "data": academic_record.to_dict()
         }
         ), 200
     except Exception as e:
