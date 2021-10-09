@@ -42,6 +42,9 @@ class Course(db.Model):
     def json(self):
         return {"CID": self.CID, "name": self.name, 
         "prerequisites": self.prerequisites,  "trainers": self.trainers}
+
+    def list_of_prerequisites(self):
+        return self.prerequisites.split(',')
 ### Course Class ###
 
 ### Course Detail Class ###
@@ -139,13 +142,6 @@ class Section(db.Model):
 
     def json(self):
         return {"SID": self.SID, "CID": self.CID, "start": self.start, "end": self.end ,"vacancy": self.vacancy, "TID": self.TID}
-    
-    def to_start_datetime(self):
-        return datetime.strptime(self.start, "%d/%m/%Y %H:%M:%S")
-
-    def to_end_datetime(self):
-        return datetime.strptime(self.end, "%d/%m/%Y %H:%M:%S")
-
 ### Section Class ###
 
 ### Trainer Class ###
@@ -187,7 +183,6 @@ class Trainer(db.Model):
 @app.route("/view_courses", methods=['GET'])
 #view all courses
 def view_all_courses():
-    # data = request.get_json()
     retrieved_courses = Course.query.all()
     courses = [course.to_dict() for course in retrieved_courses]
     if courses:
@@ -202,6 +197,59 @@ def view_all_courses():
             "message": "There are no course retrieved"
         }
     ), 500
+
+#view eligible courses
+@app.route("/view_eligible_courses", methods=['POST'])
+def view_eligible_courses():
+    data = request.get_json()
+    completed_courses = []
+    eligible_courses = []
+    non_eligible_courses = []
+    all_courses = {}
+    final_result = {"eligible":[],"non_eligible":[]}
+    try:
+        #retrieve all completed course by EID
+        completed_courses_retrieved = Course_detail.query.filter_by(EID=data["EID"], status="completed")
+        completed_courses = [course.json()['CID'] for course in completed_courses_retrieved]
+        all_courses_retrieved = Course.query.all()
+        for course in all_courses_retrieved:
+            all_courses[course.json()['CID']] = course.list_of_prerequisites()
+        
+        for key in all_courses.keys():
+            fail = False
+            if key not in completed_courses:
+                for value in all_courses[key]:
+                    if value == '':
+                        continue
+                    if value not in all_courses:
+                        fail = True
+                if fail == False:
+                    eligible_courses.append(key)
+
+        for course in all_courses:
+            if course not in eligible_courses:
+                non_eligible_courses.append(course)
+        
+        for course in all_courses_retrieved:
+            if course.json()['CID'] in eligible_courses:
+                final_result['eligible'].append(course.json())
+            else:
+                final_result['non_eligible'].append(course.json())
+
+        return jsonify(
+            {
+                "message": "Eligible and non-eligible courses are retrieved",
+                "data": final_result
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "message": "There are no course retrieved"
+            }
+        ), 500
+
 
 #create course and add in the prerequisties
 @app.route("/create_course", methods=['POST'])
