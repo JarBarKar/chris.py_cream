@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from os import environ
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
@@ -41,6 +42,9 @@ class Course(db.Model):
     def json(self):
         return {"CID": self.CID, "name": self.name, 
         "prerequisites": self.prerequisites,  "trainers": self.trainers}
+
+    def list_of_prerequisites(self):
+        return self.prerequisites.split(',')
 ### Course Class ###
 
 ### Course Detail Class ###
@@ -105,11 +109,80 @@ class Enrollment(db.Model):
         return {"CID": self.CID, "EID": self.EID, "SID": self.SID}
 ### Enrollment Class ###
 
+### Section Class ###
+class Section(db.Model):
+    __tablename__ = 'section'
+    SID = db.Column(db.String(64), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    start = db.Column(db.DateTime, nullable=False, primary_key=True)
+    end = db.Column(db.DateTime, nullable=False)
+    vacancy = db.Column(db.Integer(), nullable=False)
+    TID = db.Column(db.Integer(), nullable=False)
+
+
+    def __init__(self, SID, CID, start, end, vacancy, TID):
+        self.SID = SID
+        self.CID = CID
+        self.start = start
+        self.end = end
+        self.vacancy = vacancy
+        self.TID = TID
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"SID": self.SID, "CID": self.CID, "start": self.start, "end": self.end ,"vacancy": self.vacancy, "TID": self.TID}
+### Section Class ###
+
+### Trainer Class ###
+class Trainer(db.Model):
+    __tablename__ = 'trainer'
+    TID = db.Column(db.Integer(), nullable=False, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    password = db.Column(db.String(64), nullable=False)
+    phone = db.Column(db.Integer(),nullable=False)
+    email = db.Column(db.String(64), nullable=False)
+    address = db.Column(db.String(64), nullable=False)
+
+    def __init__(self, TID, name, password, phone, email, address):
+        self.TID = TID
+        self.name = name
+        self.password = password
+        self.phone = phone
+        self.email = email
+        self.address = address
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"TID": self.TID, "name": self.name, "password": self.password, "phone": self.phone, "email": self.email, "address": self.address}
+### Trainer Class ###
+
+
 ### Start of API points for Course CRUD ###
 @app.route("/view_courses", methods=['GET'])
 #view all courses
 def view_all_courses():
-    # data = request.get_json()
     retrieved_courses = Course.query.all()
     courses = [course.to_dict() for course in retrieved_courses]
     if courses:
@@ -124,6 +197,59 @@ def view_all_courses():
             "message": "There are no course retrieved"
         }
     ), 500
+
+#view eligible courses
+@app.route("/view_eligible_courses", methods=['POST'])
+def view_eligible_courses():
+    data = request.get_json()
+    completed_courses = []
+    eligible_courses = []
+    non_eligible_courses = []
+    all_courses = {}
+    final_result = {"eligible":[],"non_eligible":[]}
+    try:
+        #retrieve all completed course by EID
+        completed_courses_retrieved = Course_detail.query.filter_by(EID=data["EID"], status="completed")
+        completed_courses = [course.json()['CID'] for course in completed_courses_retrieved]
+        all_courses_retrieved = Course.query.all()
+        for course in all_courses_retrieved:
+            all_courses[course.json()['CID']] = course.list_of_prerequisites()
+        
+        for key in all_courses.keys():
+            fail = False
+            if key not in completed_courses:
+                for value in all_courses[key]:
+                    if value == '':
+                        continue
+                    if value not in all_courses:
+                        fail = True
+                if fail == False:
+                    eligible_courses.append(key)
+
+        for course in all_courses:
+            if course not in eligible_courses:
+                non_eligible_courses.append(course)
+        
+        for course in all_courses_retrieved:
+            if course.json()['CID'] in eligible_courses:
+                final_result['eligible'].append(course.json())
+            else:
+                final_result['non_eligible'].append(course.json())
+
+        return jsonify(
+            {
+                "message": "Eligible and non-eligible courses are retrieved",
+                "data": final_result
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "message": "There are no course retrieved"
+            }
+        ), 500
+
 
 #create course and add in the prerequisties
 @app.route("/create_course", methods=['POST'])
@@ -381,6 +507,136 @@ def hr_assign_trainer():
     ), 500
     ### End of API points for Registration functions ###
     
+    
+    ### Start of API points for Section CRUD ###
+@app.route("/view_sections", methods=['POST'])
+#view all sections by using TID
+def view_all_sections():
+    data = request.get_json()
+    retrieved_sections = Section.query.filter_by(TID = data['TID'])
+    sections = [section.to_dict() for section in retrieved_sections]
+    if sections:
+        return jsonify(
+            {
+                "message": f"All sections are retrieved for Trainer's ID {data['TID']}",
+                "data": sections
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no sections retrieved"
+        }
+    ), 500
+
+#create section and add in the prerequisties
+@app.route("/create_section", methods=['POST'])
+def create_section():
+    data = request.get_json()
+    try:
+        date_object_start = datetime.strptime(data["start"], "%d/%m/%Y %H:%M:%S")
+        date_object_end = datetime.strptime(data["end"], "%d/%m/%Y %H:%M:%S")
+        section = Section(SID=data["SID"], CID=data["CID"], start=date_object_start, end=date_object_end, vacancy=data["vacancy"], TID=data["TID"])
+        db.session.add(section)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Section {data['SID']} has been inserted successfully into the database",
+                "data": section.to_dict()
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Section {data['SID']} is not inserted successfully into the database"
+        }
+    ), 500
+
+
+# # #query specific section detail using CID. Usually used to query the pre-requisties
+# @app.route("/query_section", methods=['POST'])
+# def query_course():
+#     data = request.get_json()
+#     try:
+#         course = Course.query.filter_by(CID=data["CID"]).first()
+#         return jsonify(
+#         {
+#             "message": f"{data['CID']} has been query successfully from the database",
+#             "data": course.to_dict()
+#         }
+#     ), 200
+#     except Exception as e:
+#         return jsonify(
+#         {
+#             "message": f"{data['CID']} cannot be query",
+#         }
+#     ), 500
+
+
+# update section detail
+@app.route("/update_section", methods=['POST'])
+def update_section_detail():
+    data = request.get_json()
+    old_update_section = {}
+    new_update_section = {}
+    #split into old and new section
+    for section_key, section_value in data.items():
+        if section_key.split('_')[0] == 'old':
+            old_update_section[section_key.split('_')[1]] = section_value
+        else:
+            new_update_section[section_key.split('_')[1]] = section_value
+    try:
+        #loop through the new_update_section, replace blank string with old values. New value will not be touched
+        for section_key, section_value in new_update_section.items():
+            if section_value == '':
+                new_update_section = old_update_section[section_key]
+
+        # Convert to datetime format
+        old_update_section['start'] = datetime.strptime(old_update_section['start'], "%d/%m/%Y %H:%M:%S")
+        old_update_section['end'] = datetime.strptime(old_update_section['end'], "%d/%m/%Y %H:%M:%S")
+        new_update_section['start'] = datetime.strptime(new_update_section['start'], "%d/%m/%Y %H:%M:%S")
+        new_update_section['end'] = datetime.strptime(new_update_section['end'], "%d/%m/%Y %H:%M:%S")
+
+        #Retrieve old data and then update it with updated details
+        section = Section.query.filter_by(SID=old_update_section["SID"], CID=old_update_section["CID"], start=old_update_section["start"])
+        section.update(dict(SID=new_update_section['SID'],CID=new_update_section['CID'],start=new_update_section['start'],end=new_update_section['end'],vacancy=new_update_section['vacancy'],TID=new_update_section['TID']))
+        db.session.commit()
+        section = Section.query.filter_by(SID=new_update_section["SID"], CID=new_update_section["CID"], start=new_update_section["start"]).first()
+        return jsonify(
+        {
+            "message": f"Section {old_update_section['SID']}'s details have been updated successfully in the database",
+            "data": section.to_dict()
+        }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Section {old_update_section['CID']} is not updated"
+        }
+    ), 500
+
+
+# #delete section by section_name (can be changed)
+@app.route("/delete_section", methods=['POST'])
+def delete_section():
+    data = request.get_json()
+    try:
+        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+        Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=data["start"]).delete()
+        db.session.commit()
+        return jsonify(
+        {
+            "message": f"Section {data['SID']} has been deleted successfully from the database"
+        }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Section {data['SID']} is not deleted",
+            "error": e
+        }
+    ), 500
+### End of API points for Section CRUD ###
 
 
 if __name__ == '__main__':
