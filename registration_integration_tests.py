@@ -1,7 +1,7 @@
 import unittest
 import flask_testing
 import json
-from app import app, db, Course, Course_detail, Enrollment
+from app import app, db, Course, Academic_record, Enrollment
 
 
 class TestApp(flask_testing.TestCase):
@@ -19,8 +19,8 @@ class TestApp(flask_testing.TestCase):
         self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500', trainers='')
         self.er1 = Enrollment(EID=1, SID='G2', CID='IS500')
         self.er2 = Enrollment(EID=6, SID='G90', CID='IS600')
-        self.cd1 = Course_detail(EID=1, SID="G2", CID="IS500", QID=1, status='ongoing', quiz_result=0)
-        self.cd2 = Course_detail(EID=2, SID="G12", CID="IS600", QID=1, status='ongoing', quiz_result=0)
+        self.cd1 = Academic_record(EID=1, SID="G2", CID="IS500", QID=1, status='ongoing', quiz_result=0)
+        self.cd2 = Academic_record(EID=2, SID="G12", CID="IS600", QID=1, status='ongoing', quiz_result=0)
         
         db.create_all()
 
@@ -490,7 +490,7 @@ class TestHRApproveSignup(TestApp):
                 'status': 'ongoing',
                 'quiz_result': 0
                 },
-            'message' : f'{self.cd1.EID} prerequisites has been moved successfully from Enrollment to course_detail'
+            'message' : f'{self.cd1.EID} prerequisites has been moved successfully from Enrollment to academic_record'
             })
     
 
