@@ -48,8 +48,9 @@ class Course(db.Model):
 ### Course Class ###
 
 ### Course Detail Class ###
-class Course_detail(db.Model):
-    __tablename__ = 'course_detail'
+### Academic record ####
+class Academic_record(db.Model):
+    __tablename__ = 'academic_record'
     EID = db.Column(db.Integer(), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
@@ -209,7 +210,7 @@ def view_eligible_courses():
     final_result = {"eligible":[],"non_eligible":[]}
     try:
         #retrieve all completed course by EID
-        completed_courses_retrieved = Course_detail.query.filter_by(EID=data["EID"], status="completed")
+        completed_courses_retrieved = Academic_record.query.filter_by(EID=data["EID"], status="completed")
         completed_courses = [course.json()['CID'] for course in completed_courses_retrieved]
         all_courses_retrieved = Course.query.all()
         for course in all_courses_retrieved:
@@ -255,6 +256,12 @@ def view_eligible_courses():
 @app.route("/create_course", methods=['POST'])
 def create_course():
     data = request.get_json()
+    if "name" not in data.keys():
+        return jsonify(
+        {
+            "message": "Course name is not inserted successfully into the database",
+        }
+    ), 500
     try:
         course = Course(CID=data["CID"], name=data["name"], prerequisites=data["prerequisites"], trainers=data["trainers"])
         db.session.add(course)
@@ -278,6 +285,12 @@ def create_course():
 @app.route("/query_course", methods=['POST'])
 def query_course():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+    ), 500
     try:
         course = Course.query.filter_by(CID=data["CID"]).first()
         return jsonify(
@@ -298,6 +311,12 @@ def query_course():
 @app.route("/update_course_name", methods=['POST'])
 def update_course_name():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+        ), 500
     try:
         course = Course.query.filter_by(CID=data["CID"])
         course.update(dict(name=data['name']))
@@ -320,6 +339,12 @@ def update_course_name():
 @app.route("/update_course_prerequisites", methods=['POST'])
 def update_course_prerequisites():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+        ), 500
     try:
         course = Course.query.filter_by(CID=data["CID"])
         course.update(dict(prerequisites=data['prerequisites']))
@@ -343,8 +368,20 @@ def update_course_prerequisites():
 @app.route("/delete_course", methods=['POST'])
 def delete_course():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+        ), 500
     try:
-        Course.query.filter_by(CID=data["CID"]).delete()
+        course = Course.query.filter_by(CID=data["CID"])
+        if course.first()==None:
+            return jsonify(
+            {
+                "message": f"{data['CID']} is not deleted"
+            })
+        course.delete()
         db.session.commit()
         return jsonify(
         {
@@ -404,14 +441,14 @@ def hr_view_signup():
 def hr_assign_engineer():
     data = request.get_json()
     try:
-        course_detail = Course_detail(EID = data["EID"], SID = data["SID"], CID = data["CID"], QID = data["QID"], status = "ongoing", quiz_result = 0)
-        db.session.add(course_detail)
+        academic_record = Academic_record(EID = data["EID"], SID = data["SID"], CID = data["CID"], QID = data["QID"], status = "ongoing", quiz_result = 0)
+        db.session.add(academic_record)
         db.session.commit()
 
         return jsonify(
             {
                 "message": f"{data['EID']} has been inserted successfully into the course details",
-                "data": course_detail.to_dict()
+                "data": academic_record.to_dict()
             }
         ), 200
     except Exception as e:
@@ -427,7 +464,7 @@ def hr_withdraw_engineer():
     data = request.get_json()
     
     try:
-        Course_detail.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
+        Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
         db.session.commit()
         return jsonify(
             {
@@ -446,14 +483,14 @@ def hr_withdraw_engineer():
 def hr_approve_signup():
     data = request.get_json()
     try:
-        course_detail = Course_detail(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
+        academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
         Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
-        db.session.add(course_detail)
+        db.session.add(academic_record)
         db.session.commit()
         return jsonify(
         {
-            "message": f"{data['EID']} prerequisites has been moved successfully from Enrollment to course_detail",
-            "data": course_detail.to_dict()
+            "message": f"{data['EID']} prerequisites has been moved successfully from Enrollment to academic_record",
+            "data": academic_record.to_dict()
         }
         ), 200
     except Exception as e:
@@ -632,8 +669,7 @@ def delete_section():
     except Exception as e:
         return jsonify(
         {
-            "message": f"Section {data['SID']} is not deleted",
-            "error": e
+            "message": f"Section {data['SID']} is not deleted"
         }
     ), 500
 ### End of API points for Section CRUD ###
