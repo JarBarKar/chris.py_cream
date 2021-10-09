@@ -256,6 +256,12 @@ def view_eligible_courses():
 @app.route("/create_course", methods=['POST'])
 def create_course():
     data = request.get_json()
+    if "name" not in data.keys():
+        return jsonify(
+        {
+            "message": "Course name is not inserted successfully into the database",
+        }
+    ), 500
     try:
         course = Course(CID=data["CID"], name=data["name"], prerequisites=data["prerequisites"], trainers=data["trainers"])
         db.session.add(course)
@@ -279,6 +285,12 @@ def create_course():
 @app.route("/query_course", methods=['POST'])
 def query_course():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+    ), 500
     try:
         course = Course.query.filter_by(CID=data["CID"]).first()
         return jsonify(
@@ -299,6 +311,12 @@ def query_course():
 @app.route("/update_course_name", methods=['POST'])
 def update_course_name():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+        ), 500
     try:
         course = Course.query.filter_by(CID=data["CID"])
         course.update(dict(name=data['name']))
@@ -321,6 +339,12 @@ def update_course_name():
 @app.route("/update_course_prerequisites", methods=['POST'])
 def update_course_prerequisites():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+        ), 500
     try:
         course = Course.query.filter_by(CID=data["CID"])
         course.update(dict(prerequisites=data['prerequisites']))
@@ -344,8 +368,20 @@ def update_course_prerequisites():
 @app.route("/delete_course", methods=['POST'])
 def delete_course():
     data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+        {
+            "message": "CID is missing",
+        }
+        ), 500
     try:
-        Course.query.filter_by(CID=data["CID"]).delete()
+        course = Course.query.filter_by(CID=data["CID"])
+        if course.first()==None:
+            return jsonify(
+            {
+                "message": f"{data['CID']} is not deleted"
+            })
+        course.delete()
         db.session.commit()
         return jsonify(
         {
@@ -633,8 +669,7 @@ def delete_section():
     except Exception as e:
         return jsonify(
         {
-            "message": f"Section {data['SID']} is not deleted",
-            "error": e
+            "message": f"Section {data['SID']} is not deleted"
         }
     ), 500
 ### End of API points for Section CRUD ###
