@@ -380,7 +380,7 @@ def delete_course():
             return jsonify(
             {
                 "message": f"{data['CID']} is not deleted"
-            })
+            }),500
         course.delete()
         db.session.commit()
         return jsonify(
