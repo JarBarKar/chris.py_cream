@@ -140,21 +140,21 @@ class TestViewCourses(TestApp):
     
 
     # Testing negative case where course is not provided in request body
-    # def test_query_course_not_in_request(self):
-    #     request_body = {
-    #         'id': 1,
-    #         'name': self.c1.name,
-    #         'prerequisites': self.c1.prerequisites,
-    #         'trainers': self.c1.trainers
-    #     }
-    #     # calling query_course function via flask route
-    #     response = self.client.post("/query_course",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)                     
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.c1.CID} cannot be query'
-    #     })
+    def test_query_course_missing_cid(self):
+        request_body = {
+            'id': 1,
+            'name': self.c1.name,
+            'prerequisites': self.c1.prerequisites,
+            'trainers': self.c1.trainers
+        }
+        # calling query_course function via flask route
+        response = self.client.post("/query_course",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)                     
+        self.assertEqual(response.json, {
+            'message' : f'CID is missing'
+        })
 
 
 class TestUpdateCourse(TestApp):
@@ -214,24 +214,24 @@ class TestUpdateCourse(TestApp):
 
 
     # Testing negative case where course is not in request body
-    # def test_update_course_name_not_in_request(self):
-    #     # setting course details
-    #     request_body = {
-    #         'id' : 1,
-    #         'name': 'This is a new name',
-    #         'prerequisites': self.c1.prerequisites,
-    #         'trainers': self.c1.trainers,
-    #     }
+    def test_update_course_name_missing_cid(self):
+        # setting course details
+        request_body = {
+            'id' : 1,
+            'name': 'This is a new name',
+            'prerequisites': self.c1.prerequisites,
+            'trainers': self.c1.trainers,
+        }
 
-    #     # calling update_course_name function via flask route
-    #     response = self.client.post("/update_course_name",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message': f'{self.c1.CID} name is not updated'
+        # calling update_course_name function via flask route
+        response = self.client.post("/update_course_name",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f'CID is missing'
             
-    #     })
+        })
 
 
     # Testing positive case where course is in database
@@ -287,23 +287,23 @@ class TestUpdateCourse(TestApp):
 
     
     # Testing negative case where course is not in request body
-    # def test_update_course_prerequisites_not_in_request(self):
+    def test_update_course_prerequisites_missing_cid(self):
         # setting course details
-        # request_body = {
-        #         'id' : 1,
-        #         'name': self.c1.name,
-        #         'prerequisites': 'IS111,IS112',
-        #         'trainers': self.c1.trainers
-        #     }
+        request_body = {
+                'id' : 1,
+                'name': self.c1.name,
+                'prerequisites': 'IS111,IS112',
+                'trainers': self.c1.trainers
+            }
 
-        # # calling update_course_name function via flask route
-        # response = self.client.post("/update_course_prerequisites",
-        #                             data=json.dumps(request_body),
-        #                             content_type='application/json')
-        # self.assertEqual(response.status_code, 500)
-        # self.assertEqual(response.json, {
-        #     'message' : f'{self.c1.CID} prerequisites is not updated'
-        # })
+        # calling update_course_name function via flask route
+        response = self.client.post("/update_course_prerequisites",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f'CID is missing'
+        })
 
 
 class TestCreateCourse(TestApp):
@@ -409,23 +409,23 @@ class TestCreateCourse(TestApp):
 
 
     # Testing negative case where name is missing in request body
-    # def test_create_course_missing_name(self):
-    #     # setting course details
-    #     request_body = {
-    #         'CID' : self.c1.CID,
-    #         'prerequisites': self.c1.prerequisites,
-    #         'trainers': self.c1.trainers
-    #     }
+    def test_create_course_missing_name(self):
+        # setting course details
+        request_body = {
+            'CID' : self.c1.CID,
+            'prerequisites': self.c1.prerequisites,
+            'trainers': self.c1.trainers
+        }
 
-    #     # calling create_course function via flask route
-    #     response = self.client.post("/create_course",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
+        # calling create_course function via flask route
+        response = self.client.post("/create_course",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
     
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message':f'{self.c1.name} is not inserted successfully into the database'
-    #     })
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message':f'Course name is not inserted successfully into the database'
+        })
 
 
     # Testing negative case where prerequisites is missing in request body
@@ -492,42 +492,42 @@ class TestDeleteCourse(TestApp):
     
 
     # Testing negative case where course is not in database
-    # def test_delete_course_not_in_database(self):
-    #     # setting course details
-    #     request_body = {
-    #         'CID': self.c2.CID,
-    #         'name': self.c2.name,
-    #         'prerequisites': self.c2.prerequisites,
-    #         'trainers': self.c2.trainers
-    #     }
+    def test_delete_course_not_in_database(self):
+        # setting course details
+        request_body = {
+            'CID': self.c2.CID,
+            'name': self.c2.name,
+            'prerequisites': self.c2.prerequisites,
+            'trainers': self.c2.trainers
+        }
 
-    #     # calling create_course function via flask route
-    #     response = self.client.post("/delete_course",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message': f'{self.c2.CID} is not deleted'
-    #     })
+        # calling create_course function via flask route
+        response = self.client.post("/delete_course",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f'{self.c2.CID} is not deleted'
+        })
 
 
     # Testing negative case where course is not in request body
-    # def test_delete_course_not_in_database(self):
-    #     # setting course details
-    #     request_body = {
-    #         'name': self.c2.name,
-    #         'prerequisites': self.c2.prerequisites,
-    #         'trainers': self.c2.trainers
-    #     }
+    def test_delete_course_missing_cid(self):
+        # setting course details
+        request_body = {
+            'name': self.c2.name,
+            'prerequisites': self.c2.prerequisites,
+            'trainers': self.c2.trainers
+        }
 
-    #     # calling create_course function via flask route
-    #     response = self.client.post("/delete_course",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message': f'{self.c2.CID} is not deleted'
-    #     })
+        # calling create_course function via flask route
+        response = self.client.post("/delete_course",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f'CID is missing'
+        })
 ### COURSE TEST CASES ###
 
 if __name__ == '__main__':
