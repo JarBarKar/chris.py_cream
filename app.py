@@ -180,6 +180,46 @@ class Trainer(db.Model):
 ### Trainer Class ###
 
 
+### Section_content Class ###
+class Section_content(db.Model):
+    __tablename__ = 'section_content'
+    SID = db.Column(db.String(64), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    content_name = db.Column(db.String(64), primary_key=True)
+    QID = db.Column(db.Integer(), nullable=True)
+    content_type = db.Column(db.String(64), nullable=False)
+    link = db.Column(db.String(64), nullable=False)
+
+    
+
+
+    def __init__(self, SID, CID, QID, content_name, content_type, link):
+        self.SID = SID
+        self.CID = CID
+        self.QID = QID
+        self.content_type = content_type
+        self.content_name = content_name
+        self.link = link
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"SID": self.SID, "CID": self.CID, "QID": self.QID, "content_type": self.content_type ,"content_name": self.content_name, "link": self.link}
+### Section_content Class ###
+
+
+
+
 ### Start of API points for Course CRUD ###
 @app.route("/view_courses", methods=['GET'])
 #view all courses
@@ -527,13 +567,25 @@ def hr_reject_signup():
 def hr_assign_trainer():
     data = request.get_json()
     try:
-        course = Course.query.filter_by(CID = data['CID']).first()
-        course.trainer = course.trainer +','+ data['TID']
+        course = db.session.query(Course).get(data['CID'])
+        if len(course.trainers) == 0:
+            course.trainers = data['TID']
+        else:
+            current_trainer = course.trainers.split(',')
+            if data['TID'] not in current_trainer:
+                course.trainers = course.trainers +','+ data['TID']
+            else:
+                return jsonify(
+                {
+                    "message": f"Trainers {data['TID']} is already in database"
+                }
+            ), 500
+            
         db.session.commit()
         return jsonify(
         {
-            "message": f"Trainers {data['TID']} has been updated successfully in the database",
-            "data": course.to_dict()
+           "message": f"Trainers {data['TID']} has been updated successfully in the database",
+           "data": course.to_dict()
         }
         ), 200
     except Exception as e:
@@ -674,6 +726,144 @@ def delete_section():
     ), 500
 ### End of API points for Section CRUD ###
 
+### Start of API point for material CRUD ###
+#create section material
+@app.route("/create_material", methods=['POST'])
+def create_material():
+    data = request.get_json()
+    expected=["SID", "CID", "QID", "content_name", "content_type", "link"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section content {not_present} is not present, section content is not inserted successfully into the database"
+            }
+        ), 500
+    try:
+        section_content = Section_content(SID=data["SID"], CID=data["CID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
+        db.session.add(section_content)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Section {data['content_name']} has been inserted successfully into the database",
+                "data": section_content.to_dict()
+            }
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Section {data['content_name']} is not inserted successfully into the database"
+        }
+    ), 500
+
+#read section content
+@app.route("/view_section_content", methods=['POST'])
+#view all sections by using SID, CID
+def view_section_content():
+    data = request.get_json()
+    expected=["SID", "CID"]
+    not_present=list()
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section content {not_present} is not present, no section content is retrieved from database"
+            }
+        ), 500
+    retrieved_section_content = Section_content.query.filter_by(SID = data['SID'], CID = data['CID'])
+    section_contents = [section_content.to_dict() for section_content in retrieved_section_content]
+    if section_contents:
+        return jsonify(
+            {
+                "message": f"All sections content are retrieved for section {data['CID'], ' ', data['SID']}",
+                "data": section_contents
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no section content retrieved"
+        }
+    ), 500
+
+#update section content
+@app.route("/update_section_content", methods=['POST'])
+def update_section_content():
+    data = request.get_json()
+    expected=["old_SID", "old_CID", "old_QID", "old_content_name", "old_content_type", "old_link"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section content {not_present} is not present, section content is not inserted successfully into the database"
+            }
+        ), 500
+    potential_changes=["SID", "CID", "QID", "content_name", "content_type", "link"]
+    for change in potential_changes:
+        if change not in data.key():
+            data[change] = data[str('old_'+change)]
+    try:
+        section_content = Section_content(SID=data["SID"], CID=data["CID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
+        db.session.add(section_content)
+        db.session.commit()
+        Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], content_name = data["old_content_name"]).delete()
+        db.session.commit()
+        return jsonify(
+        {
+            "message": f"Section content {data['old_CID'], data['old_SID'], data['content_name']}'s details have been updated successfully in the database",
+            "data": section_content.to_dict()
+        }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Section {data['old_CID'], data['old_SID'], data['content_name']} is not updated"
+        }
+    ), 500
+
+
+#delete section content
+@app.route("/delete_section_content", methods=['POST'])
+def delete_section_content():
+    data = request.get_json()
+    expected=["SID", "CID", "content_name"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section content {not_present} is not present, section content is not successfully deleted"
+            }
+        ), 500
+    try:
+        Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], content_name = data["content_name"]).delete()
+        db.session.commit()
+        return jsonify(
+        {
+            "message": f"Section content { data['CID'], data['SID'], data['content_name']} has been deleted successfully from the database"
+        }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Section {data['CID'], data['SID'], data['content_name']} is not deleted"
+        }
+    ), 500
+
+### End of API points for Material CRUD ###
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
