@@ -440,6 +440,18 @@ def delete_course():
 @app.route("/engineer_signup", methods=['POST'])
 def engineer_signup():
     data = request.get_json()
+    expected=["EID", "CID", "SID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Enrollment {not_present} is not present,  engineer is not enrolled"
+            }
+        ), 500
     try:
         enrollment = Enrollment(EID = data['EID'], SID = data['SID'], CID = data['CID'])
         db.session.add(enrollment)
@@ -480,6 +492,18 @@ def hr_view_signup():
 @app.route("/hr_assign_engineer", methods=['POST'])
 def hr_assign_engineer():
     data = request.get_json()
+    expected=["EID", "CID", "SID", "QID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"academic record {not_present} is not present,  engineer is not assigned"
+            }
+        ), 500
     try:
         academic_record = Academic_record(EID = data["EID"], SID = data["SID"], CID = data["CID"], QID = data["QID"], status = "ongoing", quiz_result = 0)
         db.session.add(academic_record)
@@ -502,7 +526,18 @@ def hr_assign_engineer():
 @app.route("/hr_withdraw_engineer", methods=['POST'])
 def hr_withdraw_engineer():
     data = request.get_json()
-    
+    expected=["EID", "CID", "SID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"academic_record {not_present} is not present,  engineer is not withdrawn"
+            }
+        ), 500
     try:
         Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
         db.session.commit()
@@ -522,6 +557,18 @@ def hr_withdraw_engineer():
 @app.route("/hr_approve_signup", methods=['POST'])
 def hr_approve_signup():
     data = request.get_json()
+    expected=["EID", "CID", "SID", "QID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Academic record {not_present} is not present,  engineer is not enrolled"
+            }
+        ), 500
     try:
         academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
         Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
@@ -545,6 +592,18 @@ def hr_approve_signup():
 @app.route("/hr_reject_signup", methods=['POST'])
 def hr_reject_signup():
     data = request.get_json()
+    expected=["EID", "CID", "SID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Academic record {not_present} is not present, signup is not rejected"
+            }
+        ), 500
     try:
         Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
         db.session.commit()
@@ -566,6 +625,18 @@ def hr_reject_signup():
 @app.route("/hr_assign_trainer", methods=['POST'])
 def hr_assign_trainer():
     data = request.get_json()
+    expected=["CID", "TID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.key():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Course {not_present} is not present, trainer is not assigned"
+            }
+        ), 500
     try:
         course = db.session.query(Course).get(data['CID'])
         if len(course.trainers) == 0:
