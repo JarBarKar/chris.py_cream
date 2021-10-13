@@ -62,82 +62,25 @@ class TestEngineerSignup(TestApp):
                 }
                 ,
             'message' : f'{self.er1.EID} engineer has been updated successfully in the database'
-            })
-
-
-    # # Testing negative case where all details are present in request body but EID is empty
-    # def test_engineer_signup_all_details_eid_empty(self):
-    #     # creating request body for signup details
-    #     request_body = {
-    #         'EID': '',
-    #         'SID': self.er1.SID,
-    #         'CID': self.er1.CID
-    #     }
-        
-    #     # calling engineer_signup function via flask route
-    #     response = self.client.post("/engineer_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.er1.EID} engineer is not updated'
-    #         })    
-    
-
-    # # Testing negative case where all details are present in request body but SID is empty
-    # def test_engineer_signup_all_details_sid_empty(self):
-    #     # creating request body for signup details
-    #     request_body = {
-    #         'EID': self.er1.EID,
-    #         'SID': '',
-    #         'CID': self.er1.CID
-    #     }
-        
-    #     # calling engineer_signup function via flask route
-    #     response = self.client.post("/engineer_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.er1.EID} engineer is not updated'
-    #         }) 
-
-     
-    # # Testing negative case where all details are present in request body but CID is empty
-    # def test_engineer_signup_all_details_cid_empty(self):
-    #     # creating request body for signup details
-    #     request_body = {
-    #         'EID': self.er1.EID,
-    #         'SID': self.er1.SID,
-    #         'CID': ''
-    #     }
-        
-    #     # calling engineer_signup function via flask route
-    #     response = self.client.post("/engineer_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.er1.EID} engineer is not updated'
-    #         })  
+            }) 
 
 
     # Testing negative case where EID is missing in request body
-    # def test_engineer_signup_eid_missing(self):
-    #     # creating request body for signup details
-    #     request_body = {
-    #         'SID': self.er1.SID,
-    #         'CID': self.er1.CID,
-    #     }
+    def test_engineer_signup_eid_missing(self):
+        # creating request body for signup details
+        request_body = {
+            'SID': self.er1.SID,
+            'CID': self.er1.CID,
+        }
         
-    #     # calling engineer_signup function via flask route
-    #     response = self.client.post("/engineer_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.er1.EID} engineer is not updated'
-    #         })
+        # calling engineer_signup function via flask route
+        response = self.client.post("/engineer_signup",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f"Enrollment ['EID'] is not present,  engineer is not enrolled"
+            })
 
 
     # Testing negative case where SID is missing in request body
@@ -154,7 +97,7 @@ class TestEngineerSignup(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f'{self.er1.EID} engineer is not updated'
+            'message' : f"Enrollment ['SID'] is not present,  engineer is not enrolled"
             })
 
 
@@ -172,7 +115,7 @@ class TestEngineerSignup(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f'{self.er1.EID} engineer is not updated'
+            'message' : f"Enrollment ['CID'] is not present,  engineer is not enrolled"
             })
     
 
@@ -270,97 +213,28 @@ class TestHRAssignEngineer(TestApp):
                 },
             'message' : f'{self.cd1.EID} has been inserted successfully into the course details'
             })
-    
 
-    # # Testing negative case where all details are present in request body, but EID is empty
-    # def test_hr_assign_engineer_all_details_eid_empty(self):
-    #     # creating request body for assignment details
-    #     request_body = {
-    #         'EID': '',
-    #         'SID': self.cd1.SID,
-    #         'CID': self.cd1.CID,
-    #         'QID': self.cd1.QID,
-    #         'status': self.cd1.status,
-    #         'quiz_result': self.cd1.quiz_result
-    #     }
 
-    #     # calling hr_assign_engineer function via flask route
-    #     response = self.client.post("/hr_assign_engineer",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
+    # Testing negative case where EID missing in request body
+    def test_hr_assign_engineer_missing_eid(self):
+        # creating request body for assignment details
+        request_body = {
+            'SID': self.cd1.SID,
+            'CID': self.cd1.CID,
+            'QID': self.cd1.QID,
+            'status': self.cd1.status,
+            'quiz_result': self.cd1.quiz_result
+        }
+
+        # calling hr_assign_engineer function via flask route
+        response = self.client.post("/hr_assign_engineer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
         
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd1.EID} is not inserted successfully into the course details'
-    #         })
-
-
-    # # Testing negative case where all details are present in request body, but SID is empty
-    # def test_hr_assign_engineer_all_details_sid_empty(self):
-    #     # creating request body for assignment details
-    #     request_body = {
-    #         'EID': self.cd1.EID,
-    #         'SID': '',
-    #         'CID': self.cd1.CID,
-    #         'QID': self.cd1.QID,
-    #         'status': self.cd1.status,
-    #         'quiz_result': self.cd1.quiz_result
-    #     }
-
-    #     # calling hr_assign_engineer function via flask route
-    #     response = self.client.post("/hr_assign_engineer",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-        
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd1.EID} is not inserted successfully into the course details'
-    #         })
-    
-
-    # # Testing negative case where all details are present in request body, but CID is empty
-    # def test_hr_assign_engineer_all_details_cid_empty(self):
-    #     # creating request body for assignment details
-    #     request_body = {
-    #         'EID': self.cd1.EID,
-    #         'SID': self.cd1.SID,
-    #         'CID': '',
-    #         'QID': self.cd1.QID,
-    #         'status': self.cd1.status,
-    #         'quiz_result': self.cd1.quiz_result
-    #     }
-
-    #     # calling hr_assign_engineer function via flask route
-    #     response = self.client.post("/hr_assign_engineer",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-        
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd1.EID} is not inserted successfully into the course details'
-    #         })
-
-
-    # # Testing negative case where EID missing in request body
-    # def test_hr_assign_engineer_missing_eid(self):
-    #     # creating request body for assignment details
-    #     request_body = {
-    #         'SID': self.cd1.SID,
-    #         'CID': self.cd1.CID,
-    #         'QID': self.cd1.QID,
-    #         'status': self.cd1.status,
-    #         'quiz_result': self.cd1.quiz_result
-    #     }
-
-    #     # calling hr_assign_engineer function via flask route
-    #     response = self.client.post("/hr_assign_engineer",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-        
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd1.EID} is not inserted successfully into the course details'
-    #         })
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f"academic record ['EID'] is not present,  engineer is not assigned"
+            })
 
 
 class TestHRWithdrawEngineer(TestApp):
@@ -415,25 +289,25 @@ class TestHRWithdrawEngineer(TestApp):
 
 
     # Testing negative case where EID missing
-    # def test_hr_withdraw_engineer_missing_eid(self):
-    #     # creating request body for withdraw details
-    #     request_body = {
-    #         'SID': self.cd2.SID,
-    #         'CID': self.cd2.CID,
-    #         'QID': self.cd2.QID,
-    #         'status': self.cd2.status,
-    #         'quiz_result': self.cd2.quiz_result
-    #     }
+    def test_hr_withdraw_engineer_missing_eid(self):
+        # creating request body for withdraw details
+        request_body = {
+            'SID': self.cd2.SID,
+            'CID': self.cd2.CID,
+            'QID': self.cd2.QID,
+            'status': self.cd2.status,
+            'quiz_result': self.cd2.quiz_result
+        }
 
-    #     # calling hr_withdraw_engineer function via flask route
-    #     response = self.client.post("/hr_withdraw_engineer",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
+        # calling hr_withdraw_engineer function via flask route
+        response = self.client.post("/hr_withdraw_engineer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
         
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd2.EID} is not deleted'
-    #         })
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f"academic_record ['EID'] is not present,  engineer is not withdrawn"
+            })
 
 
     # Testing negative case where CID missing
@@ -454,7 +328,7 @@ class TestHRWithdrawEngineer(TestApp):
         
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f'{self.cd2.EID} is not deleted'
+            'message' : f"academic_record ['CID'] is not present,  engineer is not withdrawn"
             })
 
 
@@ -517,28 +391,28 @@ class TestHRApproveSignup(TestApp):
 
 
     # Testing negative case where EID is missing 
-    # def test_hr_approve_signup_missing_eid(self):
-    #     # adding dummy enrollment into database
-    #     db.session.add(self.er1)
-    #     db.session.commit
+    def test_hr_approve_signup_missing_eid(self):
+        # adding dummy enrollment into database
+        db.session.add(self.er1)
+        db.session.commit
 
-    #     # creating request body for course details
-    #     request_body = {
-    #         'SID': self.cd1.SID,
-    #         'CID': self.cd1.CID,
-    #         'QID': self.cd1.QID,
-    #         'status': self.cd1.status,
-    #         'quiz_result': self.cd1.quiz_result
-    #     }
+        # creating request body for course details
+        request_body = {
+            'SID': self.cd1.SID,
+            'CID': self.cd1.CID,
+            'QID': self.cd1.QID,
+            'status': self.cd1.status,
+            'quiz_result': self.cd1.quiz_result
+        }
 
-    #     # calling hr_approve_signup function via flask route
-    #     response = self.client.post("/hr_approve_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd1.EID} prerequisites is not moved successfully'
-    #         })
+        # calling hr_approve_signup function via flask route
+        response = self.client.post("/hr_approve_signup",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f"Academic record ['EID'] is not present,  engineer is not enrolled"
+            })
 
 
     
@@ -591,60 +465,60 @@ class TestHRRejectSignup(TestApp):
 
 
     # Testing negative case where EID is missing
-    # def test_hr_reject_signup_not_in_database(self):
-    #     # adding dummy enrollment into database
-    #     db.session.add(self.er2)
-    #     db.session.commit()
+    def test_hr_reject_signup_missing_eid(self):
+        # adding dummy enrollment into database
+        db.session.add(self.er2)
+        db.session.commit()
 
-    #     # creating request body for course details
-    #     request_body = {
+        # creating request body for course details
+        request_body = {
    
-    #         'SID': self.er2.SID,
-    #         'CID': self.er2.CID,
-    #     }
+            'SID': self.er2.SID,
+            'CID': self.er2.CID,
+        }
 
-    #     # calling hr_reject_signup function via flask route
-    #     response = self.client.post("/hr_reject_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
+        # calling hr_reject_signup function via flask route
+        response = self.client.post("/hr_reject_signup",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
 
-    #         'message' : f'{self.er2.EID} is not deleted'
+            'message' : f"Academic record ['EID'] is not present, signup is not rejected"
             
-    #         })
+            })
 
 
-# class TestHRAssignTrainer(TestApp):
-#     def test_hr_assign_trainer(self):
-#         # adding dummy course into database
-#         db.session.add(self.c2)
-#         db.session.commit()
+class TestHRAssignTrainer(TestApp):
+    def test_hr_assign_trainer(self):
+        # adding dummy course into database
+        db.session.add(self.c2)
+        db.session.commit()
 
-#         # creating request body for course 
-#         request_body = {
-#             'CID' : self.c2.CID, 
-#             'name' : self.c2.name, 
-#             'prerequisites' : self.c2.prerequisites, 
-#             'TID' : '12,14'
-#         }
+        # creating request body for course 
+        request_body = {
+            'CID' : self.c2.CID, 
+            'name' : self.c2.name, 
+            'prerequisites' : self.c2.prerequisites, 
+            'TID' : '12,14'
+        }
 
-#         # calling hr_assign_trainer function via flask route
-#         response = self.client.post("/hr_assign_trainer",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         # self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.json, {
-#             'data' : 
-#                 {
-#                 'CID': 'IS600',
-#                 'name' : 'Super Hard Mod',
-#                 'prerequisites': 'IS500',
-#                 'trainers': '12,14'
-#                 },
-#             'message' : f'Trainers 12,14 has been updated successfully in the database'
+        # calling hr_assign_trainer function via flask route
+        response = self.client.post("/hr_assign_trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' : 
+                {
+                'CID': 'IS600',
+                'name' : 'Super Hard Mod',
+                'prerequisites': 'IS500',
+                'trainers': '12,14'
+                },
+            'message' : f'Trainers 12,14 has been updated successfully in the database'
             
-#             })
+            })
 
 
 ### Registration TEST CASES ###
