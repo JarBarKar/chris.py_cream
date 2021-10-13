@@ -539,13 +539,20 @@ def hr_withdraw_engineer():
             }
         ), 500
     try:
-        Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
-        db.session.commit()
-        return jsonify(
-            {
-                "message": f"{data['EID']} has been deleted successfully from course details",
-            }
-        ), 200
+        exist = (Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).first() != None)
+        if exist:
+            Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
+            db.session.commit()
+            return jsonify(
+                {
+                    "message": f"{data['EID']} has been deleted successfully from course details",
+                }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "message": f"academic_record {data['EID']} is not present in database,  engineer is not withdrawn",
+                }), 500
     except Exception as e:
         return jsonify(
         {
