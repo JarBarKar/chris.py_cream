@@ -444,7 +444,7 @@ def engineer_signup():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -496,7 +496,7 @@ def hr_assign_engineer():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -530,7 +530,7 @@ def hr_withdraw_engineer():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -561,7 +561,7 @@ def hr_approve_signup():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -596,7 +596,7 @@ def hr_reject_signup():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -629,7 +629,7 @@ def hr_assign_trainer():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -806,7 +806,7 @@ def create_material():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -840,7 +840,7 @@ def view_section_content():
     expected=["SID", "CID"]
     not_present=list()
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -871,7 +871,7 @@ def update_section_content():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
@@ -881,7 +881,7 @@ def update_section_content():
         ), 500
     potential_changes=["SID", "CID", "QID", "content_name", "content_type", "link"]
     for change in potential_changes:
-        if change not in data.key():
+        if change not in data.keys():
             data[change] = data[str('old_'+change)]
     try:
         section_content = Section_content(SID=data["SID"], CID=data["CID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
@@ -911,7 +911,7 @@ def delete_section_content():
     not_present=list()
     #check input
     for expect in expected:
-        if expect not in data.key():
+        if expect not in data.keys():
             not_present.append(expect)
     if len(not_present)>0:
         return jsonify(
