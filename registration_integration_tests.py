@@ -266,26 +266,26 @@ class TestHRWithdrawEngineer(TestApp):
     
 
     # Testing negative case where course detail is not in database
-    # def test_hr_withdraw_engineer_not_in_database(self):
-    #     # creating request body for withdraw details
-    #     request_body = {
-    #         'EID': self.cd2.EID,
-    #         'SID': self.cd2.SID,
-    #         'CID': self.cd2.CID,
-    #         'QID': self.cd2.QID,
-    #         'status': self.cd2.status,
-    #         'quiz_result': self.cd2.quiz_result
-    #     }
+    def test_hr_withdraw_engineer_not_in_database(self):
+        # creating request body for withdraw details
+        request_body = {
+            'EID': self.cd2.EID,
+            'SID': self.cd2.SID,
+            'CID': self.cd2.CID,
+            'QID': self.cd2.QID,
+            'status': self.cd2.status,
+            'quiz_result': self.cd2.quiz_result
+        }
 
-    #     # calling hr_withdraw_engineer function via flask route
-    #     response = self.client.post("/hr_withdraw_engineer",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
+        # calling hr_withdraw_engineer function via flask route
+        response = self.client.post("/hr_withdraw_engineer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
         
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd2.EID} is not deleted'
-    #         })
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f'academic_record {self.cd2.EID} is not present in database, engineer is not withdrawn'
+            })
 
 
     # Testing negative case where EID missing
@@ -306,7 +306,7 @@ class TestHRWithdrawEngineer(TestApp):
         
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f"academic_record ['EID'] is not present,  engineer is not withdrawn"
+            'message' : f"academic_record ['EID'] is not present, engineer is not withdrawn"
             })
 
 
@@ -328,7 +328,7 @@ class TestHRWithdrawEngineer(TestApp):
         
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f"academic_record ['CID'] is not present,  engineer is not withdrawn"
+            'message' : f"academic_record ['CID'] is not present, engineer is not withdrawn"
             })
 
 
@@ -369,25 +369,25 @@ class TestHRApproveSignup(TestApp):
     
 
     # Testing negative case where enrollment detail is not in database
-    # def test_hr_approve_signup_not_in_database(self):
-    #     # creating request body for course details
-    #     request_body = {
-    #         'EID': self.cd1.EID,
-    #         'SID': self.cd1.SID,
-    #         'CID': self.cd1.CID,
-    #         'QID': self.cd1.QID,
-    #         'status': self.cd1.status,
-    #         'quiz_result': self.cd1.quiz_result
-    #     }
+    def test_hr_approve_signup_not_in_database(self):
+        # creating request body for course details
+        request_body = {
+            'EID': self.cd1.EID,
+            'SID': self.cd1.SID,
+            'CID': self.cd1.CID,
+            'QID': self.cd1.QID,
+            'status': self.cd1.status,
+            'quiz_result': self.cd1.quiz_result
+        }
 
-    #     # calling hr_approve_signup function via flask route
-    #     response = self.client.post("/hr_approve_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         'message' : f'{self.cd1.EID} prerequisites is not moved successfully'
-    #         })
+        # calling hr_approve_signup function via flask route
+        response = self.client.post("/hr_approve_signup",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : f'Academic record {self.cd1.EID} is not present, engineer is not enrolled'
+            })
 
 
     # Testing negative case where EID is missing 
@@ -411,7 +411,7 @@ class TestHRApproveSignup(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f"Academic record ['EID'] is not present,  engineer is not enrolled"
+            'message' : f"Academic record ['EID'] is not present, engineer is not enrolled"
             })
 
 
@@ -443,25 +443,25 @@ class TestHRRejectSignup(TestApp):
 
 
     # Testing negative case where enrollment detail is not in database
-    # def test_hr_reject_signup_not_in_database(self):
+    def test_hr_reject_signup_not_in_database(self):
 
-    #     # creating request body for course details
-    #     request_body = {
-    #         'EID': self.er2.EID,
-    #         'SID': self.er2.SID,
-    #         'CID': self.er2.CID,
-    #     }
+        #creating request body for course details
+        request_body = {
+            'EID': self.er2.EID,
+            'SID': self.er2.SID,
+            'CID': self.er2.CID,
+        }
 
-    #     # calling hr_reject_signup function via flask route
-    #     response = self.client.post("/hr_reject_signup",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
+        # calling hr_reject_signup function via flask route
+        response = self.client.post("/hr_reject_signup",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
 
-    #         'message' : f'{self.er2.EID} is not deleted'
+            'message' : f'Enrollment {self.er2.EID} is not present in database,  engineer is not rejected'
             
-    #         })
+            })
 
 
     # Testing negative case where EID is missing

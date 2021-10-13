@@ -535,7 +535,7 @@ def hr_withdraw_engineer():
     if len(not_present)>0:
         return jsonify(
             {
-                "message": f"academic_record {not_present} is not present,  engineer is not withdrawn"
+                "message": f"academic_record {not_present} is not present, engineer is not withdrawn"
             }
         ), 500
     try:
@@ -551,7 +551,7 @@ def hr_withdraw_engineer():
         else:
             return jsonify(
                 {
-                    "message": f"academic_record {data['EID']} is not present in database,  engineer is not withdrawn",
+                    "message": f"academic_record {data['EID']} is not present in database, engineer is not withdrawn",
                 }), 500
     except Exception as e:
         return jsonify(
@@ -573,20 +573,28 @@ def hr_approve_signup():
     if len(not_present)>0:
         return jsonify(
             {
-                "message": f"Academic record {not_present} is not present,  engineer is not enrolled"
+                "message": f"Academic record {not_present} is not present, engineer is not enrolled"
             }
         ), 500
     try:
-        academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
-        Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
-        db.session.add(academic_record)
-        db.session.commit()
-        return jsonify(
-        {
-            "message": f"{data['EID']} prerequisites has been moved successfully from Enrollment to academic_record",
-            "data": academic_record.to_dict()
-        }
-        ), 200
+        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).first() != None)
+        if exist:
+            academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
+            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
+            db.session.add(academic_record)
+            db.session.commit()
+            return jsonify(
+                {
+                    "message": f"{data['EID']} prerequisites has been moved successfully from Enrollment to academic_record",
+                    "data": academic_record.to_dict()
+                }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "message": f"Academic record {data['EID']} is not present, engineer is not enrolled",
+                }), 500
+
     except Exception as e:
         return jsonify(
         {
@@ -612,14 +620,20 @@ def hr_reject_signup():
             }
         ), 500
     try:
-        Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
-        db.session.commit()
-        return jsonify(
-        {
-            "message": f"{data['EID']} has been deleted successfully from Enrollment"
-        }
-        ), 200
-
+        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).first() != None)
+        if exist :
+            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"{data['EID']} has been deleted successfully from Enrollment"
+            }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "message": f"Enrollment {data['EID']} is not present in database,  engineer is not rejected",
+                }), 500
     except Exception as e:
         return jsonify(
         {
