@@ -253,5 +253,30 @@ INSERT INTO `enrollment` (`EID`,`SID`, `CID`) VALUES
 
 -- --------------------------------------------------------
 
+--
+-- Table structure for table `lesson`
+--
+
+DROP TABLE IF EXISTS `lesson`;
+CREATE TABLE IF NOT EXISTS `lesson` (
+  `LID` varchar(64) NOT NULL,
+  `CID` varchar(64) NOT NULL,
+  `SID` varchar(64) NOT NULL, 
+  constraint `lesson_fk1` foreign key(`CID`,`SID`) references `section`(`CID`,`SID`),
+  PRIMARY KEY (`LID`, `CID`, `SID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `lesson`
+--
+
+INSERT INTO `lesson` (`LID`,`CID`,`SID`) VALUES
+('1', 'IS111', 'G1'),
+('2', 'IS111', 'G1'),
+('1', 'IS112', 'G2')
+;
+
+-- --------------------------------------------------------
+
 
 
