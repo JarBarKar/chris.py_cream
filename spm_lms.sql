@@ -68,7 +68,6 @@ CREATE TABLE IF NOT EXISTS `course` (
   `CID` varchar(64) NOT NULL,
   `name` varchar(64) NOT NULL,
   `prerequisites` varchar(64) NOT NULL,
-  `trainers` varchar(64) NOT NULL,
   PRIMARY KEY (`CID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -76,62 +75,66 @@ CREATE TABLE IF NOT EXISTS `course` (
 -- Dumping data for table `course`
 --
 
-INSERT INTO `course` (`CID`,`name`, `prerequisites`, `trainers`) VALUES
-('IS111', 'Intro to Prog', '', '1,2'),
-('IS112', 'Data Management', '', '3'),
-('IS113', 'WAD 1', 'IS111', ''),
-('IS216', 'WAD 2', 'IS111, IS113', '')
+INSERT INTO `course` (`CID`,`name`, `prerequisites`) VALUES
+('IS111', 'Intro to Prog', ''),
+('IS112', 'Data Management', ''),
+('IS113', 'WAD 1', 'IS111'),
+('IS216', 'WAD 2', 'IS111, IS113')
 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `quiz`
+-- Table structure for table `graded_quiz`
 --
 
-DROP TABLE IF EXISTS `quiz`;
-CREATE TABLE IF NOT EXISTS `quiz` (
-  `QID` int(10) NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `graded_quiz`;
+CREATE TABLE IF NOT EXISTS `graded_quiz` (
   `CID` varchar(64) NOT NULL,
-  PRIMARY KEY (`QID`, `CID`),
-  constraint `quiz_fk1` foreign key(`CID`) references `course`(`CID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `quiz`
---
-
-INSERT INTO `quiz` (`CID`) VALUES
-('IS111'),
-('IS112'),
-('IS113'),
-('IS216')
-;
-
--- --------------------------------------------------------
---
--- Table structure for table `quiz_questions`
---
-
-DROP TABLE IF EXISTS `quiz_questions`;
-CREATE TABLE IF NOT EXISTS `quiz_questions` (
-  `QID` int(64) NOT NULL,
-  `question_number` int(64) NOT NULL,
-  `question_description` varchar(64) NOT NULL,
-  `options` varchar (64) NOT NUll,
+  `LID` int(10) NOT NULL,
+  `SID` varchar(64) NOT NULL,
+  `question` varchar(1000) NOT NULL,
   `answer` varchar(64) NOT NULL,
-  PRIMARY KEY (`QID`, `question_number`),
-  constraint `quiz_questions_fk1` foreign key(`QID`) references `quiz`(`QID`)
+  `options` varchar(1000) NOT NULL,
+  PRIMARY KEY (`CID`, `LID`, `SID`, `question`),
+ 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `quiz_questions`
+-- Dumping data for table `graded_quiz`
 --
 
-INSERT INTO `quiz_questions` (`QID`,`question_number`, `question_description`, `options`, `answer`) VALUES
-(001, 001 , 'Is the Earth round?', 'yes,no', 'yes'),
-(001, 002 , 'Is SPM hard?', 'yes,no', 'yes'),
-(002, 001 , 'What is my favourite food?', 'chicken rice,noodles,nothing', 'nothing')
+INSERT INTO `graded_quiz` (`CID`, `LID`, `SID`, `question`, `answer`, `options`) VALUES
+('SPACE CLASS', 1, 'G2', 'Is the moon round?', 'YES', 'YES|NO' ),
+('SPACE CLASS', 2, 'G2', 'Is the sun round?', 'YES', 'YES|NO' ),
+('SPACE CLASS', 3, 'G2', 'Which of these is not a planet ?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS' ),
+;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ungraded_quiz`
+--
+
+DROP TABLE IF EXISTS `ungraded_quiz`;
+CREATE TABLE IF NOT EXISTS `ungraded_quiz` (
+  `CID` varchar(64) NOT NULL,
+  `LID` int(10) NOT NULL,
+  `SID` varchar(64) NOT NULL,
+  `question` varchar(1000) NOT NULL,
+  `answer` varchar(64) NOT NULL,
+  `options` varchar(1000) NOT NULL,
+  PRIMARY KEY (`CID`, `LID`, `SID`, `question`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `ungraded_quiz`
+--
+
+INSERT INTO `ungraded_quiz` (`CID`, `LID`, `SID`, `question`, `answer`, `options`) VALUES
+('SPACE CLASS', 1, 'G2', 'Is the moon round?', 'YES', 'YES|NO' ),
+('SPACE CLASS', 1, 'G2', 'Is the sun round?', 'YES', 'YES|NO' ),
+('SPACE CLASS', 1, 'G2', 'Which of these is not a planet?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS' ),
 ;
 
 -- --------------------------------------------------------
