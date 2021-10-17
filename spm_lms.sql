@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `course` (
   `CID` varchar(64) NOT NULL,
   `name` varchar(64) NOT NULL,
   `prerequisites` varchar(64) NOT NULL,
+  `trainers` varchar(64) NULL,
   PRIMARY KEY (`CID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -75,11 +76,11 @@ CREATE TABLE IF NOT EXISTS `course` (
 -- Dumping data for table `course`
 --
 
-INSERT INTO `course` (`CID`,`name`, `prerequisites`) VALUES
-('IS111', 'Intro to Prog', ''),
-('IS112', 'Data Management', ''),
-('IS113', 'WAD 1', 'IS111'),
-('IS216', 'WAD 2', 'IS111, IS113')
+INSERT INTO `course` (`CID`,`name`, `prerequisites`, `trainers`) VALUES
+('IS111', 'Intro to Prog', '', ''),
+('IS112', 'Data Management', '', ''),
+('IS113', 'WAD 1', 'IS111', ''),
+('IS216', 'WAD 2', 'IS111, IS113', '')
 ;
 
 -- --------------------------------------------------------
