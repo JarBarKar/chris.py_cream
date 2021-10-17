@@ -1184,7 +1184,7 @@ def create_lesson():
 
 
 ### End of API point for lesson CRUD ###
-=======
+
 ### Start of API points for Ungraded Quiz CRUD ###
 #create ungraded quiz and add it in the ungraded quiz table
 @app.route("/create_ungraded_quiz_question", methods=['POST'])
