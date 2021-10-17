@@ -15,9 +15,9 @@ class TestApp(flask_testing.TestCase):
 
 
     def setUp(self):
-        self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='', trainers='')
-        self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500', trainers='')
-        self.c3 = Course(CID='IS700', name='Super Super Hard Mod', prerequisites='IS500,IS600', trainers='ali,baba')
+        self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='')
+        self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500')
+        self.c3 = Course(CID='IS700', name='Super Super Hard Mod', prerequisites='IS500,IS600')
         
         db.create_all()
 
@@ -55,8 +55,7 @@ class TestViewCourses(TestApp):
                 {
                 'CID': 'IS500',
                 'name': 'Super Mod',
-                'prerequisites': '',
-                'trainers': ''
+                'prerequisites': ''
                 }
             ],
             'message' : 'All courses are retrieved'
@@ -78,14 +77,12 @@ class TestViewCourses(TestApp):
                 {
                 'CID': 'IS500',
                 'name': 'Super Mod',
-                'prerequisites': '',
-                'trainers': ''
+                'prerequisites': ''
                 },
                 {
                 'CID': 'IS600',
                 'name': 'Super Hard Mod',
-                'prerequisites': 'IS500',
-                'trainers': ''
+                'prerequisites': 'IS500'
                 }],
             'message' : 'All courses are retrieved'
             })
@@ -101,8 +98,7 @@ class TestViewCourses(TestApp):
             'id': 1,
             'CID': self.c1.CID,
             'name': self.c1.name,
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers
+            'prerequisites': self.c1.prerequisites
         }
         # calling query_course function via flask route
         response = self.client.post("/query_course",
@@ -113,8 +109,7 @@ class TestViewCourses(TestApp):
             'data': {
                 'CID': 'IS500',
                 'name': 'Super Mod',
-                'prerequisites': '',
-                'trainers': ''
+                'prerequisites': ''
             },
             'message' : 'IS500 has been query successfully from the database'
         })
@@ -126,8 +121,7 @@ class TestViewCourses(TestApp):
             'id': 1,
             'CID': self.c1.CID,
             'name': self.c1.name,
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers
+            'prerequisites': self.c1.prerequisites
         }
         # calling query_course function via flask route
         response = self.client.post("/query_course",
@@ -144,8 +138,7 @@ class TestViewCourses(TestApp):
         request_body = {
             'id': 1,
             'name': self.c1.name,
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers
+            'prerequisites': self.c1.prerequisites
         }
         # calling query_course function via flask route
         response = self.client.post("/query_course",
@@ -169,8 +162,7 @@ class TestUpdateCourse(TestApp):
             'id' : 1,
             'CID': self.c1.CID,
             'name': 'This is a new name',
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers,
+            'prerequisites': self.c1.prerequisites
         }
 
         # calling update_course_name function via flask route
@@ -182,8 +174,7 @@ class TestUpdateCourse(TestApp):
             'data': {
                 'CID': 'IS500',
                 'name': 'This is a new name',
-                'prerequisites': '',
-                'trainers': '',
+                'prerequisites': ''
             },
             'message': 'IS500 name has been updated successfully in the database'
             
@@ -198,8 +189,7 @@ class TestUpdateCourse(TestApp):
             'id' : 1,
             'CID': self.c1.CID,
             'name': 'This is a new name',
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers,
+            'prerequisites': self.c1.prerequisites
         }
 
         # calling update_course_name function via flask route
@@ -219,8 +209,7 @@ class TestUpdateCourse(TestApp):
         request_body = {
             'id' : 1,
             'name': 'This is a new name',
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers,
+            'prerequisites': self.c1.prerequisites
         }
 
         # calling update_course_name function via flask route
@@ -245,8 +234,7 @@ class TestUpdateCourse(TestApp):
             'id' : 1,
             'CID': self.c1.CID,
             'name': self.c1.name,
-            'prerequisites': 'IS111,IS112',
-            'trainers': self.c1.trainers
+            'prerequisites': 'IS111,IS112'
         }
 
         # calling update_course_name function via flask route
@@ -258,8 +246,7 @@ class TestUpdateCourse(TestApp):
             'data' : {
                 'CID': 'IS500',
                 'name': 'Super Mod',
-                'prerequisites': 'IS111,IS112',
-                'trainers': ''
+                'prerequisites': 'IS111,IS112'
             },
             'message' : 'IS500 prerequisites has been updated successfully in the database'
         })
@@ -272,8 +259,7 @@ class TestUpdateCourse(TestApp):
             'id' : 1,
             'CID': self.c1.CID,
             'name': self.c1.name,
-            'prerequisites': 'IS111,IS112',
-            'trainers': self.c1.trainers
+            'prerequisites': 'IS111,IS112'
         }
 
         # calling update_course_name function via flask route
@@ -292,8 +278,7 @@ class TestUpdateCourse(TestApp):
         request_body = {
                 'id' : 1,
                 'name': self.c1.name,
-                'prerequisites': 'IS111,IS112',
-                'trainers': self.c1.trainers
+                'prerequisites': 'IS111,IS112'
             }
 
         # calling update_course_name function via flask route
@@ -313,8 +298,7 @@ class TestCreateCourse(TestApp):
         request_body = {
             'CID': self.c1.CID,
             'name': self.c1.name,
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers
+            'prerequisites': self.c1.prerequisites
         }
 
         # calling create_course function via flask route
@@ -327,8 +311,7 @@ class TestCreateCourse(TestApp):
             'data': {
                 'CID': 'IS500',
                 'name': 'Super Mod',
-                'prerequisites': '',
-                'trainers': ''
+                'prerequisites': ''
                 },
             'message':'Super Mod has been inserted successfully into the database'
         })
@@ -340,8 +323,7 @@ class TestCreateCourse(TestApp):
         request_body = {
             'CID': self.c2.CID,
             'name': self.c2.name,
-            'prerequisites': '',
-            'trainers': self.c2.trainers
+            'prerequisites': ''
         }
 
         # calling create_course function via flask route
@@ -354,38 +336,11 @@ class TestCreateCourse(TestApp):
             'data': {
                 'CID': 'IS600',
                 'name': 'Super Hard Mod',
-                'prerequisites': '',
-                'trainers': ''
+                'prerequisites': ''
                 },
             'message':f'{self.c2.name} has been inserted successfully into the database'
         })
     
-
-    # Testing positive case where all details are present in request body,but trainers is empty
-    def test_create_course_all_details_trainers_empty(self):
-        # setting course details
-        request_body = {
-            'CID': self.c3.CID,
-            'name': self.c3.name,
-            'prerequisites': self.c3.prerequisites,
-            'trainers': ''
-        }
-
-        # calling create_course function via flask route
-        response = self.client.post("/create_course",
-                                    data=json.dumps(request_body),
-                                    content_type='application/json')
-    
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {
-            'data': {
-                'CID': 'IS700',
-                'name': 'Super Super Hard Mod',
-                'prerequisites': 'IS500,IS600',
-                'trainers': ''
-                },
-            'message':f'{self.c3.name} has been inserted successfully into the database'
-        })
 
 
     # Testing negative case where CID is missing in request body
@@ -393,8 +348,7 @@ class TestCreateCourse(TestApp):
         # setting course details
         request_body = {
             'name': self.c1.name,
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers
+            'prerequisites': self.c1.prerequisites
         }
 
         # calling create_course function via flask route
@@ -413,8 +367,7 @@ class TestCreateCourse(TestApp):
         # setting course details
         request_body = {
             'CID' : self.c1.CID,
-            'prerequisites': self.c1.prerequisites,
-            'trainers': self.c1.trainers
+            'prerequisites': self.c1.prerequisites
         }
 
         # calling create_course function via flask route
@@ -433,8 +386,7 @@ class TestCreateCourse(TestApp):
         # setting course details
         request_body = {
             'CID' : self.c1.CID,
-            'name': self.c1.name,
-            'trainers': self.c1.trainers
+            'name': self.c1.name
         }
 
         # calling create_course function via flask route
@@ -447,24 +399,6 @@ class TestCreateCourse(TestApp):
             'message':f'{self.c1.name} is not inserted successfully into the database'
         })
     
-
-    # Testing negative case where trainers is missing in request body
-    def test_create_course_missing_trainers(self):
-        # setting course details
-        request_body = {
-            'CID' : self.c1.CID,
-            'name': self.c1.name,
-            'prerequisites': self.c1.prerequisites
-        }
-
-        # calling create_course function via flask route
-        response = self.client.post("/create_course",
-                                    data=json.dumps(request_body),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 500)
-        self.assertEqual(response.json, {
-            'message':f'{self.c1.name} is not inserted successfully into the database'
-        })
 
         
 class TestDeleteCourse(TestApp):
@@ -477,8 +411,7 @@ class TestDeleteCourse(TestApp):
         request_body = {
             'CID': self.c2.CID,
             'name': self.c2.name,
-            'prerequisites': self.c2.prerequisites,
-            'trainers': self.c2.trainers
+            'prerequisites': self.c2.prerequisites
         }
 
         # calling create_course function via flask route
@@ -497,8 +430,7 @@ class TestDeleteCourse(TestApp):
         request_body = {
             'CID': self.c2.CID,
             'name': self.c2.name,
-            'prerequisites': self.c2.prerequisites,
-            'trainers': self.c2.trainers
+            'prerequisites': self.c2.prerequisites
         }
 
         # calling create_course function via flask route
@@ -516,8 +448,7 @@ class TestDeleteCourse(TestApp):
         # setting course details
         request_body = {
             'name': self.c2.name,
-            'prerequisites': self.c2.prerequisites,
-            'trainers': self.c2.trainers
+            'prerequisites': self.c2.prerequisites
         }
 
         # calling create_course function via flask route

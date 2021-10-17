@@ -21,14 +21,12 @@ class Course(db.Model):
     CID = db.Column(db.String(64), primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     prerequisites= db.Column(db.String(64), nullable=False)
-    trainers = db.Column(db.String(64), nullable=False)
 
 
-    def __init__(self, CID, name, prerequisites, trainers):
+    def __init__(self, CID, name, prerequisites):
         self.CID = CID
         self.name = name
         self.prerequisites = prerequisites
-        self.trainers = trainers
 
     def to_dict(self):
         """
@@ -43,7 +41,7 @@ class Course(db.Model):
 
     def json(self):
         return {"CID": self.CID, "name": self.name, 
-        "prerequisites": self.prerequisites,  "trainers": self.trainers}
+        "prerequisites": self.prerequisites}
 
     def list_of_prerequisites(self):
         return self.prerequisites.split(',')
@@ -413,7 +411,7 @@ def create_course():
         }
     ), 500
     try:
-        course = Course(CID=data["CID"], name=data["name"], prerequisites=data["prerequisites"], trainers=data["trainers"])
+        course = Course(CID=data["CID"], name=data["name"], prerequisites=data["prerequisites"])
         db.session.add(course)
         db.session.commit()
         return jsonify(
