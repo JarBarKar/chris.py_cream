@@ -88,54 +88,53 @@ INSERT INTO `course` (`CID`,`name`, `prerequisites`) VALUES
 -- Table structure for table `graded_quiz`
 --
 
-DROP TABLE IF EXISTS `graded_quiz`;
-CREATE TABLE IF NOT EXISTS `graded_quiz` (
-  `CID` varchar(64) NOT NULL,
-  `LID` int(10) NOT NULL,
-  `SID` varchar(64) NOT NULL,
-  `question` varchar(1000) NOT NULL,
-  `answer` varchar(64) NOT NULL,
-  `options` varchar(1000) NOT NULL,
-  PRIMARY KEY (`CID`, `LID`, `SID`, `question`),
- 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- DROP TABLE IF EXISTS `graded_quiz`;
+-- CREATE TABLE IF NOT EXISTS `graded_quiz` (
+--   `CID` varchar(64) NOT NULL,
+--   `LID` int(10) NOT NULL,
+--   `SID` varchar(64) NOT NULL,
+--   `question` varchar(64) NOT NULL,
+--   `answer` varchar(64) NOT NULL,
+--   `options` varchar(64) NOT NULL,
+--   PRIMARY KEY (`CID`, `LID`, `SID`, `question`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `graded_quiz`
---
+-- --
+-- -- Dumping data for table `graded_quiz`
+-- --
 
-INSERT INTO `graded_quiz` (`CID`, `LID`, `SID`, `question`, `answer`, `options`) VALUES
-('SPACE CLASS', 1, 'G2', 'Is the moon round?', 'YES', 'YES|NO' ),
-('SPACE CLASS', 2, 'G2', 'Is the sun round?', 'YES', 'YES|NO' ),
-('SPACE CLASS', 3, 'G2', 'Which of these is not a planet ?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS' ),
-;
+-- INSERT INTO `graded_quiz` (`CID`, `LID`, `SID`, `question`, `answer`, `options`) VALUES
+-- ('SPACE CLASS', 1, 'G2', 'Is the moon round?', 'YES', 'YES|NO' ),
+-- ('SPACE CLASS', 2, 'G2', 'Is the sun round?', 'YES', 'YES|NO' ),
+-- ('SPACE CLASS', 3, 'G2', 'Which of these is not a planet ?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS' ),
+-- ;
 
--- --------------------------------------------------------
+-- -- --------------------------------------------------------
 
---
--- Table structure for table `ungraded_quiz`
---
+-- --
+-- -- Table structure for table `ungraded_quiz`
+-- --
 
-DROP TABLE IF EXISTS `ungraded_quiz`;
-CREATE TABLE IF NOT EXISTS `ungraded_quiz` (
-  `CID` varchar(64) NOT NULL,
-  `LID` int(10) NOT NULL,
-  `SID` varchar(64) NOT NULL,
-  `question` varchar(1000) NOT NULL,
-  `answer` varchar(64) NOT NULL,
-  `options` varchar(1000) NOT NULL,
-  PRIMARY KEY (`CID`, `LID`, `SID`, `question`),
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- DROP TABLE IF EXISTS `ungraded_quiz`;
+-- CREATE TABLE IF NOT EXISTS `ungraded_quiz` (
+--   `CID` varchar(64) NOT NULL,
+--   `LID` int(10) NOT NULL,
+--   `SID` varchar(64) NOT NULL,
+--   `question` varchar(300) NOT NULL,
+--   `answer` varchar(64) NOT NULL,
+--   `options` varchar(300) NOT NULL,
+--   PRIMARY KEY (`CID`, `LID`, `SID`, `question`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `ungraded_quiz`
---
+-- --
+-- -- Dumping data for table `ungraded_quiz`
+-- --
 
-INSERT INTO `ungraded_quiz` (`CID`, `LID`, `SID`, `question`, `answer`, `options`) VALUES
-('SPACE CLASS', 1, 'G2', 'Is the moon round?', 'YES', 'YES|NO' ),
-('SPACE CLASS', 1, 'G2', 'Is the sun round?', 'YES', 'YES|NO' ),
-('SPACE CLASS', 1, 'G2', 'Which of these is not a planet?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS' ),
-;
+-- INSERT INTO `ungraded_quiz` (`CID`, `LID`, `SID`, `question`, `answer`, `options`) VALUES
+-- ('SPACE CLASS', 1, 'G2', 'Is the moon round?', 'YES', 'YES|NO' ),
+-- ('SPACE CLASS', 1, 'G2', 'Is the sun round?', 'YES', 'YES|NO' ),
+-- ('SPACE CLASS', 1, 'G2', 'Which of these is not a planet?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS' ),
+-- ;
 
 -- --------------------------------------------------------
 --
@@ -186,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `academic_record` (
   `quiz_result` int(10) DEFAULT 00,
   constraint `academic_record_fk1` foreign key(`EID`) references `engineer`(`EID`),
   constraint `academic_record_fk2` foreign key(`SID`,`CID`) references `section`(`SID`,`CID`),
-  constraint `academic_record_fk3` foreign key(`QID`) references `quiz`(`QID`),
+  -- constraint `academic_record_fk3` foreign key(`QID`) references `quiz`(`QID`),
   PRIMARY KEY (`EID`, `SID`, `CID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -206,27 +205,27 @@ INSERT INTO `academic_record` (`EID`, `SID`, `CID`, `QID`, `status`) VALUES
 -- Table structure for table `section_content`
 --
 
-DROP TABLE IF EXISTS `section_content`;
-CREATE TABLE IF NOT EXISTS `section_content` (
-  `SID` varchar(64) NOT NULL,
-  `CID` varchar(64) NOT NULL,
-  `QID` int(10) NOT NULL, 
-  `content_type` varchar(64) NOT NULL,
-  `content_name` varchar(64) NOT NULL,
-  `link` varchar(64) NOT NULL,
-  constraint `section_content_fk1` foreign key(`SID`,`CID`) references `section`(`SID`,`CID`),
-  constraint `section_content_fk2` foreign key(`QID`) references `quiz`(`QID`),
-  PRIMARY KEY (`SID`, `CID`, `content_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- DROP TABLE IF EXISTS `section_content`;
+-- CREATE TABLE IF NOT EXISTS `section_content` (
+--   `SID` varchar(64) NOT NULL,
+--   `CID` varchar(64) NOT NULL,
+--   `QID` int(10) NOT NULL, 
+--   `content_type` varchar(64) NOT NULL,
+--   `content_name` varchar(64) NOT NULL,
+--   `link` varchar(64) NOT NULL,
+--   constraint `section_content_fk1` foreign key(`SID`,`CID`) references `section`(`SID`,`CID`),
+--   constraint `section_content_fk2` foreign key(`QID`) references `quiz`(`QID`),
+--   PRIMARY KEY (`SID`, `CID`, `content_name`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `section_content`
---
+-- --
+-- -- Dumping data for table `section_content`
+-- --
 
-INSERT INTO `section_content` (`SID`, `CID`, `QID`, `content_type`, `content_name`, `link`) VALUES
-('G1', 'IS111', 001, 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
-('G1', 'IS111', 001, 'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
-('G1', 'IS111', 001, 'pdf', 'Lesson 3 slides', 'abd.com/shared/fuie896')
+-- INSERT INTO `section_content` (`SID`, `CID`, `QID`, `content_type`, `content_name`, `link`) VALUES
+-- ('G1', 'IS111', 001, 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
+-- ('G1', 'IS111', 001, 'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
+-- ('G1', 'IS111', 001, 'pdf', 'Lesson 3 slides', 'abd.com/shared/fuie896')
 ;
 
 -- --------------------------------------------------------
