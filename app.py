@@ -5,6 +5,8 @@ from flask_cors import CORS
 from os import environ
 from datetime import datetime
 
+from sqlalchemy.sql.elements import Null
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -47,8 +49,8 @@ class Course(db.Model):
         return self.prerequisites.split(',')
 ### Course Class ###
 
-### Course Detail Class ###
-### Academic record ####
+
+### Academic record Class ###
 class Academic_record(db.Model):
     __tablename__ = 'academic_record'
     EID = db.Column(db.Integer(), primary_key=True)
@@ -80,7 +82,8 @@ class Academic_record(db.Model):
 
     def json(self):
         return {"CID": self.CID, "EID": self.EID, "SID": self.SID, "QID": self.QID, "status": self.status, "quiz_result": self.quiz_result}
-### Course Detail Class ###
+### Academic record Class ###
+
 
 ### Enrollment Class ###
 class Enrollment(db.Model):
@@ -109,6 +112,7 @@ class Enrollment(db.Model):
     def json(self):
         return {"CID": self.CID, "EID": self.EID, "SID": self.SID}
 ### Enrollment Class ###
+
 
 ### Section Class ###
 class Section(db.Model):
@@ -144,6 +148,7 @@ class Section(db.Model):
     def json(self):
         return {"SID": self.SID, "CID": self.CID, "start": self.start, "end": self.end ,"vacancy": self.vacancy, "TID": self.TID}
 ### Section Class ###
+
 
 ### Trainer Class ###
 class Trainer(db.Model):
@@ -224,6 +229,84 @@ class Lesson(db.Model):
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
 
+### Ungraded Quiz Class ###
+class Ungraded_quiz(db.Model):
+    __tablename__ = 'ungraded_quiz'
+    CID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.Integer(), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    question = db.Column(db.String(64), primary_key=True)
+    answer = db.Column(db.String(64), nullable=False)
+    options = db.Column(db.String(64), nullable=False)
+
+
+    def __init__(self, CID, LID, SID, question, answer, options):
+        self.CID = CID
+        self.LID = LID
+        self.SID = SID
+        self.question = question
+        self.answer = answer
+        self.options = options
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
+                "answer":self.answer, "options":self.options}
+
+    def get_options(self):
+        return self.options.split("|")
+### Ungraded Quiz Class ###
+
+
+### Graded Quiz Class ###
+class Graded_quiz(db.Model):
+    __tablename__ = 'Graded_quiz'
+    CID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.Integer(), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    question = db.Column(db.String(64), primary_key=True)
+    answer = db.Column(db.String(64), nullable=False)
+    options = db.Column(db.String(64), nullable=False)
+
+
+    def __init__(self, CID, LID, SID, question, answer, options):
+        self.CID = CID
+        self.LID = LID
+        self.SID = SID
+        self.question = question
+        self.answer = answer
+        self.options = options
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
+                "answer":self.answer, "options":self.options}
+
+    def get_options(self):
+        return self.options.split("|")
+### Graded Quiz Class ###
 
     def __init__(self, LID, SID, CID):
         self.LID = LID
@@ -1027,6 +1110,7 @@ def delete_section_content():
 
 ### End of API points for Material CRUD ###
 
+
 ### Start of API point for lesson CRUD ###
 #view all lessons
 @app.route("/view_lessons", methods=['GET'])
@@ -1100,6 +1184,221 @@ def create_lesson():
 
 
 ### End of API point for lesson CRUD ###
+=======
+### Start of API points for Ungraded Quiz CRUD ###
+#create ungraded quiz and add it in the ungraded quiz table
+@app.route("/create_ungraded_quiz_question", methods=['POST'])
+def create_ungraded_quiz():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, ungraded quiz question creation failed",
+            }
+        ), 500
+    try:
+        ungraded_quiz = Ungraded_quiz(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"], 
+                                    answer=data["answer"], options=data["options"])
+        db.session.add(ungraded_quiz)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Ungraded quiz question, {data['question']} ,has been inserted successfully into the database",
+                "data": ungraded_quiz.to_dict()
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Read/get all the questions from a specific ungraded quiz
+@app.route("/read_ungraded_quiz", methods=['POST'])
+def read_ungraded_quiz():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, ungraded quiz read failed",
+            }
+        ), 500
+    try:
+        quiz_questions = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
+        all_questions = [question.to_dict() for question in quiz_questions]
+        if len(all_questions) == 0:
+            return jsonify(
+            {
+                "message": f"Quiz with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
+            }
+        ), 500
+        return jsonify(
+            {
+                "message": f"Quiz with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
+                "data": all_questions
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Read/get a specific question from a specific ungraded quiz
+@app.route("/read_ungraded_quiz_question", methods=['POST'])
+def read_ungraded_quiz_question():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, ungraded quiz question read failed",
+            }
+        ), 500
+    try:
+        quiz_question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        question = quiz_question.first()
+        if question == None:
+            return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
+            }
+        ), 500
+        return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
+                "data": question.to_dict()
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Update a question from a specific ungraded quiz
+'''primary keys cant be updated, only fields that needs to be updated will be sent over'''
+@app.route("/update_ungraded_quiz_question", methods=['POST'])
+def update_ungraded_quiz_question():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, ungraded quiz update failed",
+            }
+        ), 500
+    try:
+        question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        possible_update_columns = ['answer', 'options']
+        if 'answer' in data.keys():
+            question.update(dict(answer=data['answer']))
+            db.session.commit()
+        if 'options' in data.keys():
+            question.update(dict(options=data['options']))
+            db.session.commit()
+        question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"]).first()
+        return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' has been updated",
+                "data": question.json()
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Delete an ungraded quiz from database
+@app.route("/delete_ungraded_quiz", methods=['POST'])
+def delete_ungraded_quiz():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, ungraded quiz deletion failed",
+            }
+        ), 500
+    try:
+        quiz_questions = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
+        all_questions = [question.to_dict() for question in quiz_questions]
+        if len(all_questions) == 0:
+            return jsonify(
+            {
+                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
+            }
+        ), 500
+        quiz_questions.delete()
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
+    
+
+#Delete an ungraded quiz question from database
+@app.route("/delete_ungraded_quiz_question", methods=['POST'])
+def delete_ungraded_quiz_question():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, ungraded quiz question deletion failed",
+            }
+        ), 500
+    try:
+        quiz_question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        question = quiz_question.first()
+        if question == None:
+            return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
+            }
+        ), 500
+        quiz_question.delete()
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
+### End of API points for Ungraded Quiz CRUD ###
+
+### Start of API points for Graded Quiz CRUD ###
+### End of API points for Graded Quiz CRUD ###
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
