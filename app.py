@@ -1397,6 +1397,214 @@ def delete_ungraded_quiz_question():
 ### End of API points for Ungraded Quiz CRUD ###
 
 ### Start of API points for Graded Quiz CRUD ###
+#create graded quiz and add it in the graded quiz table
+@app.route("/create_graded_quiz_question", methods=['POST'])
+def create_graded_quiz():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, graded quiz question creation failed",
+            }
+        ), 500
+    try:
+        graded_quiz = Graded_quiz(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"], 
+                                    answer=data["answer"], options=data["options"])
+        db.session.add(graded_quiz)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Graded quiz question, {data['question']} ,has been inserted successfully into the database",
+                "data": graded_quiz.to_dict()
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Read/get all the questions from a specific graded quiz
+@app.route("/read_graded_quiz", methods=['POST'])
+def read_graded_quiz():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, graded quiz read failed",
+            }
+        ), 500
+    try:
+        quiz_questions = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
+        all_questions = [question.to_dict() for question in quiz_questions]
+        if len(all_questions) == 0:
+            return jsonify(
+            {
+                "message": f"Quiz with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
+            }
+        ), 500
+        return jsonify(
+            {
+                "message": f"Quiz with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
+                "data": all_questions
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Read/get a specific question from a specific graded quiz
+@app.route("/read_graded_quiz_question", methods=['POST'])
+def read_graded_quiz_question():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, graded quiz question read failed",
+            }
+        ), 500
+    try:
+        quiz_question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        question = quiz_question.first()
+        if question == None:
+            return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
+            }
+        ), 500
+        return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
+                "data": question.to_dict()
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Update a question from a specific graded quiz
+'''primary keys cant be updated, only fields that needs to be updated will be sent over'''
+@app.route("/update_graded_quiz_question", methods=['POST'])
+def update_graded_quiz_question():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, graded quiz update failed",
+            }
+        ), 500
+    try:
+        question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        possible_update_columns = ['answer', 'options']
+        if 'answer' in data.keys():
+            question.update(dict(answer=data['answer']))
+            db.session.commit()
+        if 'options' in data.keys():
+            question.update(dict(options=data['options']))
+            db.session.commit()
+        question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"]).first()
+        return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' has been updated",
+                "data": question.json()
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+    ), 500
+
+
+#Delete an graded quiz from database
+@app.route("/delete_graded_quiz", methods=['POST'])
+def delete_graded_quiz():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, graded quiz deletion failed",
+            }
+        ), 500
+    try:
+        quiz_questions = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
+        all_questions = [question.to_dict() for question in quiz_questions]
+        if len(all_questions) == 0:
+            return jsonify(
+            {
+                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
+            }
+        ), 500
+        quiz_questions.delete()
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
+    
+
+#Delete an graded quiz question from database
+@app.route("/delete_graded_quiz_question", methods=['POST'])
+def delete_graded_quiz_question():
+    data = request.get_json()
+    fields = ['CID', 'LID', 'SID', 'question']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, graded quiz question deletion failed",
+            }
+        ), 500
+    try:
+        quiz_question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        question = quiz_question.first()
+        if question == None:
+            return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
+            }
+        ), 500
+        quiz_question.delete()
+        db.session.commit()
+        return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
+            }
+        ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
 ### End of API points for Graded Quiz CRUD ###
 
 
