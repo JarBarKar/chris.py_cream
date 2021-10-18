@@ -16,18 +16,18 @@ class TestApp(flask_testing.TestCase):
 
     def setUp(self):
         self.ugq1q1 = Ungraded_quiz(CID='IS500', LID=1, SID='G2', question='Is the moon round?', 
-                                    answer='YES', options='YES|NO')
+                                    answer='YES', options='YES|NO', duration=2)
         self.ugq1q2 = Ungraded_quiz(CID='IS500', LID=1, SID='G2', question='Is the sun round?',
-                                    answer='YES', options='YES|NO')
+                                    answer='YES', options='YES|NO', duration=2)
         self.ugq1q3 = Ungraded_quiz(CID='IS500', LID=1, SID='G2', question='Which of these is not a planet?',
-                                    answer='Pluto', options='EARTH|MARS|JUPITER|PLUTO|VENUS')
+                                    answer='Pluto', options='EARTH|MARS|JUPITER|PLUTO|VENUS', duration=2)
         
         self.ugq2q1 = Ungraded_quiz(CID='IS500', LID=2, SID='G2', question='Is Computational Thinking a hard module?', 
-                                    answer='YES', options='YES|NO')
+                                    answer='YES', options='YES|NO', duration=2)
         self.ugq2q2 = Ungraded_quiz(CID='IS500', LID=2, SID='G2', question='Is Intro to Machine Learning hard?',
-                                    answer='YES', options='YES|NO')
+                                    answer='YES', options='YES|NO', duration=2)
         self.ugq2q3 = Ungraded_quiz(CID='IS500', LID=2, SID='G2', question='What course is this code for?',
-                                    answer='SPM', options='SPM|PMS|MPS|SMP|PSM')
+                                    answer='SPM', options='SPM|PMS|MPS|SMP|PSM', duration=2)
         self.maxDiff = None
         db.create_all()
 
@@ -54,7 +54,8 @@ class TestCreateUngradedQuizQuestion(TestApp):
             'SID': self.ugq1q1.SID,
             'question': self.ugq1q1.question,
             'answer': self.ugq1q1.answer,
-            'options': self.ugq1q1.options
+            'options': self.ugq1q1.options,
+            'duration': self.ugq1q1.duration
         }
         # calling create_ungraded_quiz_question function via flask route
         response = self.client.post("/create_ungraded_quiz_question",
@@ -68,7 +69,8 @@ class TestCreateUngradedQuizQuestion(TestApp):
                 'SID': self.ugq1q1.SID,
                 'question': self.ugq1q1.question,
                 'answer': self.ugq1q1.answer,
-                'options': self.ugq1q1.options
+                'options': self.ugq1q1.options,
+                'duration': self.ugq1q1.duration
             },
             'message' : f'Ungraded quiz question, {self.ugq1q1.question} ,has been inserted successfully into the database'
         })
@@ -82,7 +84,8 @@ class TestCreateUngradedQuizQuestion(TestApp):
             'SID': self.ugq1q1.SID,
             'question': self.ugq1q1.question,
             'answer': self.ugq1q1.answer,
-            'options': self.ugq1q1.options
+            'options': self.ugq1q1.options,
+            'duration': self.ugq1q1.duration
         }
         # calling create_ungraded_quiz_question function via flask route
         response = self.client.post("/create_ungraded_quiz_question",
@@ -102,7 +105,8 @@ class TestCreateUngradedQuizQuestion(TestApp):
             'LID': self.ugq1q1.LID,
             'SID': self.ugq1q1.SID,
             'answer': self.ugq1q1.answer,
-            'options': self.ugq1q1.options
+            'options': self.ugq1q1.options,
+            'duration': self.ugq1q1.duration
         }
         # calling create_ungraded_quiz_question function via flask route
         response = self.client.post("/create_ungraded_quiz_question",
@@ -145,7 +149,8 @@ class TestReadUngradedQuiz(TestApp):
                 'SID': self.ugq1q1.SID,
                 'question': self.ugq1q1.question,
                 'answer': self.ugq1q1.answer,
-                'options': self.ugq1q1.options
+                'options': self.ugq1q1.options,
+                'duration': self.ugq1q1.duration
                 },
                 {
                 'CID': self.ugq1q2.CID,
@@ -153,7 +158,8 @@ class TestReadUngradedQuiz(TestApp):
                 'SID': self.ugq1q2.SID,
                 'question': self.ugq1q2.question,
                 'answer': self.ugq1q2.answer,
-                'options': self.ugq1q2.options
+                'options': self.ugq1q2.options,
+                'duration': self.ugq1q2.duration
                 },
                 {
                 'CID': self.ugq1q3.CID,
@@ -161,7 +167,8 @@ class TestReadUngradedQuiz(TestApp):
                 'SID': self.ugq1q3.SID,
                 'question': self.ugq1q3.question,
                 'answer': self.ugq1q3.answer,
-                'options': self.ugq1q3.options
+                'options': self.ugq1q3.options,
+                'duration': self.ugq1q3.duration
                 }
             ],
             'message' : f"Quiz with CID {self.ugq1q1.CID}, LID {self.ugq1q1.LID}, SID {self.ugq1q1.SID} has been retrieved"
@@ -264,7 +271,8 @@ class TestReadUngradedQuizQuestion(TestApp):
                 'SID': self.ugq1q1.SID,
                 'question': self.ugq1q1.question,
                 'answer': self.ugq1q1.answer,
-                'options': self.ugq1q1.options
+                'options': self.ugq1q1.options,
+                'duration': self.ugq1q1.duration
                 },
             'message' : f"Quiz question \'{self.ugq1q1.question}\' with CID {self.ugq1q1.CID}, LID {self.ugq1q1.LID}, SID {self.ugq1q1.SID} has been retrieved"
         })
@@ -368,7 +376,8 @@ class TestUpdateUngradedQuizQuestion(TestApp):
                 'SID': self.ugq2q2.SID,
                 'question' : self.ugq2q2.question,
                 'answer' : 'NO',
-                'options' : self.ugq2q2.options
+                'options' : self.ugq2q2.options,
+                'duration': self.ugq2q2.duration
             },
             'message' : f"Quiz question \'{self.ugq2q2.question}\' has been updated"
             
@@ -404,7 +413,8 @@ class TestUpdateUngradedQuizQuestion(TestApp):
                 'SID': self.ugq2q2.SID,
                 'question' : self.ugq2q2.question,
                 'answer' : self.ugq2q2.answer,
-                'options' : 'YES|NO|MAYBE'
+                'options' : 'YES|NO|MAYBE',
+                'duration': self.ugq2q2.duration
             },
             'message' : f"Quiz question \'{self.ugq2q2.question}\' has been updated"
             
@@ -426,7 +436,8 @@ class TestUpdateUngradedQuizQuestion(TestApp):
             'LID': self.ugq2q2.LID,
             'SID': self.ugq2q2.SID,
             'question' : self.ugq2q2.question,
-            'options' : 'YES|NO|MAYBE'
+            'options' : 'YES|NO|MAYBE',
+            'duration': self.ugq2q2.duration
         }
         # calling update_ungraded_quiz_question function via flask route
         response = self.client.post("/update_ungraded_quiz_question",
@@ -453,7 +464,8 @@ class TestUpdateUngradedQuizQuestion(TestApp):
             'CID': self.ugq2q2.CID,
             'SID': self.ugq2q2.SID,
             'question' : self.ugq2q2.question,
-            'options' : 'YES|NO|MAYBE'
+            'options' : 'YES|NO|MAYBE',
+            'duration': self.ugq2q2.duration
         }
         # calling update_ungraded_quiz_question function via flask route
         response = self.client.post("/update_ungraded_quiz_question",
@@ -514,7 +526,8 @@ class TestDeleteUngradedQuiz(TestApp):
                 'SID': self.ugq1q1.SID,
                 'question': self.ugq1q1.question,
                 'answer': self.ugq1q1.answer,
-                'options': self.ugq1q1.options
+                'options': self.ugq1q1.options,
+                'duration': self.ugq1q1.duration
                 },
                 {
                 'CID': self.ugq1q2.CID,
@@ -522,7 +535,8 @@ class TestDeleteUngradedQuiz(TestApp):
                 'SID': self.ugq1q2.SID,
                 'question': self.ugq1q2.question,
                 'answer': self.ugq1q2.answer,
-                'options': self.ugq1q2.options
+                'options': self.ugq1q2.options,
+                'duration': self.ugq1q2.duration
                 },
                 {
                 'CID': self.ugq1q3.CID,
@@ -530,7 +544,8 @@ class TestDeleteUngradedQuiz(TestApp):
                 'SID': self.ugq1q3.SID,
                 'question': self.ugq1q3.question,
                 'answer': self.ugq1q3.answer,
-                'options': self.ugq1q3.options
+                'options': self.ugq1q3.options,
+                'duration': self.ugq1q3.duration
                 }
             ],
             'message' : f"Quiz with CID {self.ugq1q1.CID}, LID {self.ugq1q1.LID}, SID {self.ugq1q1.SID} has been retrieved"
@@ -651,7 +666,8 @@ class TestDeleteUngradedQuizQuestion(TestApp):
                 'SID': self.ugq2q1.SID,
                 'question': self.ugq2q1.question,
                 'answer': self.ugq2q1.answer,
-                'options': self.ugq2q1.options
+                'options': self.ugq2q1.options,
+                'duration': self.ugq2q1.duration
                 },
                 {
                 'CID': self.ugq2q3.CID,
@@ -659,7 +675,8 @@ class TestDeleteUngradedQuizQuestion(TestApp):
                 'SID': self.ugq2q3.SID,
                 'question': self.ugq2q3.question,
                 'answer': self.ugq2q3.answer,
-                'options': self.ugq2q3.options
+                'options': self.ugq2q3.options,
+                'duration': self.ugq2q3.duration
                 }
             ],
             'message' : f"Quiz with CID {self.ugq2q2.CID}, LID {self.ugq2q2.LID}, SID {self.ugq2q2.SID} has been retrieved"

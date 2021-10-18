@@ -182,7 +182,7 @@ class Trainer(db.Model):
         return {"TID": self.TID, "name": self.name, "password": self.password, "phone": self.phone, "email": self.email, "address": self.address}
 ### Trainer Class ###
 
-
+# NEED TO CHANGE, REMOVE THIS AFTER CHANGE
 ### Section_content Class ###
 class Section_content(db.Model):
     __tablename__ = 'section_content'
@@ -192,9 +192,6 @@ class Section_content(db.Model):
     QID = db.Column(db.Integer(), nullable=True)
     content_type = db.Column(db.String(64), nullable=False)
     link = db.Column(db.String(64), nullable=False)
-
-    
-
 
     def __init__(self, SID, CID, QID, content_name, content_type, link):
         self.SID = SID
@@ -220,92 +217,14 @@ class Section_content(db.Model):
         return {"SID": self.SID, "CID": self.CID, "QID": self.QID, "content_type": self.content_type ,"content_name": self.content_name, "link": self.link}
 ### Section_content Class ###
 
-### Section Class ###
+### Lesson Class ###
 class Lesson(db.Model):
     __tablename__ = 'lesson'
     LID = db.Column(db.String(64), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
 
-### Ungraded Quiz Class ###
-class Ungraded_quiz(db.Model):
-    __tablename__ = 'ungraded_quiz'
-    CID = db.Column(db.String(64), primary_key=True)
-    LID = db.Column(db.Integer(), primary_key=True)
-    SID = db.Column(db.String(64), primary_key=True)
-    question = db.Column(db.String(64), primary_key=True)
-    answer = db.Column(db.String(64), nullable=False)
-    options = db.Column(db.String(64), nullable=False)
-
-
-    def __init__(self, CID, LID, SID, question, answer, options):
-        self.CID = CID
-        self.LID = LID
-        self.SID = SID
-        self.question = question
-        self.answer = answer
-        self.options = options
-
-
-    def to_dict(self):
-        """
-        'to_dict' converts the object into a dictionary,
-        in which the keys correspond to database columns
-        """
-        columns = self.__mapper__.column_attrs.keys()
-        result = {}
-        for column in columns:
-            result[column] = getattr(self, column)
-        return result
-
-    def json(self):
-        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
-                "answer":self.answer, "options":self.options}
-
-    def get_options(self):
-        return self.options.split("|")
-### Ungraded Quiz Class ###
-
-
-### Graded Quiz Class ###
-class Graded_quiz(db.Model):
-    __tablename__ = 'Graded_quiz'
-    CID = db.Column(db.String(64), primary_key=True)
-    LID = db.Column(db.Integer(), primary_key=True)
-    SID = db.Column(db.String(64), primary_key=True)
-    question = db.Column(db.String(64), primary_key=True)
-    answer = db.Column(db.String(64), nullable=False)
-    options = db.Column(db.String(64), nullable=False)
-
-
-    def __init__(self, CID, LID, SID, question, answer, options):
-        self.CID = CID
-        self.LID = LID
-        self.SID = SID
-        self.question = question
-        self.answer = answer
-        self.options = options
-
-
-    def to_dict(self):
-        """
-        'to_dict' converts the object into a dictionary,
-        in which the keys correspond to database columns
-        """
-        columns = self.__mapper__.column_attrs.keys()
-        result = {}
-        for column in columns:
-            result[column] = getattr(self, column)
-        return result
-
-    def json(self):
-        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
-                "answer":self.answer, "options":self.options}
-
-    def get_options(self):
-        return self.options.split("|")
-### Graded Quiz Class ###
-
+    
     def __init__(self, LID, SID, CID):
         self.LID = LID
         self.SID = SID
@@ -323,9 +242,87 @@ class Graded_quiz(db.Model):
             result[column] = getattr(self, column)
         return result
 
+
     def json(self):
         return {"LID": self.LID, "SID": self.SID, "CID": self.CID}
-### Section Class ###
+### Lesson Class ###
+
+### Ungraded Quiz Class ###
+class Ungraded_quiz(db.Model):
+    __tablename__ = 'ungraded_quiz'
+    LID = db.Column(db.Integer(), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    question = db.Column(db.String(64), primary_key=True)
+    answer = db.Column(db.String(64), nullable=False)
+    options = db.Column(db.String(64), nullable=False)
+    duration = db.Column(db.Integer(), nullable=False)
+
+
+    def __init__(self, LID, CID, SID, question, answer, options, duration):
+        self.LID = LID
+        self.CID = CID
+        self.SID = SID
+        self.question = question
+        self.answer = answer
+        self.options = options
+        self.duration = duration
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
+                "answer":self.answer, "options":self.options, "duration":self.duration}
+### Ungraded Quiz Class ###
+
+
+### Graded Quiz Class ###
+class Graded_quiz(db.Model):
+    __tablename__ = 'Graded_quiz'
+    LID = db.Column(db.Integer(), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    question = db.Column(db.String(64), primary_key=True)
+    answer = db.Column(db.String(64), nullable=False)
+    options = db.Column(db.String(64), nullable=False)
+    duration = db.Column(db.Integer(), nullable=False)
+
+
+    def __init__(self, LID, CID, SID, question, answer, options, duration):
+        self.LID = LID
+        self.CID = CID
+        self.SID = SID
+        self.question = question
+        self.answer = answer
+        self.options = options
+        self.duration = duration
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
+                "answer":self.answer, "options":self.options, "duration":self.duration}
+### Graded Quiz Class ###
 
 
 ### Start of API points for Course CRUD ###
@@ -1183,12 +1180,13 @@ def create_lesson():
 
 ### End of API point for lesson CRUD ###
 
+
 ### Start of API points for Ungraded Quiz CRUD ###
 #create ungraded quiz and add it in the ungraded quiz table
 @app.route("/create_ungraded_quiz_question", methods=['POST'])
 def create_ungraded_quiz():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options']
+    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options', 'duration']
     for key in fields:
         if key not in data.keys():
             return jsonify(
@@ -1198,7 +1196,7 @@ def create_ungraded_quiz():
         ), 500
     try:
         ungraded_quiz = Ungraded_quiz(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"], 
-                                    answer=data["answer"], options=data["options"])
+                                    answer=data["answer"], options=data["options"], duration=data["duration"])
         db.session.add(ungraded_quiz)
         db.session.commit()
         return jsonify(
@@ -1300,12 +1298,15 @@ def update_ungraded_quiz_question():
         ), 500
     try:
         question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
-        possible_update_columns = ['answer', 'options']
+        possible_update_columns = ['answer', 'options', 'duration']
         if 'answer' in data.keys():
             question.update(dict(answer=data['answer']))
             db.session.commit()
         if 'options' in data.keys():
             question.update(dict(options=data['options']))
+            db.session.commit()
+        if 'duration' in data.keys():
+            question.update(dict(options=data['duration']))
             db.session.commit()
         question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"]).first()
         return jsonify(
