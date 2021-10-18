@@ -594,32 +594,32 @@ class TestUpdateSection(TestApp):
 #         })
     
 
-    # # Testing negative case where SID is not in database
-    # def test_update_section_content_SID_not_in_database(self):
-    #     # adding one section to database
-    #     db.session.add(self.s1)
-    #     db.session.commit()
+    # Testing negative case where SID is not in database
+    def test_update_section_content_SID_not_in_database(self):
+        # adding one section to database
+        db.session.add(self.s1)
+        db.session.commit()
 
-    #     # setting section details
-    #     request_body = {
-    #         'old_SID': 'doesnt exist',
-    #         'old_CID': self.s1.CID,
-    #         'old_LID': self.s1.LID,
-    #         'old_QID': self.s1.QID,
-    #         'old_content_name': self.s1.content_name,
-    #         'old_content_type': self.s1.content_type,
-    #         'old_link': self.s1.link,
-    #         'content_name': 'new lesson slides'
-    #     }
+        # setting section details
+        request_body = {
+            'old_SID': 'do not exist',
+            'old_CID': self.s1.CID,
+            'old_LID': self.s1.LID,
+            'old_QID': self.s1.QID,
+            'old_content_name': self.s1.content_name,
+            'old_content_type': self.s1.content_type,
+            'old_link': self.s1.link,
+            'content_name': 'new lesson slides'
+        }
 
-    #     # calling update_section_content function via flask route
-    #     response = self.client.post("/update_section_content",
-    #                                 data=json.dumps(request_body),
-    #                                 content_type='application/json')
-    #     self.assertEqual(response.status_code, 500)
-    #     self.assertEqual(response.json, {
-    #         "message": "Section is not found"
-    #     })
+        # calling update_section_content function via flask route
+        response = self.client.post("/update_section_content",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Section content {request_body['old_CID'], request_body['old_SID'], request_body['old_LID'], request_body['old_content_name']} do not exist"
+        })
 
 #     # Testing negative case where CID is not in database
 #     def test_update_section_content_CID_not_in_database(self):
@@ -734,38 +734,111 @@ class TestUpdateSection(TestApp):
 #             "message": "SID not found"
 #         })
     
-#     def test_update_section_content_start_not_in_request(self):
-#         # setting section details
-#         request_body = {
-#             "SID": self.s1.SID,
-#             "CID": self.s1.CID,
-#             "end": "01/01/0001 00:00:00",
-#             "vacancy": self.s1.CID,
-#             "TID": self.s1.TID
-#         }
+    def test_update_section_content_missing_SID(self):
+        # setting section details
+        request_body = {
+            'old_CID': self.s1.CID,
+            'old_LID': self.s1.LID,
+            'old_QID': self.s1.QID,
+            'old_content_name': self.s1.content_name,
+            'old_content_type': self.s1.content_type,
+            'old_link': self.s1.link,
+            'content_name': 'new lesson slides'
+        }
 
-#         # calling update_section_content function via flask route
-#         response = self.client.post("/update_section_content",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 500)
-#         self.assertEqual(response.json, {
-#             "message": "start not found"
-#         })
+        # calling update_section_content function via flask route
+        response = self.client.post("/update_section_content",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": "Section content ['old_SID'] is not present, section content is not inserted successfully into the database"
+        })
     
-#     def test_update_section_content_empty_request(self):
-#         # setting section details
-#         request_body = {
-#         }
+    def test_update_section_content_empty_request(self):
+        # setting section details
+        request_body = {
+        }
 
-#         # calling update_section_content function via flask route
-#         response = self.client.post("/update_section_content",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 500)
-#         self.assertEqual(response.json, {
-#             "message": "SID,CID,start,end,vacancy,TID not found"
-#         })
+        # calling update_section_content function via flask route
+        response = self.client.post("/update_section_content",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": "Section content ['old_SID', 'old_CID', 'old_LID', 'old_QID', 'old_content_name', 'old_content_type', 'old_link'] is not present, section content is not inserted successfully into the database"
+        })
+
+
+class TestDeleteSectionMateria(TestApp):
+    # Testing positive case where content name is updated
+    def test_delete_section_content(self):
+        # adding one section to database
+        db.session.add(self.s1)
+        db.session.commit()
+
+        # setting section details
+        request_body = {
+            'SID': self.s1.SID,
+            'CID': self.s1.CID,
+            'LID': self.s1.LID,
+            'QID': self.s1.QID,
+            'content_name': self.s1.content_name,
+        }
+
+        # calling update_section_content function via flask route
+        response = self.client.post("/delete_section_content",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "message": f"Section content { self.s1.CID, self.s1.SID, self.s1.LID, self.s1.content_name} has been deleted successfully from the database"    
+        })
+
+    def test_delete_section_content_missing_CID(self):
+        # adding one section to database
+        db.session.add(self.s1)
+        db.session.commit()
+
+        # setting section details
+        request_body = {
+            'SID': self.s1.SID,
+            'LID': self.s1.LID,
+            'QID': self.s1.QID,
+            'content_name': self.s1.content_name,
+        }
+
+        # calling update_section_content function via flask route
+        response = self.client.post("/delete_section_content",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Section content ['CID'] is not present, section content is not successfully deleted"
+        })
+
+    def test_delete_section_content_not_in_database(self):
+        # adding one section to database
+
+        # setting section details
+        request_body = {
+            'SID': self.s1.SID,
+            'CID': self.s1.CID,
+            'LID': self.s1.LID,
+            'QID': self.s1.QID,
+            'content_name': self.s1.content_name,
+        }
+
+        # calling update_section_content function via flask route
+        response = self.client.post("/delete_section_content",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Section content {self.s1.CID, self.s1.SID, self.s1.LID, self.s1.content_name} do not exist"
+        })
+
+
 
 # ### SECTION TEST CASES ###
 

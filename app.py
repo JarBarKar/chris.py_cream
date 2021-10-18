@@ -1057,30 +1057,39 @@ def update_section_content():
     for change in potential_changes:
         if change not in data.keys():
             data[change] = data[str('old_'+change)]
-    try:
-        Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], LID = data["old_LID"], content_name = data["old_content_name"]).delete()
-        section_content = Section_content(SID=data["SID"], CID=data["CID"], LID=data["LID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
-        db.session.add(section_content)
-        db.session.commit()
+    exist = (Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], LID = data["old_LID"], content_name = data["old_content_name"]).first() != None)
+    if exist:
+        try:
+            Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], LID = data["old_LID"], content_name = data["old_content_name"]).delete()
+            section_content = Section_content(SID=data["SID"], CID=data["CID"], LID=data["LID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
+            db.session.add(section_content)
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Section content {data['old_CID'], data['old_SID'], data['old_LID'], data['content_name']}'s details have been updated successfully in the database",
+                "data": section_content.to_dict()
+            }
+            ), 200
+
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Section content{data['old_CID'], data['old_SID'], data['old_LID'], data['old_content_name']} is not updated"
+            }
+        ), 500
+    else:
         return jsonify(
         {
-            "message": f"Section content {data['old_CID'], data['old_SID'], data['old_LID'], data['content_name']}'s details have been updated successfully in the database",
-            "data": section_content.to_dict()
-        }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Section {data['old_CID'], data['old_SID'], data['old_LID'], data['content_name']} is not updated"
-        }
-    ), 500
+            "message": f"Section content {data['old_CID'], data['old_SID'], data['old_LID'], data['old_content_name']} do not exist"
+        }), 500
+
 
 
 #delete section content
 @app.route("/delete_section_content", methods=['POST'])
 def delete_section_content():
     data = request.get_json()
-    expected=["SID", "CID", "content_name"]
+    expected=["SID", "CID", "LID", "content_name"]
     not_present=list()
     #check input
     for expect in expected:
@@ -1092,20 +1101,28 @@ def delete_section_content():
                 "message": f"Section content {not_present} is not present, section content is not successfully deleted"
             }
         ), 500
-    try:
-        Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], content_name = data["content_name"]).delete()
-        db.session.commit()
-        return jsonify(
-        {
-            "message": f"Section content { data['CID'], data['SID'], data['content_name']} has been deleted successfully from the database"
-        }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Section {data['CID'], data['SID'], data['content_name']} is not deleted"
-        }
+    exist = (Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], content_name = data["content_name"]).first() != None)
+    if exist:
+        try:
+            Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], content_name = data["content_name"]).delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Section content { data['CID'], data['SID'], data['LID'], data['content_name']} has been deleted successfully from the database"
+            }
+            ), 200
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Section {data['CID'], data['SID'], data['content_name']} is not deleted"
+            }
     ), 500
+    else:
+        return jsonify(
+        {
+            "message": f"Section content {data['CID'], data['SID'], data['LID'], data['content_name']} do not exist"
+        }), 500
+    
 
 ### End of API points for Material CRUD ###
 
