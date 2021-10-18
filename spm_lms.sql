@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `content` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `section_content`
+-- Dumping data for table `content`
 --
 
 INSERT INTO `content` (`LID`, `CID`, `SID`, `content_type`, `content_name`, `link`) VALUES
