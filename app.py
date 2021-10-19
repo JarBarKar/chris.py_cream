@@ -1400,7 +1400,7 @@ def delete_ungraded_quiz_question():
 @app.route("/create_graded_quiz_question", methods=['POST'])
 def create_graded_quiz():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options']
+    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options', 'duration']
     for key in fields:
         if key not in data.keys():
             return jsonify(
@@ -1410,7 +1410,7 @@ def create_graded_quiz():
         ), 500
     try:
         graded_quiz = Graded_quiz(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"], 
-                                    answer=data["answer"], options=data["options"])
+                                    answer=data["answer"], options=data["options"], duration=data["duration"])
         db.session.add(graded_quiz)
         db.session.commit()
         return jsonify(
@@ -1512,12 +1512,15 @@ def update_graded_quiz_question():
         ), 500
     try:
         question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
-        possible_update_columns = ['answer', 'options']
+        possible_update_columns = ['answer', 'options', 'duration']
         if 'answer' in data.keys():
             question.update(dict(answer=data['answer']))
             db.session.commit()
         if 'options' in data.keys():
             question.update(dict(options=data['options']))
+            db.session.commit()
+        if 'duration' in data.keys():
+            question.update(dict(duration=data['duration']))
             db.session.commit()
         question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"]).first()
         return jsonify(
