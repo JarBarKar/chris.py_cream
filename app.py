@@ -194,14 +194,7 @@ class Section_content(db.Model):
     content_type = db.Column(db.String(64), nullable=False)
     link = db.Column(db.String(64), nullable=False)
 
-<<<<<<< HEAD
-    
-
-
-    def __init__(self, SID, CID, LID, QID, content_name, content_type, link):
-=======
-    def __init__(self, SID, CID, QID, content_name, content_type, link):
->>>>>>> main
+    def __init__(self, SID, CID, QID, LID, content_name, content_type, link):
         self.SID = SID
         self.CID = CID
         self.QID = QID
@@ -229,48 +222,12 @@ class Section_content(db.Model):
 ### Lesson Class ###
 class Lesson(db.Model):
     __tablename__ = 'lesson'
-    LID = db.Column(db.Integer(), primary_key=True)
+    LID = db.Column(db.String(64), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
 
-<<<<<<< HEAD
-    def __init__(self, SID, CID, LID):
-            self.SID = SID
-            self.CID = CID
-            self.LID = LID
-
-
-    def to_dict(self):
-        """
-        'to_dict' converts the object into a dictionary,
-        in which the keys correspond to database columns
-        """
-        columns = self.__mapper__.column_attrs.keys()
-        result = {}
-        for column in columns:
-            result[column] = getattr(self, column)
-        return result
-
-    def json(self):
-        return {"SID": self.SID, "CID": self.CID, "LID": self.LID}
-
-### Ungraded Quiz Class ###
-class Ungraded_quiz(db.Model):
-    __tablename__ = 'ungraded_quiz'
-    CID = db.Column(db.String(64), primary_key=True)
-    LID = db.Column(db.Integer(), primary_key=True)
-    SID = db.Column(db.String(64), primary_key=True)
-    question = db.Column(db.String(64), primary_key=True)
-    answer = db.Column(db.String(64), nullable=False)
-    options = db.Column(db.String(64), nullable=False)
-
-
-    def __init__(self, CID, LID, SID, question, answer, options):
-        self.CID = CID
-=======
     
     def __init__(self, LID, SID, CID):
->>>>>>> main
         self.LID = LID
         self.SID = SID
         self.CID = CID
@@ -793,49 +750,49 @@ def hr_reject_signup():
 
 
 
-@app.route("/hr_assign_trainer", methods=['POST'])
-def hr_assign_trainer():
-    data = request.get_json()
-    expected=["CID", "TID"]
-    not_present=list()
-    #check input
-    for expect in expected:
-        if expect not in data.keys():
-            not_present.append(expect)
-    if len(not_present)>0:
-        return jsonify(
-            {
-                "message": f"Course {not_present} is not present, trainer is not assigned"
-            }
-        ), 500
-    try:
-        course = db.session.query(Course).get(data['CID'])
-        if len(course.trainers) == 0:
-            course.trainers = data['TID']
-        else:
-            current_trainer = course.trainers.split(',')
-            if data['TID'] not in current_trainer:
-                course.trainers = course.trainers +','+ data['TID']
-            else:
-                return jsonify(
-                {
-                    "message": f"Trainers {data['TID']} is already in database"
-                }
-            ), 500
+# @app.route("/hr_assign_trainer", methods=['POST'])
+# def hr_assign_trainer():
+#     data = request.get_json()
+#     expected=["CID", "TID"]
+#     not_present=list()
+#     #check input
+#     for expect in expected:
+#         if expect not in data.keys():
+#             not_present.append(expect)
+#     if len(not_present)>0:
+#         return jsonify(
+#             {
+#                 "message": f"Course {not_present} is not present, trainer is not assigned"
+#             }
+#         ), 500
+#     try:
+#         course = db.session.query(Course).get(data['CID'])
+#         if len(course.trainers) == 0:
+#             course.trainers = data['TID']
+#         else:
+#             current_trainer = course.trainers.split(',')
+#             if data['TID'] not in current_trainer:
+#                 course.trainers = course.trainers +','+ data['TID']
+#             else:
+#                 return jsonify(
+#                 {
+#                     "message": f"Trainers {data['TID']} is already in database"
+#                 }
+#             ), 500
             
-        db.session.commit()
-        return jsonify(
-        {
-           "message": f"Trainers {data['TID']} has been updated successfully in the database",
-           "data": course.to_dict()
-        }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Trainers {data['TID']} are not updated"
-        }
-    ), 500
+#         db.session.commit()
+#         return jsonify(
+#         {
+#            "message": f"Trainers {data['TID']} has been updated successfully in the database",
+#            "data": course.to_dict()
+#         }
+#         ), 200
+#     except Exception as e:
+#         return jsonify(
+#         {
+#             "message": f"Trainers {data['TID']} are not updated"
+#         }
+#     ), 500
     ### End of API points for Registration functions ###
     
     
