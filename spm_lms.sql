@@ -124,19 +124,20 @@ DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson` (
   `LID` varchar(64) NOT NULL,
   `CID` varchar(64) NOT NULL,
-  `SID` varchar(64) NOT NULL, 
-  constraint `lesson_fk1` foreign key(`CID`,`SID`) references `section`(`CID`,`SID`),
-  PRIMARY KEY (`LID`, `CID`, `SID`)
+  `SID` varchar(64) NOT NULL,
+  `start` datetime NOT NULL, 
+  constraint `lesson_fk1` foreign key(`SID`,`CID`, `start`) references `section`(`SID`,`CID`, `start`),
+  PRIMARY KEY (`LID`, `SID`, `CID`, `start`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `lesson`
 --
 
-INSERT INTO `lesson` (`LID`,`CID`,`SID`) VALUES
-('1', 'IS111', 'G1'),
-('2', 'IS111', 'G1'),
-('1', 'IS112', 'G2')
+INSERT INTO `lesson` (`LID`,`SID`,`CID`, `start`) VALUES
+('1', 'G1', 'IS111', 2021-04-01),
+('2', 'G1', 'IS111', 2021-04-01),
+('1', 'G2', 'IS112', 2021-05-01)
 ;
 
 -- --------------------------------------------------------
@@ -145,57 +146,34 @@ INSERT INTO `lesson` (`LID`,`CID`,`SID`) VALUES
 -- Table structure for table `graded_quiz`
 --
 
-DROP TABLE IF EXISTS `graded_quiz`;
-CREATE TABLE IF NOT EXISTS `graded_quiz` (
+DROP TABLE IF EXISTS `quiz_questions`;
+CREATE TABLE IF NOT EXISTS `quiz_questions` (
   `LID` varchar(64) NOT NULL,
-  `CID` varchar(64) NOT NULL,
   `SID` varchar(64) NOT NULL,
+  `CID` varchar(64) NOT NULL,
+  `start` datetime NOT NULL ,
   `question` varchar(64) NOT NULL,
   `answer` varchar(64) NOT NULL,
   `options` varchar(64) NOT NULL,
   `duration` int(10) NOT NULL,
-  constraint `graded_quiz_fk1` foreign key(`LID`,`CID`,`SID`) references `lesson`(`LID`,`CID`,`SID`),
-  PRIMARY KEY (`LID`, `CID`, `SID`, `question`)
+  `type` varchar(64) NOT NULL,
+  constraint `quiz_questions_fk1` foreign key(`LID`,`SID`,`CID`,`start`) references `lesson`(`LID`,`SID`,`CID`,`start`),
+  PRIMARY KEY (`LID`, `SID`, `CID`, `start`, `question`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --
--- -- Dumping data for table `graded_quiz`
+-- -- Dumping data for table `quiz_questions`
 -- --
 
-INSERT INTO `graded_quiz` (`LID`, `CID`,  `SID`, `question`, `answer`, `options`, `duration`) VALUES
-('1', 'IS111', 'G1', 'Is the moon round?', 'YES', 'YES|NO',  0),
-('1', 'IS111', 'G1', 'Is the sun round?', 'YES', 'YES|NO',  0),
-('1', 'IS111', 'G1', 'Which of these is not a planet ?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS',  0)
+INSERT INTO `quiz_questions` (`LID`, `SID`,  `CID`, `start`, `question`, `answer`, `options`, `duration`, `type`) VALUES
+('1', 'G1', 'IS111', 2021-04-01, 'Is the moon round?', 'YES', 'YES|NO',  0, 'ungraded'),
+('1', 'G1', 'IS111', 2021-04-01, 'Is the sun round?', 'YES', 'YES|NO',  0, 'ungraded'),
+('1', 'G1', 'IS111', 2021-04-01, 'Which of these is not a planet ?', 'PLUTO', 'EARTH|MARS|JUPITER|PLUTO|VENUS',  0, 'ungraded'),
+('2', 'G1', 'IS111', 2021-04-01, 'Bla bla black sheep have you any ?', 'WOLF', 'FOOD|WOLF|CAT|HUMAN',  0, 'graded'),
+('2', 'G1', 'IS111', 2021-04-01, 'Mary had a little ?', 'LAMB', 'COW|LAMP|LAMB',  0, 'graded'),
+('2', 'G1', 'IS111', 2021-04-01, 'Do you want to pass ?', 'YES', 'YES|NO',  0, 'graded')
 ;
 
--- -- --------------------------------------------------------
-
--- --
--- -- Table structure for table `ungraded_quiz`
--- --
-
-DROP TABLE IF EXISTS `ungraded_quiz`;
-CREATE TABLE IF NOT EXISTS `ungraded_quiz` (
-  `LID` varchar(64) NOT NULL,
-  `CID` varchar(64) NOT NULL,
-  `SID` varchar(64) NOT NULL,
-  `question` varchar(300) NOT NULL,
-  `answer` varchar(64) NOT NULL,
-  `options` varchar(300) NOT NULL,
-  `duration` int(10) NOT NULL,
-  constraint `ungraded_quiz_fk1` foreign key(`LID`,`CID`,`SID`) references `lesson`(`LID`,`CID`,`SID`),
-  PRIMARY KEY (`LID`, `CID`, `SID`, `question`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `ungraded_quiz`
---
-
-INSERT INTO `ungraded_quiz` (`LID`, `CID`, `SID`, `question`, `answer`, `options`, `duration`) VALUES
-('1', 'IS112', 'G2', 'Is the moon round?', 'YES', 'YES|NO', 0),
-('1', 'IS112', 'G2', 'Is the sun round?', 'YES', 'YES|NO', 0),
-('1', 'IS112', 'G2', 'Which of these is not a planet?', 'Pluto', 'EARTH|MARS|JUPITER|PLUTO|VENUS', 0)
-;
 
 -- --------------------------------------------------------
 
@@ -234,23 +212,24 @@ INSERT INTO `academic_record` (`EID`, `SID`, `CID`, `start`, `status`) VALUES
 DROP TABLE IF EXISTS `content`;
 CREATE TABLE IF NOT EXISTS `content` (
   `LID` varchar(64) NOT NULL, 
-  `CID` varchar(64) NOT NULL,
   `SID` varchar(64) NOT NULL,
+  `CID` varchar(64) NOT NULL,
+  `start` datetime NOT NULL,
   `content_type` varchar(64) NOT NULL,
   `content_name` varchar(64) NOT NULL,
   `link` varchar(64) NOT NULL,
-  constraint `content_fk1` foreign key(`LID`,`CID`,`SID`) references `lesson`(`LID`,`CID`,`SID`),
-  PRIMARY KEY (`LID`, `SID`, `CID`, `content_name`)
+  constraint `content_fk1` foreign key(`LID`,`SID`,`CID`,`start`) references `lesson`(`LID`,`SID`,`CID`,`start`),
+  PRIMARY KEY (`LID`, `SID`, `CID`, `start`, `content_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `content`
 --
 
-INSERT INTO `content` (`LID`, `CID`, `SID`, `content_type`, `content_name`, `link`) VALUES
-('1', 'IS111', 'G1', 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
-('2', 'IS111', 'G1',  'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
-('1', 'IS111', 'G1', 'pdf', 'Lesson 1 slides part 2', 'abd.com/shared/fuie896')
+INSERT INTO `content` (`LID`, `SID`, `CID`, `start`, `content_type`, `content_name`, `link`) VALUES
+('1', 'G1', 'IS111', 2021-04-01, 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
+('2', 'G1', 'IS111', 2021-04-01, 'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
+('1', 'G1', 'IS111', 2021-04-01, 'pdf', 'Lesson 1 slides part 2', 'abd.com/shared/fuie896')
 ;
 
 -- --------------------------------------------------------
@@ -266,7 +245,7 @@ CREATE TABLE IF NOT EXISTS `enrollment` (
   `CID` varchar(64) NOT NULL,
   `start` datetime NOT NULL,
   constraint `enrollment_fk1` foreign key(`EID`) references `engineer`(`EID`),
-  constraint `enrollment_fk2` foreign key(`SID`,`CID`, `start`) references `section`(`SID`,`CID`,`start`),
+  constraint `enrollment_fk2` foreign key(`SID`, `CID`, `start`) references `section`(`SID`, `CID`,`start`),
   PRIMARY KEY (`EID`, `SID`, `CID`, `start`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -286,23 +265,27 @@ INSERT INTO `enrollment` (`EID`,`SID`, `CID`, `start`) VALUES
 
 DROP TABLE IF EXISTS `quiz_record`;
 CREATE TABLE IF NOT EXISTS `quiz_record` (
-  `LID` varchar(64) NOT NULL,
-  `CID` varchar(64) NOT NULL,
-  `SID` varchar(64) NOT NULL,
   `EID` int(10) NOT NULL,
+  `LID` varchar(64) NOT NULL,
+  `SID` varchar(64) NOT NULL,
+  `CID` varchar(64) NOT NULL,
+  `start` datetime NOT NULL,
+  `question` varchar(64) NOT NULL,
+  `answer_given` varchar(64) NOT NULL,
   `marks` int(10) NOT NULL DEFAULT 0,
-  `status` varchar(64) NOT NULL,
   constraint `quiz_record_fk1` foreign key(`EID`) references `engineer`(`EID`),
-  constraint `quiz_record_fk2` foreign key(`LID`,`CID`,`SID`) references `graded_quiz`(`LID`,`CID`,`SID`),
-  PRIMARY KEY (`LID`, `CID`, `SID`, `EID`)
+  constraint `quiz_record_fk2` foreign key(`LID`,`SID`,`CID`,`start`,`question`) references `quiz_questions`(`LID`,`SID`,`CID`,`start`,`question`),
+  PRIMARY KEY (`EID`,`LID`, `SID`, `CID`, `start`,`question`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `quiz_record`
 --
 
-INSERT INTO `quiz_record` (`LID`,`CID`, `SID`, `EID`, `marks`, `status`) VALUES
-('1', 'IS111', 'G1', 001, 3, 'completed')
+INSERT INTO `quiz_record` (`EID`, `LID`, `SID`, `CID`, `start`, `question`, `answer_given`, `marks`) VALUES
+(001, '1', 'G1', 'IS111', 2021-04-01, 'Is the moon round?', 'YES', 1),
+(001, '1', 'G1', 'IS111', 2021-04-01, 'Is the sun round?', 'NO', 0),
+(001, '1', 'G1', 'IS111', 2021-04-01, 'Which of these is not a planet ?', 'EARTH', 0)
 ;
 
 -- --------------------------------------------------------
