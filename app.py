@@ -188,15 +188,24 @@ class Section_content(db.Model):
     __tablename__ = 'section_content'
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.String(64), primary_key=True)
     content_name = db.Column(db.String(64), primary_key=True)
     QID = db.Column(db.Integer(), nullable=True)
     content_type = db.Column(db.String(64), nullable=False)
     link = db.Column(db.String(64), nullable=False)
 
+<<<<<<< HEAD
+    
+
+
+    def __init__(self, SID, CID, LID, QID, content_name, content_type, link):
+=======
     def __init__(self, SID, CID, QID, content_name, content_type, link):
+>>>>>>> main
         self.SID = SID
         self.CID = CID
         self.QID = QID
+        self.LID = LID
         self.content_type = content_type
         self.content_name = content_name
         self.link = link
@@ -214,18 +223,54 @@ class Section_content(db.Model):
         return result
 
     def json(self):
-        return {"SID": self.SID, "CID": self.CID, "QID": self.QID, "content_type": self.content_type ,"content_name": self.content_name, "link": self.link}
+        return {"SID": self.SID, "CID": self.CID, "LID": self.LID, "QID": self.QID, "content_type": self.content_type ,"content_name": self.content_name, "link": self.link}
 ### Section_content Class ###
 
 ### Lesson Class ###
 class Lesson(db.Model):
     __tablename__ = 'lesson'
-    LID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.Integer(), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
 
+<<<<<<< HEAD
+    def __init__(self, SID, CID, LID):
+            self.SID = SID
+            self.CID = CID
+            self.LID = LID
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"SID": self.SID, "CID": self.CID, "LID": self.LID}
+
+### Ungraded Quiz Class ###
+class Ungraded_quiz(db.Model):
+    __tablename__ = 'ungraded_quiz'
+    CID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.Integer(), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    question = db.Column(db.String(64), primary_key=True)
+    answer = db.Column(db.String(64), nullable=False)
+    options = db.Column(db.String(64), nullable=False)
+
+
+    def __init__(self, CID, LID, SID, question, answer, options):
+        self.CID = CID
+=======
     
     def __init__(self, LID, SID, CID):
+>>>>>>> main
         self.LID = LID
         self.SID = SID
         self.CID = CID
@@ -971,7 +1016,7 @@ def delete_section():
 @app.route("/create_material", methods=['POST'])
 def create_material():
     data = request.get_json()
-    expected=["SID", "CID", "QID", "content_name", "content_type", "link"]
+    expected=["SID", "CID", "LID", "QID", "content_name", "content_type", "link"]
     not_present=list()
     #check input
     for expect in expected:
@@ -984,7 +1029,7 @@ def create_material():
             }
         ), 500
     try:
-        section_content = Section_content(SID=data["SID"], CID=data["CID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
+        section_content = Section_content(SID=data["SID"], CID=data["CID"], LID=data["LID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
         db.session.add(section_content)
         db.session.commit()
         return jsonify(
@@ -1002,9 +1047,9 @@ def create_material():
     ), 500
 
 #read section content
-@app.route("/view_section_content", methods=['POST'])
+@app.route("/view_all_section_content", methods=['POST'])
 #view all sections by using SID, CID
-def view_section_content():
+def view_all_section_content():
     data = request.get_json()
     expected=["SID", "CID"]
     not_present=list()
@@ -1032,11 +1077,42 @@ def view_section_content():
         }
     ), 500
 
+#read section content
+@app.route("/view_lesson_content", methods=['POST'])
+#view all sections by using SID, CID
+def view_lesson_content():
+    data = request.get_json()
+    expected=["SID", "CID", "LID"]
+    not_present=list()
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section content {not_present} is not present, no section content is retrieved from database"
+            }
+        ), 500
+    retrieved_section_content = Section_content.query.filter_by(SID = data['SID'], CID = data['CID'], LID = data['LID'])
+    section_contents = [section_content.to_dict() for section_content in retrieved_section_content]
+    if section_contents:
+        return jsonify(
+            {
+                "message": f"All sections content are retrieved for section {data['CID'], data['SID'], data['LID']}",
+                "data": section_contents
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no section content retrieved"
+        }
+    ), 500
+
 #update section content
 @app.route("/update_section_content", methods=['POST'])
 def update_section_content():
     data = request.get_json()
-    expected=["old_SID", "old_CID", "old_QID", "old_content_name", "old_content_type", "old_link"]
+    expected=["old_SID", "old_CID", "old_LID", "old_QID", "old_content_name", "old_content_type", "old_link"]
     not_present=list()
     #check input
     for expect in expected:
@@ -1048,35 +1124,43 @@ def update_section_content():
                 "message": f"Section content {not_present} is not present, section content is not inserted successfully into the database"
             }
         ), 500
-    potential_changes=["SID", "CID", "QID", "content_name", "content_type", "link"]
+    potential_changes=["SID", "CID", "LID", "QID", "content_name", "content_type", "link"]
     for change in potential_changes:
         if change not in data.keys():
             data[change] = data[str('old_'+change)]
-    try:
-        section_content = Section_content(SID=data["SID"], CID=data["CID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
-        db.session.add(section_content)
-        db.session.commit()
-        Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], content_name = data["old_content_name"]).delete()
-        db.session.commit()
+    exist = (Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], LID = data["old_LID"], content_name = data["old_content_name"]).first() != None)
+    if exist:
+        try:
+            Section_content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], LID = data["old_LID"], content_name = data["old_content_name"]).delete()
+            section_content = Section_content(SID=data["SID"], CID=data["CID"], LID=data["LID"], QID=data["QID"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
+            db.session.add(section_content)
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Section content {data['old_CID'], data['old_SID'], data['old_LID'], data['content_name']}'s details have been updated successfully in the database",
+                "data": section_content.to_dict()
+            }
+            ), 200
+
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Section content{data['old_CID'], data['old_SID'], data['old_LID'], data['old_content_name']} is not updated"
+            }
+        ), 500
+    else:
         return jsonify(
         {
-            "message": f"Section content {data['old_CID'], data['old_SID'], data['content_name']}'s details have been updated successfully in the database",
-            "data": section_content.to_dict()
-        }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Section {data['old_CID'], data['old_SID'], data['content_name']} is not updated"
-        }
-    ), 500
+            "message": f"Section content {data['old_CID'], data['old_SID'], data['old_LID'], data['old_content_name']} do not exist"
+        }), 500
+
 
 
 #delete section content
 @app.route("/delete_section_content", methods=['POST'])
 def delete_section_content():
     data = request.get_json()
-    expected=["SID", "CID", "content_name"]
+    expected=["SID", "CID", "LID", "content_name"]
     not_present=list()
     #check input
     for expect in expected:
@@ -1088,20 +1172,28 @@ def delete_section_content():
                 "message": f"Section content {not_present} is not present, section content is not successfully deleted"
             }
         ), 500
-    try:
-        Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], content_name = data["content_name"]).delete()
-        db.session.commit()
-        return jsonify(
-        {
-            "message": f"Section content { data['CID'], data['SID'], data['content_name']} has been deleted successfully from the database"
-        }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Section {data['CID'], data['SID'], data['content_name']} is not deleted"
-        }
+    exist = (Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], content_name = data["content_name"]).first() != None)
+    if exist:
+        try:
+            Section_content.query.filter_by(SID = data["SID"], CID = data["CID"], content_name = data["content_name"]).delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Section content { data['CID'], data['SID'], data['LID'], data['content_name']} has been deleted successfully from the database"
+            }
+            ), 200
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Section {data['CID'], data['SID'], data['LID'], data['content_name']} is not deleted"
+            }
     ), 500
+    else:
+        return jsonify(
+        {
+            "message": f"Section content {data['CID'], data['SID'], data['LID'], data['content_name']} do not exist"
+        }), 500
+    
 
 ### End of API points for Material CRUD ###
 
@@ -1177,6 +1269,44 @@ def create_lesson():
         }
     ), 500
 
+
+#delete lesson
+@app.route("/delete_lesson", methods=['POST'])
+def delete_lesson():
+    data = request.get_json()
+    expected=["SID", "CID", "LID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Lesson {not_present} is not present, lesson is not successfully deleted"
+            }
+        ), 500
+    exist = (Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"]).first() != None)
+    if exist:
+        try:
+            Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"]).delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Lesson { data['CID'], data['SID'], data['LID']} has been deleted successfully from the database"
+            }
+            ), 200
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Lesson {data['CID'], data['SID'], data['LID']} is not deleted"
+            }
+    ), 500
+    else:
+        return jsonify(
+        {
+            "message": f"Lesson {data['CID'], data['SID'], data['LID']} do not exist"
+        }), 500
 
 ### End of API point for lesson CRUD ###
 
