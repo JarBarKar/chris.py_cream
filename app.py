@@ -188,7 +188,7 @@ class Section_content(db.Model):
     __tablename__ = 'section_content'
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
-    LID = db.Column(db.Integer(), primary_key=True)
+    LID = db.Column(db.String(64), primary_key=True)
     content_name = db.Column(db.String(64), primary_key=True)
     QID = db.Column(db.Integer(), nullable=True)
     content_type = db.Column(db.String(64), nullable=False)
@@ -225,9 +225,29 @@ class Section_content(db.Model):
 ### Section Class ###
 class Lesson(db.Model):
     __tablename__ = 'lesson'
-    LID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.Integer(), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
+
+    def __init__(self, SID, CID, LID):
+            self.SID = SID
+            self.CID = CID
+            self.LID = LID
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"SID": self.SID, "CID": self.CID, "LID": self.LID}
 
 ### Ungraded Quiz Class ###
 class Ungraded_quiz(db.Model):
@@ -1007,9 +1027,9 @@ def create_material():
     ), 500
 
 #read section content
-@app.route("/view_section_content", methods=['POST'])
+@app.route("/view_all_section_content", methods=['POST'])
 #view all sections by using SID, CID
-def view_section_content():
+def view_all_section_content():
     data = request.get_json()
     expected=["SID", "CID"]
     not_present=list()
@@ -1028,6 +1048,37 @@ def view_section_content():
         return jsonify(
             {
                 "message": f"All sections content are retrieved for section {data['CID'], ' ', data['SID']}",
+                "data": section_contents
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no section content retrieved"
+        }
+    ), 500
+
+#read section content
+@app.route("/view_lesson_content", methods=['POST'])
+#view all sections by using SID, CID
+def view_lesson_content():
+    data = request.get_json()
+    expected=["SID", "CID", "LID"]
+    not_present=list()
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section content {not_present} is not present, no section content is retrieved from database"
+            }
+        ), 500
+    retrieved_section_content = Section_content.query.filter_by(SID = data['SID'], CID = data['CID'], LID = data['LID'])
+    section_contents = [section_content.to_dict() for section_content in retrieved_section_content]
+    if section_contents:
+        return jsonify(
+            {
+                "message": f"All sections content are retrieved for section {data['CID'], data['SID'], data['LID']}",
                 "data": section_contents
             }
         ), 200
@@ -1114,7 +1165,7 @@ def delete_section_content():
         except Exception as e:
             return jsonify(
             {
-                "message": f"Section {data['CID'], data['SID'], data['content_name']} is not deleted"
+                "message": f"Section {data['CID'], data['SID'], data['LID'], data['content_name']} is not deleted"
             }
     ), 500
     else:
@@ -1198,6 +1249,44 @@ def create_lesson():
         }
     ), 500
 
+
+#delete lesson
+@app.route("/delete_lesson", methods=['POST'])
+def delete_lesson():
+    data = request.get_json()
+    expected=["SID", "CID", "LID"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Lesson {not_present} is not present, lesson is not successfully deleted"
+            }
+        ), 500
+    exist = (Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"]).first() != None)
+    if exist:
+        try:
+            Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"]).delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Lesson { data['CID'], data['SID'], data['LID']} has been deleted successfully from the database"
+            }
+            ), 200
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Lesson {data['CID'], data['SID'], data['LID']} is not deleted"
+            }
+    ), 500
+    else:
+        return jsonify(
+        {
+            "message": f"Lesson {data['CID'], data['SID'], data['LID']} do not exist"
+        }), 500
 
 ### End of API point for lesson CRUD ###
 
