@@ -15,8 +15,8 @@ class TestApp(flask_testing.TestCase):
 
 
     def setUp(self):
-        self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='', trainers='')
-        self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500', trainers='')
+        self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='')
+        self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500')
         self.er1 = Enrollment(EID=1, SID='G2', CID='IS500')
         self.er2 = Enrollment(EID=6, SID='G90', CID='IS600')
         self.cd1 = Academic_record(EID=1, SID="G2", CID="IS500", QID=1, status='ongoing', quiz_result=0)
@@ -489,36 +489,36 @@ class TestHRRejectSignup(TestApp):
             })
 
 
-class TestHRAssignTrainer(TestApp):
-    def test_hr_assign_trainer(self):
-        # adding dummy course into database
-        db.session.add(self.c2)
-        db.session.commit()
+# class TestHRAssignTrainer(TestApp):
+#     def test_hr_assign_trainer(self):
+#         # adding dummy course into database
+#         db.session.add(self.c2)
+#         db.session.commit()
 
-        # creating request body for course 
-        request_body = {
-            'CID' : self.c2.CID, 
-            'name' : self.c2.name, 
-            'prerequisites' : self.c2.prerequisites, 
-            'TID' : '12,14'
-        }
+#         # creating request body for course 
+#         request_body = {
+#             'CID' : self.c2.CID, 
+#             'name' : self.c2.name, 
+#             'prerequisites' : self.c2.prerequisites, 
+#             'TID' : '12,14'
+#         }
 
-        # calling hr_assign_trainer function via flask route
-        response = self.client.post("/hr_assign_trainer",
-                                    data=json.dumps(request_body),
-                                    content_type='application/json')
-        # self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {
-            'data' : 
-                {
-                'CID': 'IS600',
-                'name' : 'Super Hard Mod',
-                'prerequisites': 'IS500',
-                'trainers': '12,14'
-                },
-            'message' : f'Trainers 12,14 has been updated successfully in the database'
+#         # calling hr_assign_trainer function via flask route
+#         response = self.client.post("/hr_assign_trainer",
+#                                     data=json.dumps(request_body),
+#                                     content_type='application/json')
+#         # self.assertEqual(response.status_code, 200)
+#         self.assertEqual(response.json, {
+#             'data' : 
+#                 {
+#                 'CID': 'IS600',
+#                 'name' : 'Super Hard Mod',
+#                 'prerequisites': 'IS500',
+#                 'trainers': '12,14'
+#                 },
+#             'message' : f'Trainers 12,14 has been updated successfully in the database'
             
-            })
+#             })
 
 
 ### Registration TEST CASES ###
