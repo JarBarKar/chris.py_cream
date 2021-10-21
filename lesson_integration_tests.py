@@ -1,8 +1,10 @@
+from typing import ContextManager
 import unittest
 import flask_testing
 import json
 from app import app, db, Lesson
 from datetime import datetime
+
 
 
 class TestApp(flask_testing.TestCase):
@@ -14,7 +16,6 @@ class TestApp(flask_testing.TestCase):
     def create_app(self):
         return app
 
-
     def setUp(self):
         self.l1 = Lesson(LID='1', CID='IS111', SID='G1', start=datetime.min)
         self.l2 = Lesson(LID='2', CID='IS111', SID='G1', start=datetime.min)
@@ -22,8 +23,8 @@ class TestApp(flask_testing.TestCase):
         
         db.create_all()
 
-
     def tearDown(self):
+
         self.l1 = None
         self.l2 = None
         self.l3 = None
@@ -415,10 +416,75 @@ class TestCreateCourse(TestApp):
         self.assertEqual(response.json, {
             'message':'Lesson is not inserted successfully into the database'
         })
+          
 
+
+class TestDeleteLesson(TestApp):
+    # Testing positive case where content name is updated
+    def test_delete_lesson(self):
+        # adding one lesson to database
+        db.session.add(self.s1)
+        db.session.commit()
+
+        # setting lesson details
+        request_body = {
+            'SID': self.s1.SID,
+            'CID': self.s1.CID,
+            'LID': self.s1.LID,
+        }
+
+        # calling delete function via flask route
+        response = self.client.post("/delete_lesson",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "message": f"Lesson { self.s1.CID, self.s1.SID, self.s1.LID} has been deleted successfully from the database"    
+        })
+
+    def test_delete_missing_CID(self):
+        # adding one section to database
+        db.session.add(self.s1)
+        db.session.commit()
+
+        # setting section details
+        request_body = {
+            'SID': self.s1.SID,
+            'LID': self.s1.LID,
+        }
+
+        # calling delete_lesson function via flask route
+        response = self.client.post("/delete_lesson",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Lesson ['CID'] is not present, lesson is not successfully deleted"
+        })
+
+    def test_delete_lesson_not_in_database(self):
+        # adding one lesson to database
+
+        # setting section details
+        request_body = {
+            'SID': self.s1.SID,
+            'CID': self.s1.CID,
+            'LID': self.s1.LID,
+        }
+
+        # calling delete_lesson function via flask route
+        response = self.client.post("/delete_lesson",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Lesson {self.s1.CID, self.s1.SID, self.s1.LID} do not exist"
+        })
 
 
 # ### LESSON TEST CASES ###
+
+
 
 if __name__ == '__main__':
     unittest.main()
