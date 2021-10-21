@@ -125,18 +125,19 @@ CREATE TABLE IF NOT EXISTS `lesson` (
   `LID` varchar(64) NOT NULL,
   `CID` varchar(64) NOT NULL,
   `SID` varchar(64) NOT NULL, 
-  constraint `lesson_fk1` foreign key(`CID`,`SID`) references `section`(`CID`,`SID`),
-  PRIMARY KEY (`LID`, `CID`, `SID`)
+  `start` datetime NOT NULL,
+  constraint `lesson_fk1` foreign key(`CID`,`SID`,`start`) references `section`(`CID`,`SID`,`start`),
+  PRIMARY KEY (`LID`, `CID`, `SID`, `start`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `lesson`
 --
 
-INSERT INTO `lesson` (`LID`,`CID`,`SID`) VALUES
-('1', 'IS111', 'G1'),
-('2', 'IS111', 'G1'),
-('1', 'IS112', 'G2')
+INSERT INTO `lesson` (`LID`,`CID`,`SID`,`start`) VALUES
+('1', 'IS111', 'G1', 2021-04-01),
+('2', 'IS111', 'G1', 2021-04-01),
+('1', 'IS112', 'G2', 2021-04-01)
 ;
 
 -- --------------------------------------------------------
