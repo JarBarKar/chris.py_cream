@@ -15,9 +15,9 @@ class TestApp(flask_testing.TestCase):
         return app
 
     def setUp(self):
-        self.s1 = Section(SID='G1', CID='IS111', start=datetime.min, end=datetime.min, vacancy=50, TID=1)
-        self.s2 = Section(SID='G2', CID='IS111', start=datetime.min, end=datetime.min, vacancy=50, TID=1)
-        self.s3 = Section(SID='G3', CID='IS333', start=datetime(2021,6,1), end=datetime(2021,7,1), vacancy=50, TID=3)
+        self.s1 = Section(SID='G1', CID='IS111', start=datetime.min, end=datetime.max, vacancy=50, TID=1)
+        self.s2 = Section(SID='G2', CID='IS111', start=datetime.min, end=datetime.max, vacancy=50, TID=1)
+        self.s3 = Section(SID='G3', CID='IS333', start=datetime.min, end=datetime.max, vacancy=50, TID=3)
         
         db.create_all()
 
@@ -53,7 +53,7 @@ class TestViewSections(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 1
                 },
@@ -61,7 +61,7 @@ class TestViewSections(TestApp):
                 'SID': 'G2',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 1
                 }
@@ -72,12 +72,11 @@ class TestViewSections(TestApp):
     # Testing failed case when there are no database
     def test_view_sections_not_in_database(self):
         # calling create_sections function via flask route
-        self.s1 = Section(SID='G1', CID='IS111', start=datetime.min, end=datetime.min, vacancy=50, TID=1)
         request_body = {
-            'SID': self.s1.TID,
-            'CID': self.s1.TID,
-            'start': self.s1.TID,
-            'end': self.s1.TID,
+            'SID': self.s1.SID,
+            'CID': self.s1.CID,
+            'start': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -131,7 +130,7 @@ class TestCreateSection(TestApp):
             'SID': self.s1.SID,
             'CID': self.s1.CID,
             'start': "01/01/0001 00:00:00",
-            'end': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -147,12 +146,11 @@ class TestCreateSection(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 1
             },
             'message': f"Section {self.s1.SID} has been inserted successfully into the database"
-            
         })
 
         # Testing failed case where SID is missing
@@ -161,7 +159,7 @@ class TestCreateSection(TestApp):
         request_body = {
             'CID': self.s1.CID,
             'start': "01/01/0001 00:00:00",
-            'end': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -182,7 +180,7 @@ class TestCreateSection(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'start': "01/01/0001 00:00:00",
-            'end': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -203,7 +201,7 @@ class TestCreateSection(TestApp):
         request_body = {
             'CID': self.s1.CID,
             'SID': self.s1.SID,
-            'end': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -223,7 +221,7 @@ class TestCreateSection(TestApp):
         # setting section details
         request_body = {
             'SID': self.s1.SID,
-            'end': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -242,7 +240,7 @@ class TestCreateSection(TestApp):
     def test_create_course_missing_SID_start_CID(self):
         # setting section details
         request_body = {
-            'end': "01/01/0001 00:00:00",
+            'end': "31/12/9999 23:59:59",
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -297,7 +295,7 @@ class TestQuerySections(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 1
                 },
@@ -305,7 +303,7 @@ class TestQuerySections(TestApp):
                 'SID': 'G2',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 1
                 }
@@ -477,7 +475,7 @@ class TestUpdateSection(TestApp):
             "SID": self.s1.SID,
             "CID": self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": 30,
             "TID": self.s1.TID
         }
@@ -492,7 +490,7 @@ class TestUpdateSection(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 30,
                 'TID': 1
             },
@@ -511,7 +509,7 @@ class TestUpdateSection(TestApp):
             "SID": self.s1.SID,
             "CID": self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.vacancy,
             "TID": 100
         }
@@ -526,7 +524,7 @@ class TestUpdateSection(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 100
             },
@@ -545,7 +543,7 @@ class TestUpdateSection(TestApp):
             "SID": self.s1.SID,
             "CID": self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "02/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.vacancy,
             "TID": self.s1.TID
         }
@@ -560,7 +558,7 @@ class TestUpdateSection(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Tue, 02 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 50,
                 'TID': 1
             },
@@ -579,7 +577,7 @@ class TestUpdateSection(TestApp):
             "SID": self.s1.SID,
             "CID": self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "02/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": 1,
             "TID": 1000
         }
@@ -594,7 +592,7 @@ class TestUpdateSection(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Tue, 02 Jan 0001 00:00:00 GMT',
+                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
                 'vacancy': 1,
                 'TID': 1000
             },
@@ -614,7 +612,7 @@ class TestUpdateSection(TestApp):
             "SID": "HELLO GOOD NIGHT",
             "CID": self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -639,7 +637,7 @@ class TestUpdateSection(TestApp):
             "SID": self.s1.SID,
             "CID": "GOOD NIGHT",
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -653,7 +651,7 @@ class TestUpdateSection(TestApp):
             "message": "Section is not found"
         })
     
-    # Testing negative case where CID is not in database
+    # Testing negative case where start is not in database
     def test_update_section_start_not_in_database(self):
         # adding one section to database
         db.session.add(self.s1)
@@ -663,8 +661,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "start": "blah",
-            "end": "01/01/0001 00:00:00",
+            "start": "ETHEREUM TO THE MOON",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -686,7 +684,7 @@ class TestUpdateSection(TestApp):
             "SID": self.s1.SID,
             "CID": self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -702,12 +700,11 @@ class TestUpdateSection(TestApp):
     
     # Testing negative case where section is never in the database
     def test_update_section_CID_not_in_request(self):
-
         # setting section details
         request_body = {
             "SID": self.s1.SID,
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -727,7 +724,7 @@ class TestUpdateSection(TestApp):
         request_body = {
             "CID" : self.s1.CID,
             "start": "01/01/0001 00:00:00",
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -746,7 +743,7 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "end": "01/01/0001 00:00:00",
+            "end": "31/12/9999 23:59:59",
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -774,7 +771,7 @@ class TestUpdateSection(TestApp):
             "message": "SID,CID,start,end,vacancy,TID not found"
         })
 
-# ### SECTION TEST CASES ###
+### SECTION TEST CASES ###
 
 if __name__ == '__main__':
     unittest.main()

@@ -128,11 +128,13 @@ CREATE TABLE IF NOT EXISTS `lesson` (
   `start` datetime NOT NULL, 
   constraint `lesson_fk1` foreign key(`SID`,`CID`, `start`) references `section`(`SID`,`CID`, `start`),
   PRIMARY KEY (`LID`, `SID`, `CID`, `start`)
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `lesson`
 --
+
 
 INSERT INTO `lesson` (`LID`,`SID`,`CID`, `start`) VALUES
 ('1', 'G1', 'IS111', 2021-04-01),
