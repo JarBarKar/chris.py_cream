@@ -1,7 +1,8 @@
 import unittest
 import flask_testing
 import json
-from app import app, db, Course
+from app import app, db, Course, Academic_record
+from datetime import datetime
 
 
 class TestApp(flask_testing.TestCase):
@@ -18,6 +19,8 @@ class TestApp(flask_testing.TestCase):
         self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='')
         self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500')
         self.c3 = Course(CID='IS700', name='Super Super Hard Mod', prerequisites='IS500,IS600')
+        self.a1 = Academic_record(EID=1, SID="G1", CID="IS500", start= datetime.min, status="completed")
+        self.a2 = Academic_record(EID=1, SID="G1", CID="IS600", start= datetime.min, status="ongoing")
         
         db.create_all()
 
@@ -26,6 +29,8 @@ class TestApp(flask_testing.TestCase):
         self.c1 = None
         self.c2 = None
         self.c3 = None
+        self.a1 = None
+        self.a2 = None
         db.session.remove()
         db.drop_all()
 
@@ -148,6 +153,102 @@ class TestViewCourses(TestApp):
         self.assertEqual(response.json, {
             'message' : f'CID is missing'
         })
+
+
+class TestViewEligibleCourses(TestApp):
+    # Testing function when it is success case
+    def test_view_eligible_courses_0(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.c1)
+        db.session.add(self.c2)
+        db.session.add(self.c3)
+        db.session.add(self.a1)
+        db.session.add(self.a2)
+        db.session.commit()
+
+        request_body = {
+            'EID': 1
+        }
+        response = self.client.post("/view_eligible_courses",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "message": "Eligible and non-eligible courses are retrieved",
+            "data" : 
+            {
+            'eligible': [], 
+            'non_eligible': 
+                [{'CID': 'IS500', 'name': 'Super Mod', 'prerequisites': ''}, 
+                {'CID': 'IS600', 'name': 'Super Hard Mod', 'prerequisites': 'IS500'}, 
+                {'CID': 'IS700', 'name': 'Super Super Hard Mod', 'prerequisites': 'IS500,IS600'}]
+            }
+        })
+    
+        # Testing function when it is success case
+    def test_view_eligible_courses_1(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.c1)
+        db.session.add(self.c2)
+        db.session.add(self.c3)
+        db.session.add(self.a1)
+        db.session.commit()
+
+        request_body = {
+            'EID': 1
+        }
+        response = self.client.post("/view_eligible_courses",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "message": "Eligible and non-eligible courses are retrieved",
+            "data" : 
+            {
+            'eligible': [{'CID': 'IS600', 'name': 'Super Hard Mod', 'prerequisites': 'IS500'}], 
+            'non_eligible': 
+                [{'CID': 'IS500', 'name': 'Super Mod', 'prerequisites': ''}, 
+                {'CID': 'IS700', 'name': 'Super Super Hard Mod', 'prerequisites': 'IS500,IS600'}]
+            }
+        })
+
+    # Testing function when eid is not inserted
+    def test_view_eligible_courses_no_EID(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.c1)
+        db.session.add(self.c2)
+        db.session.add(self.c3)
+        db.session.add(self.a1)
+        db.session.commit()
+
+        request_body = {
+        }
+        response = self.client.post("/view_eligible_courses",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": "EID is missing"
+            }
+        )
+
+    # Testing function when database does not exist
+    def test_view_eligible_courses_EID_fail(self):
+        # calling view_eligible_courses function via flask route
+        request_body = {
+            "EID" : 1
+        }
+        response = self.client.post("/view_eligible_courses",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": "There are no course retrieved"
+            }
+        )
 
 
 class TestUpdateCourse(TestApp):
