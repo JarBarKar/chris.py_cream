@@ -44,7 +44,10 @@ class Course(db.Model):
         "prerequisites": self.prerequisites}
 
     def list_of_prerequisites(self):
-        return self.prerequisites.split(',')
+        if self.prerequisites.split(',')[0] == '':
+            return []
+        else:
+            return self.prerequisites.split(',')
 ### Course Class ###
 
 
@@ -54,18 +57,16 @@ class Academic_record(db.Model):
     EID = db.Column(db.Integer(), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
-    QID = db.Column(db.Integer(), nullable=True)
+    start = db.Column(db.DateTime, nullable=False, primary_key=True)
     status = db.Column(db.String(64), nullable=False)
-    quiz_result = db.Column(db.Integer(), nullable=False)
 
 
-    def __init__(self, EID, SID, CID, QID, status, quiz_result):
+    def __init__(self, EID, SID, CID, start, status):
         self.EID = EID
         self.SID = SID
         self.CID = CID
-        self.QID = QID
+        self.start = start
         self.status = status
-        self.quiz_result = quiz_result
 
     def to_dict(self):
         """
@@ -79,7 +80,7 @@ class Academic_record(db.Model):
         return result
 
     def json(self):
-        return {"CID": self.CID, "EID": self.EID, "SID": self.SID, "QID": self.QID, "status": self.status, "quiz_result": self.quiz_result}
+        return {"EID": self.EID, "SID": self.SID, "CID": self.CID, "start": self.start, "status": self.status}
 ### Academic record Class ###
 
 
@@ -223,12 +224,14 @@ class Lesson(db.Model):
     LID = db.Column(db.String(64), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
+    start = db.Column(db.DateTime, nullable=False, primary_key=True)
 
     
-    def __init__(self, LID, SID, CID):
+    def __init__(self, LID, SID, CID, start):
         self.LID = LID
         self.SID = SID
         self.CID = CID
+        self.start = start
 
 
     def to_dict(self):
@@ -244,7 +247,7 @@ class Lesson(db.Model):
 
 
     def json(self):
-        return {"LID": self.LID, "SID": self.SID, "CID": self.CID}
+        return {"LID": self.LID, "SID": self.SID, "CID": self.CID, "start": self.start}
 ### Lesson Class ###
 
 ### Ungraded Quiz Class ###
@@ -344,7 +347,7 @@ def view_all_courses():
         }
     ), 500
 
-#view eligible courses
+#view eligible courses by EID
 @app.route("/view_eligible_courses", methods=['POST'])
 def view_eligible_courses():
     data = request.get_json()
@@ -353,24 +356,37 @@ def view_eligible_courses():
     non_eligible_courses = []
     all_courses = {}
     final_result = {"eligible":[],"non_eligible":[]}
+
+    if "EID" not in data.keys():
+        return jsonify(
+            {
+                "message": "EID is missing"
+            }
+        ), 500
+
     try:
-        #retrieve all completed course by EID
+        #retrieve all completed course, ongoing course by EID
         completed_courses_retrieved = Academic_record.query.filter_by(EID=data["EID"], status="completed")
-        completed_courses = [course.json()['CID'] for course in completed_courses_retrieved]
+        ongoing_courses_retrieved = Academic_record.query.filter_by(EID=data["EID"], status="ongoing")
+        completed_courses = [course.to_dict() for course in completed_courses_retrieved]
+        ongoing_courses = [course.to_dict() for course in ongoing_courses_retrieved]
+
         all_courses_retrieved = Course.query.all()
+
         for course in all_courses_retrieved:
             all_courses[course.json()['CID']] = course.list_of_prerequisites()
-        
-        for key in all_courses.keys():
-            fail = False
-            if key not in completed_courses:
-                for value in all_courses[key]:
-                    if value == '':
-                        continue
-                    if value not in all_courses:
-                        fail = True
-                if fail == False:
-                    eligible_courses.append(key)
+
+        # If course is not in completed courses and on-going courses and fulfil the re-requisite, it is eligible
+        # If course is either on-going or completed, it is not eligible
+        for course, prerequisites in all_courses.items():
+            if course not in [c_course["CID"] for c_course in completed_courses] and course not in [o_course["CID"] for o_course in ongoing_courses]:
+                status = True
+                for prereq in prerequisites:
+                    if prereq not in [c_course["CID"] for c_course in completed_courses] and course not in [o_course["CID"] for o_course in ongoing_courses]:
+                        status = False
+                if status == True:
+                    eligible_courses.append(course)
+
 
         for course in all_courses:
             if course not in eligible_courses:
@@ -1125,14 +1141,14 @@ def view_all_lessons():
         }
     ), 500
 
-# query specific lessons detail using SID & CID
+# query specific lessons detail using SID & CID & start
 @app.route("/query_lessons", methods=['POST'])
 def query_lessons():
     data = request.get_json()
 
     try:
-        retrieved_lessons = Lesson.query.filter_by(SID=data['SID'] ,CID=data["CID"])
-
+        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+        retrieved_lessons = Lesson.query.filter_by(SID=data['SID'] ,CID=data["CID"], start=data['start'])
         lessons = [lesson.to_dict() for lesson in retrieved_lessons]
 
         if len(lessons) == 0:
@@ -1159,8 +1175,20 @@ def query_lessons():
 @app.route("/create_lesson", methods=['POST'])
 def create_lesson():
     data = request.get_json()
+    missing_input = []
+    expected_input = ["LID","SID","CID","start"]
+    for key in expected_input:
+        if key not in data.keys():
+            missing_input.append(key)
+    if len(missing_input)>0:
+        return jsonify(
+            {
+                "message": f"{','.join(missing_input)} is missing"
+            }
+        ), 500
     try:
-        lesson = Lesson(LID=data["LID"], SID=data["SID"], CID=data["CID"])
+        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+        lesson = Lesson(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"])
         db.session.add(lesson)
         db.session.commit()
         return jsonify(
