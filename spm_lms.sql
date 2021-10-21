@@ -145,7 +145,7 @@ INSERT INTO `lesson` (`LID`,`SID`,`CID`, `start`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `graded_quiz`
+-- Table structure for table `quiz_questions`
 --
 
 DROP TABLE IF EXISTS `quiz_questions`;

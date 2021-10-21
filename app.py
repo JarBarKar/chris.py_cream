@@ -252,26 +252,29 @@ class Lesson(db.Model):
         return {"LID": self.LID, "SID": self.SID, "CID": self.CID, "start": self.start}
 ### Lesson Class ###
 
-### Ungraded Quiz Class ###
-class Ungraded_quiz(db.Model):
-    __tablename__ = 'ungraded_quiz'
+### Quiz Questions Class ###
+class Quiz_questions(db.Model):
+    __tablename__ = 'Quiz_questions'
     LID = db.Column(db.Integer(), primary_key=True)
-    CID = db.Column(db.String(64), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    start = db.Column(db.DateTime, nullable=False, primary_key=True)
     question = db.Column(db.String(64), primary_key=True)
     answer = db.Column(db.String(64), nullable=False)
     options = db.Column(db.String(64), nullable=False)
     duration = db.Column(db.Integer(), nullable=False)
+    type = db.Column(db.String(64), nullable=False)
 
-
-    def __init__(self, LID, CID, SID, question, answer, options, duration):
+    def __init__(self, LID, SID, CID, start, question, answer, options, duration, type):
         self.LID = LID
-        self.CID = CID
         self.SID = SID
+        self.CID = CID
+        self.start = start
         self.question = question
         self.answer = answer
         self.options = options
         self.duration = duration
+        self.type = type
 
 
     def to_dict(self):
@@ -282,52 +285,16 @@ class Ungraded_quiz(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
         return result
 
     def json(self):
-        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
-                "answer":self.answer, "options":self.options, "duration":self.duration}
-### Ungraded Quiz Class ###
-
-
-### Graded Quiz Class ###
-class Graded_quiz(db.Model):
-    __tablename__ = 'Graded_quiz'
-    LID = db.Column(db.Integer(), primary_key=True)
-    CID = db.Column(db.String(64), primary_key=True)
-    SID = db.Column(db.String(64), primary_key=True)
-    question = db.Column(db.String(64), primary_key=True)
-    answer = db.Column(db.String(64), nullable=False)
-    options = db.Column(db.String(64), nullable=False)
-    duration = db.Column(db.Integer(), nullable=False)
-
-
-    def __init__(self, LID, CID, SID, question, answer, options, duration):
-        self.LID = LID
-        self.CID = CID
-        self.SID = SID
-        self.question = question
-        self.answer = answer
-        self.options = options
-        self.duration = duration
-
-
-    def to_dict(self):
-        """
-        'to_dict' converts the object into a dictionary,
-        in which the keys correspond to database columns
-        """
-        columns = self.__mapper__.column_attrs.keys()
-        result = {}
-        for column in columns:
-            result[column] = getattr(self, column)
-        return result
-
-    def json(self):
-        return {"CID": self.CID, "LID": self.LID, "SID": self.SID,  "question": self.question,
-                "answer":self.answer, "options":self.options, "duration":self.duration}
-### Graded Quiz Class ###
+        return {"LID": self.LID, "SID": self.SID, "CID": self.CID, "start": self.start , "question": self.question,
+                "answer":self.answer, "options":self.options, "duration":self.duration, "type": self.type}
+### Quiz Questions Class ###
 
 
 ### Start of API points for Course CRUD ###
@@ -1296,28 +1263,29 @@ def delete_lesson():
 ### End of API point for lesson CRUD ###
 
 
-### Start of API points for Ungraded Quiz CRUD ###
-#create ungraded quiz and add it in the ungraded quiz table
-@app.route("/create_ungraded_quiz_question", methods=['POST'])
-def create_ungraded_quiz():
+### Start of API points for Quiz CRUD ###
+#create quiz question and add it in the quiz questions table
+@app.route("/create_quiz_question", methods=['POST'])
+def create_quiz_question():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options', 'duration']
+    fields = ['LID', 'SID', 'CID', 'start', 'question', 'answer', 'options', 'duration', 'type']
     for key in fields:
         if key not in data.keys():
             return jsonify(
             {
-                "message": f"{key} is missing from request body, ungraded quiz question creation failed",
+                "message": f"{key} is missing from request body, quiz question creation failed",
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        ungraded_quiz = Ungraded_quiz(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"], 
-                                    answer=data["answer"], options=data["options"], duration=data["duration"])
-        db.session.add(ungraded_quiz)
+        quiz_question= Quiz_questions(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"], question=data["question"], 
+                                    answer=data["answer"], options=data["options"], duration=data["duration"], type=data["type"])
+        db.session.add(quiz_question)
         db.session.commit()
         return jsonify(
             {
-                "message": f"Ungraded quiz question, {data['question']} ,has been inserted successfully into the database",
-                "data": ungraded_quiz.to_dict()
+                "message": f"Quiz question, {data['question']} ,has been inserted successfully into the database",
+                "data": quiz_question.to_dict()
             }
         ), 200
     except Exception as e:
@@ -1328,30 +1296,31 @@ def create_ungraded_quiz():
     ), 500
 
 
-#Read/get all the questions from a specific ungraded quiz
-@app.route("/read_ungraded_quiz", methods=['POST'])
-def read_ungraded_quiz():
+#Read/get all the questions from a specific quiz
+@app.route("/read_quiz", methods=['POST'])
+def read_quiz():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID']
+    fields = ['LID', 'SID', 'CID', 'start']
     for key in fields:
         if key not in data.keys():
             return jsonify(
             {
-                "message": f"{key} is missing from request body, ungraded quiz read failed",
+                "message": f"{key} is missing from request body, quiz read failed",
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        quiz_questions = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
+        quiz_questions = Quiz_questions.query.filter_by(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"])
         all_questions = [question.to_dict() for question in quiz_questions]
         if len(all_questions) == 0:
             return jsonify(
             {
-                "message": f"Quiz with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
+                "message": f"Quiz with LID: {data['LID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} does not exist in database",
             }
         ), 500
         return jsonify(
             {
-                "message": f"Quiz with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
+                "message": f"Quiz with LID: {data['LID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been retrieved",
                 "data": all_questions
             }
         ), 200
@@ -1364,29 +1333,30 @@ def read_ungraded_quiz():
 
 
 #Read/get a specific question from a specific ungraded quiz
-@app.route("/read_ungraded_quiz_question", methods=['POST'])
-def read_ungraded_quiz_question():
+@app.route("/read_quiz_question", methods=['POST'])
+def read_quiz_question():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question']
+    fields = ['LID', 'SID', 'CID', 'start', 'question']
     for key in fields:
         if key not in data.keys():
             return jsonify(
             {
-                "message": f"{key} is missing from request body, ungraded quiz question read failed",
+                "message": f"{key} is missing from request body, quiz question read failed",
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        quiz_question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        quiz_question = Quiz_questions.query.filter_by(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"], question=data["question"])
         question = quiz_question.first()
         if question == None:
             return jsonify(
             {
-                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
+                "message": f"Quiz question \'{data['question']}\' with LID {data['LID']}, SID {data['SID']}, CID {data['CID']}, start {data['start']} does not exist in database",
             }
         ), 500
         return jsonify(
             {
-                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
+                "message": f"Quiz question \'{data['question']}\' with LID {data['LID']}, SID {data['SID']}, CID {data['CID']}, start {data['start']} has been retrieved",
                 "data": question.to_dict()
             }
         ), 200
@@ -1400,207 +1370,44 @@ def read_ungraded_quiz_question():
 
 #Update a question from a specific ungraded quiz
 '''primary keys cant be updated, only fields that needs to be updated will be sent over'''
-@app.route("/update_ungraded_quiz_question", methods=['POST'])
-def update_ungraded_quiz_question():
+@app.route("/update_quiz_question", methods=['POST'])
+def update_quiz_question():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question']
+    fields = ['LID', 'SID', 'CID', 'start', 'question']
     for key in fields:
         if key not in data.keys():
             return jsonify(
             {
-                "message": f"{key} is missing from request body, ungraded quiz update failed",
+                "message": f"{key} is missing from request body, quiz update failed",
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
-        possible_update_columns = ['answer', 'options', 'duration']
+        question = Quiz_questions.query.filter_by(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"], question=data["question"])
+        if question.first() == None:
+            return jsonify(
+            {
+                "message": f"Quiz question \'{data['question']}\' with LID {data['LID']}, SID {data['SID']}, CID {data['CID']}, start {data['start']} does not exist in database",
+            }
+        ), 500
+        # possible_update_columns = ['answer', 'options', 'duration', 'type']
         if 'answer' in data.keys():
             question.update(dict(answer=data['answer']))
-            db.session.commit()
+            
         if 'options' in data.keys():
             question.update(dict(options=data['options']))
-            db.session.commit()
+           
         if 'duration' in data.keys():
-            question.update(dict(options=data['duration']))
-            db.session.commit()
-        question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"]).first()
+            question.update(dict(duration=data['duration']))
+            
+        if 'type' in data.keys():
+            question.update(dict(type=data['type']))
+
+        db.session.commit()
+        question = Quiz_questions.query.filter_by(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"], question=data["question"]).first()
         return jsonify(
             {
                 "message": f"Quiz question \'{data['question']}\' has been updated",
-                "data": question.json()
-            }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Error! {e}",
-        }
-    ), 500
-
-
-#Delete an ungraded quiz from database
-@app.route("/delete_ungraded_quiz", methods=['POST'])
-def delete_ungraded_quiz():
-    data = request.get_json()
-    fields = ['CID', 'LID', 'SID']
-    for key in fields:
-        if key not in data.keys():
-            return jsonify(
-            {
-                "message": f"{key} is missing from request body, ungraded quiz deletion failed",
-            }
-        ), 500
-    try:
-        quiz_questions = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
-        all_questions = [question.to_dict() for question in quiz_questions]
-        if len(all_questions) == 0:
-            return jsonify(
-            {
-                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
-            }
-        ), 500
-        quiz_questions.delete()
-        db.session.commit()
-        return jsonify(
-            {
-                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
-            }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Error! {e}",
-        }
-        ), 500
-    
-
-#Delete an ungraded quiz question from database
-@app.route("/delete_ungraded_quiz_question", methods=['POST'])
-def delete_ungraded_quiz_question():
-    data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question']
-    for key in fields:
-        if key not in data.keys():
-            return jsonify(
-            {
-                "message": f"{key} is missing from request body, ungraded quiz question deletion failed",
-            }
-        ), 500
-    try:
-        quiz_question = Ungraded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
-        question = quiz_question.first()
-        if question == None:
-            return jsonify(
-            {
-                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
-            }
-        ), 500
-        quiz_question.delete()
-        db.session.commit()
-        return jsonify(
-            {
-                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
-            }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Error! {e}",
-        }
-        ), 500
-### End of API points for Ungraded Quiz CRUD ###
-
-### Start of API points for Graded Quiz CRUD ###
-#create graded quiz and add it in the graded quiz table
-@app.route("/create_graded_quiz_question", methods=['POST'])
-def create_graded_quiz():
-    data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question', 'answer', 'options', 'duration']
-    for key in fields:
-        if key not in data.keys():
-            return jsonify(
-            {
-                "message": f"{key} is missing from request body, graded quiz question creation failed",
-            }
-        ), 500
-    try:
-        graded_quiz = Graded_quiz(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"], 
-                                    answer=data["answer"], options=data["options"], duration=data["duration"])
-        db.session.add(graded_quiz)
-        db.session.commit()
-        return jsonify(
-            {
-                "message": f"Graded quiz question, {data['question']} ,has been inserted successfully into the database",
-                "data": graded_quiz.to_dict()
-            }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Error! {e}",
-        }
-    ), 500
-
-
-#Read/get all the questions from a specific graded quiz
-@app.route("/read_graded_quiz", methods=['POST'])
-def read_graded_quiz():
-    data = request.get_json()
-    fields = ['CID', 'LID', 'SID']
-    for key in fields:
-        if key not in data.keys():
-            return jsonify(
-            {
-                "message": f"{key} is missing from request body, graded quiz read failed",
-            }
-        ), 500
-    try:
-        quiz_questions = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
-        all_questions = [question.to_dict() for question in quiz_questions]
-        if len(all_questions) == 0:
-            return jsonify(
-            {
-                "message": f"Quiz with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
-            }
-        ), 500
-        return jsonify(
-            {
-                "message": f"Quiz with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
-                "data": all_questions
-            }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Error! {e}",
-        }
-    ), 500
-
-
-#Read/get a specific question from a specific graded quiz
-@app.route("/read_graded_quiz_question", methods=['POST'])
-def read_graded_quiz_question():
-    data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question']
-    for key in fields:
-        if key not in data.keys():
-            return jsonify(
-            {
-                "message": f"{key} is missing from request body, graded quiz question read failed",
-            }
-        ), 500
-    try:
-        quiz_question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
-        question = quiz_question.first()
-        if question == None:
-            return jsonify(
-            {
-                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in database",
-            }
-        ), 500
-        return jsonify(
-            {
-                "message": f"Quiz question \'{data['question']}\' with CID {data['CID']}, LID {data['LID']}, SID {data['SID']} has been retrieved",
                 "data": question.to_dict()
             }
         ), 200
@@ -1612,72 +1419,33 @@ def read_graded_quiz_question():
     ), 500
 
 
-#Update a question from a specific graded quiz
-'''primary keys cant be updated, only fields that needs to be updated will be sent over'''
-@app.route("/update_graded_quiz_question", methods=['POST'])
-def update_graded_quiz_question():
+#Delete a quiz from database
+@app.route("/delete_quiz", methods=['POST'])
+def delete_quiz():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question']
+    fields = ['LID', 'SID', 'CID', 'start']
     for key in fields:
         if key not in data.keys():
             return jsonify(
             {
-                "message": f"{key} is missing from request body, graded quiz update failed",
+                "message": f"{key} is missing from request body, quiz deletion failed",
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
-        possible_update_columns = ['answer', 'options', 'duration']
-        if 'answer' in data.keys():
-            question.update(dict(answer=data['answer']))
-            db.session.commit()
-        if 'options' in data.keys():
-            question.update(dict(options=data['options']))
-            db.session.commit()
-        if 'duration' in data.keys():
-            question.update(dict(duration=data['duration']))
-            db.session.commit()
-        question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"]).first()
-        return jsonify(
-            {
-                "message": f"Quiz question \'{data['question']}\' has been updated",
-                "data": question.json()
-            }
-        ), 200
-    except Exception as e:
-        return jsonify(
-        {
-            "message": f"Error! {e}",
-        }
-    ), 500
-
-
-#Delete an graded quiz from database
-@app.route("/delete_graded_quiz", methods=['POST'])
-def delete_graded_quiz():
-    data = request.get_json()
-    fields = ['CID', 'LID', 'SID']
-    for key in fields:
-        if key not in data.keys():
-            return jsonify(
-            {
-                "message": f"{key} is missing from request body, graded quiz deletion failed",
-            }
-        ), 500
-    try:
-        quiz_questions = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"])
+        quiz_questions = Quiz_questions.query.filter_by(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"])
         all_questions = [question.to_dict() for question in quiz_questions]
         if len(all_questions) == 0:
             return jsonify(
             {
-                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
+                "message": f"Quiz with LID: {data['LID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} does not exist in the database",
             }
         ), 500
         quiz_questions.delete()
         db.session.commit()
         return jsonify(
             {
-                "message": f"Quiz with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
+                "message": f"Quiz with LID: {data['LID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been deleted successfully",
             }
         ), 200
     except Exception as e:
@@ -1688,32 +1456,33 @@ def delete_graded_quiz():
         ), 500
     
 
-#Delete an graded quiz question from database
-@app.route("/delete_graded_quiz_question", methods=['POST'])
-def delete_graded_quiz_question():
+#Delete a quiz question from database
+@app.route("/delete_quiz_question", methods=['POST'])
+def delete_quiz_question():
     data = request.get_json()
-    fields = ['CID', 'LID', 'SID', 'question']
+    fields = ['LID', 'SID', 'CID', 'start', 'question']
     for key in fields:
         if key not in data.keys():
             return jsonify(
             {
-                "message": f"{key} is missing from request body, graded quiz question deletion failed",
+                "message": f"{key} is missing from request body, quiz question deletion failed",
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        quiz_question = Graded_quiz.query.filter_by(CID=data["CID"], LID=data["LID"], SID=data["SID"], question=data["question"])
+        quiz_question = Quiz_questions.query.filter_by(LID=data["LID"], SID=data["SID"],CID=data["CID"], start=data["start"], question=data["question"])
         question = quiz_question.first()
         if question == None:
             return jsonify(
             {
-                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} does not exist in the database",
+                "message": f"Quiz question \'{data['question']}\' with LID: {data['LID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} does not exist in the database",
             }
         ), 500
         quiz_question.delete()
         db.session.commit()
         return jsonify(
             {
-                "message": f"Quiz question \'{data['question']}\' with the CID {data['CID']} LID {data['LID']} SID {data['SID']} has been deleted successfully",
+                "message": f"Quiz question \'{data['question']}\' with LID: {data['LID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been deleted successfully",
             }
         ), 200
     except Exception as e:
@@ -1722,7 +1491,8 @@ def delete_graded_quiz_question():
             "message": f"Error! {e}",
         }
         ), 500
-### End of API points for Graded Quiz CRUD ###
+### End of API points for Quiz CRUD ###
+
 
 
 if __name__ == '__main__':
