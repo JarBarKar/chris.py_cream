@@ -367,12 +367,19 @@ def view_eligible_courses():
             else:
                 final_result['non_eligible'].append(course.json())
 
-        return jsonify(
-            {
-                "message": "Eligible and non-eligible courses are retrieved",
-                "data": final_result
-            }
-        ), 200
+        if final_result['eligible'] or final_result['non_eligible']:
+            return jsonify(
+                {
+                    "message": "Eligible and non-eligible courses are retrieved",
+                    "data": final_result
+                }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "message": "There are no course retrieved"
+                }
+            ), 500
 
     except Exception as e:
         return jsonify(
@@ -823,8 +830,8 @@ def create_section():
         ), 500
 
     try:
-        date_object_start = datetime.strptime(data["start"], "%d/%m/%Y %H:%M:%S")
-        date_object_end = datetime.strptime(data["end"], "%d/%m/%Y %H:%M:%S")
+        date_object_start = datetime.fromisoformat(data["start"])
+        date_object_end = datetime.fromisoformat(data["end"])
         section = Section(SID=data["SID"], CID=data["CID"], start=date_object_start, end=date_object_end, vacancy=data["vacancy"], TID=data["TID"])
         db.session.add(section)
         db.session.commit()
@@ -893,27 +900,36 @@ def update_section_detail():
         ), 500
     try:
         # Convert to datetime format
-        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
-        data['end'] = datetime.strptime(data['end'], "%d/%m/%Y %H:%M:%S")
+        date_object_start = datetime.fromisoformat(data["start"])
+        date_object_end = datetime.fromisoformat(data["end"])
 
         #Retrieve data and then update it with updated details
-        section = Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=data["start"])
+        section = Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=date_object_start)
 
-        section.update(dict(SID=data['SID'],CID=data['CID'],start=data['start'],end=data['end'],vacancy=data['vacancy'],TID=data['TID']))
+        section.update(dict(SID=data['SID'],CID=data['CID'],start=date_object_start,end=date_object_end,vacancy=data['vacancy'],TID=data['TID']))
+
         db.session.commit()
-        section = Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=data["start"]).first()
 
-        
-        return jsonify(
-        {
-            "message": f"Section {data['SID']}'s details have been updated successfully in the database",
-            "data": section.to_dict()
-        }
-        ), 200
+        section = Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=date_object_start).first()
+
+        if section:
+            return jsonify(
+            {
+                "message": f"Section {data['SID']}'s details have been updated successfully in the database",
+                "data": section.to_dict()
+            }
+            ), 200
+        else:
+            return jsonify(
+            {
+                "message": "Section is not found",
+            }
+            ), 500
+
     except Exception as e:
         return jsonify(
         {
-            "message": "Section is not found"
+            "message": "Section is not found",
         }
     ), 500
 
@@ -935,8 +951,8 @@ def delete_section():
         }
         ), 500
     try:
-        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
-        Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=data["start"]).delete()
+        date_object_start = datetime.fromisoformat(data["start"])
+        Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=date_object_start).delete()
         db.session.commit()
         return jsonify(
         {
@@ -1163,14 +1179,12 @@ def view_all_lessons():
         }
     ), 500
 
-# query specific lessons detail using SID & CID & start
+# query specific lessons detail using SID & CID
 @app.route("/query_lessons", methods=['POST'])
 def query_lessons():
     data = request.get_json()
-
     try:
-        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
-        retrieved_lessons = Lesson.query.filter_by(SID=data['SID'] ,CID=data["CID"], start=data['start'])
+        retrieved_lessons = Lesson.query.filter_by(SID=data['SID'] ,CID=data["CID"])
         lessons = [lesson.to_dict() for lesson in retrieved_lessons]
 
         if len(lessons) == 0:
@@ -1209,8 +1223,8 @@ def create_lesson():
             }
         ), 500
     try:
-        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
-        lesson = Lesson(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=data["start"])
+        date_object_start = datetime.fromisoformat(data["start"])
+        lesson = Lesson(LID=data["LID"], SID=data["SID"], CID=data["CID"], start=date_object_start)
         db.session.add(lesson)
         db.session.commit()
         return jsonify(
@@ -1232,7 +1246,8 @@ def create_lesson():
 @app.route("/delete_lesson", methods=['POST'])
 def delete_lesson():
     data = request.get_json()
-    expected=["SID", "CID", "LID"]
+    date_object_start = datetime.fromisoformat(data["start"])
+    expected=["SID", "CID", "LID","start"]
     not_present=list()
     #check input
     for expect in expected:
@@ -1244,26 +1259,26 @@ def delete_lesson():
                 "message": f"Lesson {not_present} is not present, lesson is not successfully deleted"
             }
         ), 500
-    exist = (Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"]).first() != None)
+    exist = (Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start=date_object_start).first() != None)
     if exist:
         try:
-            Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"]).delete()
+            Lesson.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start=date_object_start).delete()
             db.session.commit()
             return jsonify(
             {
-                "message": f"Lesson { data['CID'], data['SID'], data['LID']} has been deleted successfully from the database"
+                "message": f"Lesson { data['CID'], data['SID'], data['LID'], data['start']} has been deleted successfully from the database"
             }
             ), 200
         except Exception as e:
             return jsonify(
             {
-                "message": f"Lesson {data['CID'], data['SID'], data['LID']} is not deleted"
+                "message": f"Lesson {data['CID'], data['SID'], data['LID'], data['start']} is not deleted"
             }
     ), 500
     else:
         return jsonify(
         {
-            "message": f"Lesson {data['CID'], data['SID'], data['LID']} do not exist"
+            "message": f"Lesson {data['CID'], data['SID'], data['LID'], data['start']} do not exist"
         }), 500
 
 ### End of API point for lesson CRUD ###
