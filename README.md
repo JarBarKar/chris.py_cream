@@ -1,14 +1,14 @@
 # Coding SOP #
-##Coding SOP ##
+
 *	Identify the tasks assigned to you, go to Jira dashboard, and shift the tasks to in progress
 * Check Slack channel and Github for any existing unresolve pull request
   * If no merge conflict, review code and merge into main
   * If there is conflict, review code and raise conflict issue with code owner 
 * Pull the repository from Github into local working environment
 *	Create new branch with the naming convention
-  *	Creation of new class/feature : “Creation of Class name”
-  *	Modification of new class/feature : “Modification of Class name”
-  *	Bug Fixes : “Bug fixes for Class”
+ *	Creation of new class/feature : “Creation of Class name”
+ *	Modification of new class/feature : “Modification of Class name”
+ *	Bug Fixes : “Bug fixes for Class”
 *	Publish branch to main repo
 *	Start coding on the tasks assigned
   *	Prior to any class creation, check the ER diagram for the latest design. Check the sql file to ensure the design has been implemented correctly. Create the class based         on the design shown in the sql file
