@@ -1,8 +1,8 @@
-# Coding SOP
-*Coding SOP
-  *1.	Identify the tasks assigned to you, go to Jira dashboard, and shift the tasks to in progress
-  *2.	Check Slack channel and Github for any existing unresolve pull request
-    *a.	If no merge conflict, review code and merge into main
+# Coding SOP #
+##Coding SOP ##
+*	Identify the tasks assigned to you, go to Jira dashboard, and shift the tasks to in progress
+* Check Slack channel and Github for any existing unresolve pull request
+  * If no merge conflict, review code and merge into main
     *b.	If there is conflict, review code and raise conflict issue with code owner 
   *3.	Pull the repository from Github into local working environment
   *4.	Create new branch with the naming convention
