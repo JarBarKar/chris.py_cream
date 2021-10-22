@@ -17,9 +17,9 @@ class TestApp(flask_testing.TestCase):
         return app
 
     def setUp(self):
-        self.l1 = Lesson(LID='1', CID='IS111', SID='G1', start=datetime.min)
-        self.l2 = Lesson(LID='2', CID='IS111', SID='G1', start=datetime.min)
-        self.l3 = Lesson(LID='1', CID='IS212', SID='G4', start=datetime.min)
+        self.l1 = Lesson(LID='1', CID='IS111', SID='G1', start=datetime.fromisoformat("2021-04-01 09:15:00"))
+        self.l2 = Lesson(LID='2', CID='IS111', SID='G1', start=datetime.fromisoformat("2021-04-08 09:15:00"))
+        self.l3 = Lesson(LID='1', CID='IS212', SID='G4', start=datetime.fromisoformat("2021-04-01 09:15:00"))
         
         db.create_all()
 
@@ -46,7 +46,7 @@ class TestViewLessons(TestApp):
                 {"LID":"1",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Mon, 01 Jan 0001 00:00:00 GMT"}
+                "start":"Thu, 01 Apr 2021 09:15:00 GMT"}
             ]
         })
     
@@ -65,13 +65,13 @@ class TestViewLessons(TestApp):
                 "LID":"1",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Mon, 01 Jan 0001 00:00:00 GMT"
+                "start":"Thu, 01 Apr 2021 09:15:00 GMT"
                 },
                 {
                 "LID":"2",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Mon, 01 Jan 0001 00:00:00 GMT"
+                "start":"Thu, 08 Apr 2021 09:15:00 GMT"
                 }
             ]
         })
@@ -86,7 +86,7 @@ class TestViewLessons(TestApp):
         })
 
 class TestQueryLessons(TestApp):
-    # Testing function to query lesson by SID, CID and start
+    # Testing function to query lesson by SID, CID
     def test_query_lessons_0(self):
         # calling query_lessons function via flask route
         db.session.add(self.l1)
@@ -95,8 +95,7 @@ class TestQueryLessons(TestApp):
 
         request_body = {
             "SID": self.l1.SID,
-            "CID": self.l1.CID,
-            "start": "01/01/0001 00:00:00"
+            "CID": self.l1.CID
         }
 
         response = self.client.post("/query_lessons",
@@ -110,13 +109,13 @@ class TestQueryLessons(TestApp):
                 "LID":"1",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Mon, 01 Jan 0001 00:00:00 GMT"
+                "start":"Thu, 01 Apr 2021 09:15:00 GMT"
                 },
                 {
                 "LID":"2",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Mon, 01 Jan 0001 00:00:00 GMT"
+                "start":"Thu, 08 Apr 2021 09:15:00 GMT"
                 }
             ],
             'message' : 'Lessons have been query successfully from the database'
@@ -129,7 +128,7 @@ class TestQueryLessons(TestApp):
         request_body = {
             "SID": self.l1.SID,
             "CID": self.l1.CID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start),
         }
         # calling query_lessons function via flask route
         response = self.client.post("/query_lessons",
@@ -145,7 +144,7 @@ class TestQueryLessons(TestApp):
     def test_query_lessons_missing_sid(self):
         request_body = {
             "CID": self.l1.CID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
         # calling query_lessons function via flask route
         response = self.client.post("/query_lessons",
@@ -160,7 +159,7 @@ class TestQueryLessons(TestApp):
     def test_query_lessons_missing_cid(self):
         request_body = {
             "SID": self.l1.SID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
         # calling query_lessons function via flask route
         response = self.client.post("/query_lessons",
@@ -191,7 +190,7 @@ class TestQueryLessons(TestApp):
         request_body = {
             "SID": "USAIN BOLT",
             "CID": self.l1.CID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
         # calling query_lessons function via flask route
         response = self.client.post("/query_lessons",
@@ -207,7 +206,7 @@ class TestQueryLessons(TestApp):
         request_body = {
             "SID": self.l1.SID,
             "CID": "POKEMON",
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
         # calling query_lessons function via flask route
         response = self.client.post("/query_lessons",
@@ -223,7 +222,7 @@ class TestQueryLessons(TestApp):
         request_body = {
             "SID": self.l1.SID,
             "CID": self.l1.CID,
-            "start": "20/01/0001 00:00:00"
+            "start": "2021-04-09 09:15:00"
         }
         # calling query_lessons function via flask route
         response = self.client.post("/query_lessons",
@@ -257,7 +256,7 @@ class TestCreateCourse(TestApp):
             "LID": self.l1.LID,
             "SID": self.l1.SID,
             "CID": self.l1.CID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling create_lesson function via flask route
@@ -272,7 +271,7 @@ class TestCreateCourse(TestApp):
                     "CID": "IS111",
                     "SID": "G1",
                     "LID": "1",
-                    "start": "Mon, 01 Jan 0001 00:00:00 GMT"
+                    "start": "Thu, 01 Apr 2021 09:15:00 GMT"
                 }
         })
 
@@ -284,7 +283,7 @@ class TestCreateCourse(TestApp):
             "LID": self.l3.LID,
             "SID": self.l3.SID,
             "CID": self.l3.CID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling create_lesson function via flask route
@@ -299,11 +298,10 @@ class TestCreateCourse(TestApp):
                     "CID": "IS212",
                     "SID": "G4",
                     "LID": "1",
-                    "start": "Mon, 01 Jan 0001 00:00:00 GMT"
+                    "start": "Thu, 01 Apr 2021 09:15:00 GMT"
                 }
         })
     
-
 
     # Testing negative case where LID is missing in request body
     def test_create_lesson_missing_lid(self):
@@ -311,7 +309,7 @@ class TestCreateCourse(TestApp):
         request_body = {
             "SID": self.l3.SID,
             "CID": self.l3.CID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling create_lesson function via flask route
@@ -330,7 +328,7 @@ class TestCreateCourse(TestApp):
         request_body = {
             "LID": self.l3.LID,
             "SID": self.l3.SID,
-            "start": "01/01/0001 00:00:00"
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling create_lesson function via flask route
@@ -423,14 +421,15 @@ class TestDeleteLesson(TestApp):
     # Testing positive case where content name is updated
     def test_delete_lesson(self):
         # adding one lesson to database
-        db.session.add(self.s1)
+        db.session.add(self.l1)
         db.session.commit()
 
         # setting lesson details
         request_body = {
-            'SID': self.s1.SID,
-            'CID': self.s1.CID,
-            'LID': self.s1.LID,
+            'SID': self.l1.SID,
+            'CID': self.l1.CID,
+            'LID': self.l1.LID,
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling delete function via flask route
@@ -439,18 +438,19 @@ class TestDeleteLesson(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            "message": f"Lesson { self.s1.CID, self.s1.SID, self.s1.LID} has been deleted successfully from the database"    
+            "message": f"Lesson { self.l1.CID, self.l1.SID, self.l1.LID, datetime.isoformat(self.l1.start)} has been deleted successfully from the database"    
         })
 
     def test_delete_missing_CID(self):
         # adding one section to database
-        db.session.add(self.s1)
+        db.session.add(self.l1)
         db.session.commit()
 
         # setting section details
         request_body = {
-            'SID': self.s1.SID,
-            'LID': self.s1.LID,
+            'SID': self.l1.SID,
+            'LID': self.l1.LID,
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling delete_lesson function via flask route
@@ -467,9 +467,10 @@ class TestDeleteLesson(TestApp):
 
         # setting section details
         request_body = {
-            'SID': self.s1.SID,
-            'CID': self.s1.CID,
-            'LID': self.s1.LID,
+            'SID': self.l1.SID,
+            'CID': self.l1.CID,
+            'LID': self.l1.LID,
+            "start": datetime.isoformat(self.l1.start)
         }
 
         # calling delete_lesson function via flask route
@@ -478,7 +479,7 @@ class TestDeleteLesson(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            "message": f"Lesson {self.s1.CID, self.s1.SID, self.s1.LID} do not exist"
+            "message": f"Lesson {self.l1.CID, self.l1.SID, self.l1.LID, datetime.isoformat(self.l1.start)} do not exist"
         })
 
 
