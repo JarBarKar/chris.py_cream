@@ -15,9 +15,9 @@ class TestApp(flask_testing.TestCase):
         return app
 
     def setUp(self):
-        self.s1 = Section(SID='G1', CID='IS111', start=datetime.min, end=datetime.max, vacancy=50, TID=1)
-        self.s2 = Section(SID='G2', CID='IS111', start=datetime.min, end=datetime.max, vacancy=50, TID=1)
-        self.s3 = Section(SID='G3', CID='IS333', start=datetime.min, end=datetime.max, vacancy=50, TID=3)
+        self.s1 = Section(SID='G1', CID='IS111', start=datetime.fromisoformat("2021-04-01 09:15:00"), end=datetime.fromisoformat("2021-05-01 09:15:00"), vacancy=50, TID=1)
+        self.s2 = Section(SID='G2', CID='IS111', start=datetime.fromisoformat("2021-04-01 09:15:00"), end=datetime.fromisoformat("2021-05-01 09:15:00"), vacancy=50, TID=1)
+        self.s3 = Section(SID='G3', CID='IS333', start=datetime.fromisoformat("2021-04-01 09:15:00"), end=datetime.fromisoformat("2021-06-01 09:15:00"), vacancy=50, TID=3)
         
         db.create_all()
 
@@ -37,10 +37,11 @@ class TestViewSections(TestApp):
         request_body = {
             'TID': self.s1.TID
         }
-        # adding three sections to database
+        # adding two sections to database
         db.session.add(self.s1)
         db.session.add(self.s2)
         db.session.commit()
+
 
         response = self.client.post("/view_sections",
                                     data=json.dumps(request_body),
@@ -52,16 +53,16 @@ class TestViewSections(TestApp):
                 {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 1
                 },
                 {
                 'SID': 'G2',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 1
                 }
@@ -75,8 +76,8 @@ class TestViewSections(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00",
-            'end': "31/12/9999 23:59:59",
+            'start':datetime.isoformat(self.s1.start),
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -129,8 +130,8 @@ class TestCreateSection(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00",
-            'end': "31/12/9999 23:59:59",
+            'start':datetime.isoformat(self.s1.start),
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -145,8 +146,8 @@ class TestCreateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 1
             },
@@ -158,8 +159,8 @@ class TestCreateSection(TestApp):
         # setting section details
         request_body = {
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00",
-            'end': "31/12/9999 23:59:59",
+            'start':datetime.isoformat(self.s1.start),
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -179,8 +180,8 @@ class TestCreateSection(TestApp):
         # setting section details
         request_body = {
             'SID': self.s1.SID,
-            'start': "01/01/0001 00:00:00",
-            'end': "31/12/9999 23:59:59",
+            'start':datetime.isoformat(self.s1.start),
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -201,7 +202,7 @@ class TestCreateSection(TestApp):
         request_body = {
             'CID': self.s1.CID,
             'SID': self.s1.SID,
-            'end': "31/12/9999 23:59:59",
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -221,7 +222,7 @@ class TestCreateSection(TestApp):
         # setting section details
         request_body = {
             'SID': self.s1.SID,
-            'end': "31/12/9999 23:59:59",
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -240,7 +241,7 @@ class TestCreateSection(TestApp):
     def test_create_course_missing_SID_start_CID(self):
         # setting section details
         request_body = {
-            'end': "31/12/9999 23:59:59",
+            'end': datetime.isoformat(self.s1.end),
             'vacancy': self.s1.vacancy,
             'TID': self.s1.TID
         }
@@ -294,16 +295,16 @@ class TestQuerySections(TestApp):
                 {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 1
                 },
                 {
                 'SID': 'G2',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 1
                 }
@@ -385,7 +386,7 @@ class TestDeleteSection(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00"
+            'start': datetime.isoformat(self.s1.start)
         }
 
         # calling delete_section function via flask route
@@ -403,7 +404,7 @@ class TestDeleteSection(TestApp):
         # setting section details
         request_body = {
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00"
+            'start': datetime.isoformat(self.s1.start)
         }
 
         # calling delete_section function via flask route
@@ -420,7 +421,7 @@ class TestDeleteSection(TestApp):
         # setting section details
         request_body = {
             'SID': self.s1.SID,
-            'start': "01/01/0001 00:00:00"
+            'start': datetime.isoformat(self.s1.start)
         }
 
         # calling delete_section function via flask route
@@ -463,6 +464,7 @@ class TestDeleteSection(TestApp):
         self.assertEqual(response.json, {
             'message': "SID,CID,start not found"
         })
+
 class TestUpdateSection(TestApp):
     # Testing positive case where section's vacancy is updated
     def test_update_section_vacancy_in_database(self):
@@ -474,9 +476,9 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
-            "vacancy": 30,
+            'start': datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
+            "vacancy": 10,
             "TID": self.s1.TID
         }
 
@@ -484,14 +486,15 @@ class TestUpdateSection(TestApp):
         response = self.client.post("/update_section",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
-                'vacancy': 30,
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'vacancy': 10,
                 'TID': 1
             },
             'message': f"Section {self.s1.SID}'s details have been updated successfully in the database"
@@ -508,8 +511,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            'start': datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.vacancy,
             "TID": 100
         }
@@ -523,8 +526,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sat, 01 May 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 100
             },
@@ -542,8 +545,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            'start': datetime.isoformat(self.s1.start),
+            "end": "2021-08-01 09:15:00",
             "vacancy": self.s1.vacancy,
             "TID": self.s1.TID
         }
@@ -557,8 +560,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sun, 01 Aug 2021 09:15:00 GMT',
                 'vacancy': 50,
                 'TID': 1
             },
@@ -566,7 +569,7 @@ class TestUpdateSection(TestApp):
             
         })
 
-        # Testing positive case where section's end,vacancy,TID is updated
+    # Testing positive case where section's end,vacancy,TID is updated
     def test_update_section_all_in_database(self):
         # adding one section to database
         db.session.add(self.s1)
@@ -576,8 +579,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            'start': datetime.isoformat(self.s1.start),
+            "end": "2021-08-01 09:15:00",
             "vacancy": 1,
             "TID": 1000
         }
@@ -591,8 +594,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
-                'end': 'Fri, 31 Dec 9999 23:59:59 GMT',
+                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
+                'end': 'Sun, 01 Aug 2021 09:15:00 GMT',
                 'vacancy': 1,
                 'TID': 1000
             },
@@ -611,8 +614,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": "HELLO GOOD NIGHT",
             "CID": self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            "start": datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -636,8 +639,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": "GOOD NIGHT",
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            "start": datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -683,8 +686,8 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            "start": datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -703,8 +706,8 @@ class TestUpdateSection(TestApp):
         # setting section details
         request_body = {
             "SID": self.s1.SID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            "start": datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -723,8 +726,8 @@ class TestUpdateSection(TestApp):
         # setting section details
         request_body = {
             "CID" : self.s1.CID,
-            "start": "01/01/0001 00:00:00",
-            "end": "31/12/9999 23:59:59",
+            "start": datetime.isoformat(self.s1.start),
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
@@ -743,7 +746,7 @@ class TestUpdateSection(TestApp):
         request_body = {
             "SID": self.s1.SID,
             "CID": self.s1.CID,
-            "end": "31/12/9999 23:59:59",
+            "end": datetime.isoformat(self.s1.end),
             "vacancy": self.s1.CID,
             "TID": self.s1.TID
         }
