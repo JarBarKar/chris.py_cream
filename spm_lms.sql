@@ -6,6 +6,12 @@ CREATE DATABASE IF NOT EXISTS `spm_lms` DEFAULT CHARACTER SET utf8 COLLATE utf8_
 USE `spm_lms`;
 
 -- --------------------------------------------------------
+--
+-- Setting datetime format for database
+--
+-- Set DateFormat YMD --indicates the general format is Year Month Day 
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `engineer`
@@ -106,13 +112,13 @@ CREATE TABLE IF NOT EXISTS `section` (
 --
 
 INSERT INTO `section` (`SID`, `CID`, `TID`, `start`, `end`, `vacancy`) VALUES
-('G1', 'IS111', 001, 2021-04-01, 2021-06-01, 40),
-('G2', 'IS111', 001, 2021-05-01, 2021-07-01, 40),
-('G1', 'IS112', 002, 2021-04-01, 2021-06-01, 40),
-('G2', 'IS112', 002, 2021-05-01, 2021-07-01, 40),
-('G1', 'IS113', 003, 2021-04-01, 2021-06-01, 40),
-('G2', 'IS113', 003, 2021-05-01, 2021-07-01, 40),
-('G2', 'IS216', 001, 2021-05-01, 2021-07-01, 40)
+('G1', 'IS111', 001, CAST('2021-04-01 09:15:00' AS datetime), CAST('2021-06-01 18:00:00' AS datetime), 40),
+('G2', 'IS111', 001, CAST('2021-05-01 09:15:00' AS datetime), CAST('2021-07-01 18:00:00' AS datetime), 40),
+('G1', 'IS112', 002, CAST('2021-04-01 09:15:00' AS datetime), CAST('2021-06-01 18:00:00' AS datetime), 40),
+('G2', 'IS112', 002, CAST('2021-05-01 09:15:00' AS datetime), CAST('2021-07-01 18:00:00' AS datetime), 40),
+('G1', 'IS113', 003, CAST('2021-04-01 09:15:00' AS datetime), CAST('2021-06-01 18:00:00' AS datetime), 40),
+('G2', 'IS113', 003, CAST('2021-05-01 09:15:00' AS datetime), CAST('2021-07-01 18:00:00' AS datetime), 40),
+('G2', 'IS216', 001, CAST('2021-05-01 09:15:00' AS datetime), CAST('2021-07-01 18:00:00' AS datetime), 40)
 ;
 
 -- --------------------------------------------------------
@@ -137,9 +143,9 @@ CREATE TABLE IF NOT EXISTS `lesson` (
 
 
 INSERT INTO `lesson` (`LID`,`SID`,`CID`, `start`) VALUES
-('1', 'G1', 'IS111', 2021-04-01),
-('2', 'G1', 'IS111', 2021-04-01),
-('1', 'G2', 'IS112', 2021-05-01)
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime))
 ;
 
 -- --------------------------------------------------------
@@ -168,12 +174,12 @@ CREATE TABLE IF NOT EXISTS `quiz_questions` (
 -- --
 
 INSERT INTO `quiz_questions` (`LID`, `SID`,  `CID`, `start`, `question`, `answer`, `options`, `duration`, `type`) VALUES
-('1', 'G1', 'IS111', 2021-04-01, 'Is the moon round?', 'YES', 'YES|NO',  0, 'ungraded'),
-('1', 'G1', 'IS111', 2021-04-01, 'Is the sun round?', 'YES', 'YES|NO',  0, 'ungraded'),
-('1', 'G1', 'IS111', 2021-04-01, 'Which of these is not a planet ?', 'PLUTO', 'EARTH|MARS|JUPITER|PLUTO|VENUS',  0, 'ungraded'),
-('2', 'G1', 'IS111', 2021-04-01, 'Bla bla black sheep have you any ?', 'WOLF', 'FOOD|WOLF|CAT|HUMAN',  0, 'graded'),
-('2', 'G1', 'IS111', 2021-04-01, 'Mary had a little ?', 'LAMB', 'COW|LAMP|LAMB',  0, 'graded'),
-('2', 'G1', 'IS111', 2021-04-01, 'Do you want to pass ?', 'YES', 'YES|NO',  0, 'graded')
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the moon round?', 'YES', 'YES|NO',  0, 'ungraded'),
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the sun round?', 'YES', 'YES|NO',  0, 'ungraded'),
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Which of these is not a planet ?', 'PLUTO', 'EARTH|MARS|JUPITER|PLUTO|VENUS',  0, 'ungraded'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Bla bla black sheep have you any ?', 'WOLF', 'FOOD|WOLF|CAT|HUMAN',  0, 'graded'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Mary had a little ?', 'LAMB', 'COW|LAMP|LAMB',  0, 'graded'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Do you want to pass ?', 'YES', 'YES|NO',  0, 'graded')
 ;
 
 
@@ -200,9 +206,9 @@ CREATE TABLE IF NOT EXISTS `academic_record` (
 --
 
 INSERT INTO `academic_record` (`EID`, `SID`, `CID`, `start`, `status`) VALUES
-(001, 'G1', 'IS111', 2021-04-01, 'ongoing'),
-(001, 'G2', 'IS112', 2021-05-01, 'ongoing'),
-(002, 'G1', 'IS111', 2021-04-01, 'completed')
+(001, 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'ongoing'),
+(001, 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'ongoing'),
+(002, 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'completed')
 ;
 
 -- --------------------------------------------------------
@@ -229,9 +235,9 @@ CREATE TABLE IF NOT EXISTS `content` (
 --
 
 INSERT INTO `content` (`LID`, `SID`, `CID`, `start`, `content_type`, `content_name`, `link`) VALUES
-('1', 'G1', 'IS111', 2021-04-01, 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
-('2', 'G1', 'IS111', 2021-04-01, 'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
-('1', 'G1', 'IS111', 2021-04-01, 'pdf', 'Lesson 1 slides part 2', 'abd.com/shared/fuie896')
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides part 2', 'abd.com/shared/fuie896')
 ;
 
 -- --------------------------------------------------------
@@ -256,8 +262,8 @@ CREATE TABLE IF NOT EXISTS `enrollment` (
 --
 
 INSERT INTO `enrollment` (`EID`,`SID`, `CID`, `start`) VALUES
-(001, 'G1', 'IS113', 2021-04-01),
-(001, 'G2', 'IS216', 2021-05-01)
+(001, 'G1', 'IS113', CAST('2021-04-01 09:15:00' AS datetime)),
+(001, 'G2', 'IS216', CAST('2021-05-01 09:15:00' AS datetime))
 ;
 
 -- --------------------------------------------------------
@@ -276,7 +282,7 @@ CREATE TABLE IF NOT EXISTS `quiz_record` (
   `answer_given` varchar(64) NOT NULL,
   `marks` int(10) NOT NULL DEFAULT 0,
   constraint `quiz_record_fk1` foreign key(`EID`) references `engineer`(`EID`),
-  constraint `quiz_record_fk2` foreign key(`LID`,`SID`,`CID`,`start`,`question`) references `quiz_questions`(`LID`,`SID`,`CID`,`start`,`question`),
+  -- constraint `quiz_record_fk2` foreign key(`LID`,`SID`,`CID`,`start`,`question`) references `quiz_questions`(`LID`,`SID`,`CID`,`start`,`question`),
   PRIMARY KEY (`EID`,`LID`, `SID`, `CID`, `start`,`question`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -285,9 +291,9 @@ CREATE TABLE IF NOT EXISTS `quiz_record` (
 --
 
 INSERT INTO `quiz_record` (`EID`, `LID`, `SID`, `CID`, `start`, `question`, `answer_given`, `marks`) VALUES
-(001, '1', 'G1', 'IS111', 2021-04-01, 'Is the moon round?', 'YES', 1),
-(001, '1', 'G1', 'IS111', 2021-04-01, 'Is the sun round?', 'NO', 0),
-(001, '1', 'G1', 'IS111', 2021-04-01, 'Which of these is not a planet ?', 'EARTH', 0)
+(001, '1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the moon round?', 'YES', 1),
+(001, '1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the sun round?', 'NO', 0),
+(001, '1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Which of these is not a planet ?', 'EARTH', 0)
 ;
 
 -- --------------------------------------------------------
