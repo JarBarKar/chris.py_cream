@@ -19,8 +19,8 @@ class TestApp(flask_testing.TestCase):
         self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='')
         self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500')
         self.c3 = Course(CID='IS700', name='Super Super Hard Mod', prerequisites='IS500,IS600')
-        self.a1 = Academic_record(EID=1, SID="G1", CID="IS500", start= datetime.min, status="completed")
-        self.a2 = Academic_record(EID=1, SID="G1", CID="IS600", start= datetime.min, status="ongoing")
+        self.a1 = Academic_record(EID=1, SID="G1", CID="IS500", start=datetime.fromisoformat("2021-04-01 09:15:00"), status="completed")
+        self.a2 = Academic_record(EID=1, SID="G1", CID="IS600", start= datetime.fromisoformat("2021-04-01 09:15:00"), status="ongoing")
         
         db.create_all()
 
