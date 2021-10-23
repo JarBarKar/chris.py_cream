@@ -816,7 +816,7 @@ def view_all_sections():
 @app.route("/create_section", methods=['POST'])
 def create_section():
     data = request.get_json()
-    required_keys = ["CID","SID","start","end","TID"]
+    required_keys = ["CID","SID","start","end","TID", "vacancy"]
     missing_keys = []
     for key in required_keys:
         if key not in data.keys():
@@ -952,13 +952,23 @@ def delete_section():
         ), 500
     try:
         date_object_start = datetime.fromisoformat(data["start"])
-        Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=date_object_start).delete()
-        db.session.commit()
-        return jsonify(
-        {
-            "message": f"Section {data['SID']} has been deleted successfully from the database"
-        }
-        ), 200
+        section_query = Section.query.filter_by(SID=data["SID"], CID=data["CID"], start=date_object_start)
+        if section_query.first():
+            section_query.delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"Section {data['SID']} has been deleted successfully from the database"
+            }
+            ), 200
+        else:
+            return jsonify(
+            {
+                "message": f"Section {data['SID']} is not deleted"
+            }
+            ), 500
+        
+
     except Exception as e:
         return jsonify(
         {
@@ -1237,7 +1247,8 @@ def create_lesson():
     except Exception as e:
         return jsonify(
         {
-            "message": "Lesson is not inserted successfully into the database"
+            "message": "Lesson is not inserted successfully into the database",
+            "e" : e
         }
     ), 500
 
