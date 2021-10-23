@@ -5,6 +5,9 @@ import SignUpCourses from './components/SignUpCourses.vue'
 import HR from './components/HR.vue'
 import ViewSignUps from './components/ViewSignUps.vue'
 import AssignTrainers from './components/AssignTrainers.vue'
+import ViewEligibleCourses from './components/ViewEligibleCourses.vue'
+import ViewSections from './components/ViewSections.vue'
+import AttendCourses from './components/AttendCourses.vue'
 
 const routes = [
     {
@@ -26,6 +29,18 @@ const routes = [
     },
 
     {
+        path: '/engineer/attend_courses',
+        name: 'attend_courses',
+        component: AttendCourses
+    },
+
+    {
+        path: '/engineer/view_eligible_courses',
+        name: 'view_eligible_courses',
+        component: ViewEligibleCourses
+    },
+
+    {
         path: '/hr',
         name: 'hr',
         component: HR
@@ -41,7 +56,16 @@ const routes = [
         path: '/hr/assign_trainers',
         name: 'assign_trainers',
         component: AssignTrainers
+    },
+
+    {
+        path: '/sections',
+        name: 'sections',
+        component: ViewSections,
+        props: true
     }
+
+    
 ]
 const router = createRouter({
     history: createWebHistory(),

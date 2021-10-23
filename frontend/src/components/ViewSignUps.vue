@@ -1,15 +1,18 @@
 <template>
   <div>
         <h1>View Sign Ups</h1>
-    
-        <ul class="list-group">
-            <li class="float-left list-group-item" v-for="signup in sign_ups" :key="[signup.EID, signup.SID, signup.CID]">
-                {{signup.EID}} {{signup.CID}} {{signup.SID}}
-                <span><button type="button" class="btn btn-outline-primary">Accept</button></span>
-                <span class="float-right"><button type="button" class="btn btn-outline-primary">Reject</button></span>
-            </li>
-            
-        </ul>
+        <div class="container">
+            <div class="container mt-5">
+                <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="signup in sign_ups" :key="[signup.EID, signup.SID, signup.CID]">
+                    <div>
+                        {{signup.EID}} {{signup.CID}} {{signup.SID}}
+                    </div>
+
+                    <div><button type="button" class="btn btn-outline-primary">Accept</button>
+                    <span class="float-right"><button type="button" class="btn btn-outline-primary">Reject</button></span></div>
+                </div>
+            </div>
+        </div>
   </div>
 </template>
 

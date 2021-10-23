@@ -2,14 +2,16 @@
     <div>
         <h1>Assign Trainers</h1>
 
-        <ul class="list-group">
-            <li class="list-group-item" v-for="course in courses" :key="course.CID">
-                {{course.name}}
-                <span>
+        <div class="container mt-5">
+            <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="course in courses" :key="course.CID">
+                <div>
+                    {{course.name}}
+                </div>
+                <div>
                     <button type="button" class="btn btn-outline-primary">Assign Trainer</button>
-                </span>
-            </li>
-        </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
