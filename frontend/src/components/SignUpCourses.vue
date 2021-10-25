@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container mt-3">
         <h1>Sign Up for Courses</h1>
         <div class="container">
             <!-- Nav tabs -->

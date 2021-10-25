@@ -1,5 +1,5 @@
 <template>
-  <div>
+    <div class="container mt-3">
         <h1>View Sign Ups</h1>
         <div class="container">
             <div class="container mt-5">
@@ -13,7 +13,7 @@
                 </div>
             </div>
         </div>
-  </div>
+    </div>
 </template>
 
 <script>

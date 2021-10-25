@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container mt-3">
         <h1>Sections</h1>
         <table class="table">
             <thead>
