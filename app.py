@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 
 CORS(app)  
 
-print('gaay')
+print('gaasdy')
 
 ### Course Class ###
 class Course(db.Model):
