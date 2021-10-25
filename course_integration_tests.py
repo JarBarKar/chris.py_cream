@@ -1,4 +1,5 @@
 import unittest
+from flask import Flask, request, jsonify
 import flask_testing
 import json
 from app import app, db, Course
