@@ -51,6 +51,7 @@ class TestViewAllSectionContent(TestApp):
         self.assertEqual(response.json, {
                 'data' :[
                 {
+                'SID': 'G1',
                 'CID': 'IS111',
                 'LID': '1',
                 'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
