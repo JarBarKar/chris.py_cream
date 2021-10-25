@@ -9,16 +9,16 @@ pipeline {
                 url: 'https://github.com/JarBarKar/chris.py_cream.git']]])
             }
         }
-        stage('Code Analysis') {
-            steps {
-            sh '''
-            python3 -m venv env
-            source env/bin/activate
-            pip3 install flake8
-            flake8 app.py
-            '''
-            }
-        }
+//         stage('Code Analysis') {
+//             steps {
+//             sh '''
+//             python3 -m venv env
+//             source env/bin/activate
+//             pip3 install flake8
+//             flake8 app.py
+//             '''
+//             }
+//         }
         stage('Unit Test') {
               steps {
                 sh '''
