@@ -983,7 +983,7 @@ def delete_section():
 @app.route("/create_content", methods=['POST'])
 def create_content():
     data = request.get_json()
-    expected=["SID", "CID", "start", "content_name", "content_type", "link"]
+    expected=["SID", "CID", "LID", "start", "content_name", "content_type", "link"]
     not_present=list()
     #check input
     for expect in expected:
