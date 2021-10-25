@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 
 CORS(app)  
 
-print('mama mia')
+print('lesgosaaassssaaassaa')
 ### Course Class ###
 class Course(db.Model):
     __tablename__ = 'course'
@@ -1132,7 +1132,7 @@ def update_content():
 @app.route("/delete_content", methods=['POST'])
 def delete_content():
     data = request.get_json()
-    expected=["SID", "CID", "LID", "start", "content_name"]
+    expected=["CID", "LID", "start", "content_name"]
     not_present=list()
     #check input
     for expect in expected:
