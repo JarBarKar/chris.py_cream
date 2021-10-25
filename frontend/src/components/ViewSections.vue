@@ -10,7 +10,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="section in sections" :key="[section.CID, section.start]">
+				<tr v-for="section in sections" :key="[section.CID, section.start, section.SID]">
 					<td>{{section.SID}}</td>
 					<td>{{section.vacancy}}</td>
 					<td>

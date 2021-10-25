@@ -13,7 +13,7 @@
         </div>
 
         <div class="container-fluid my-2">
-            <button type="button" class="btn btn-outline-primary">Log in as Trainer</button>
+            <router-link type="button" class="btn btn-outline-primary" to="/trainer">Log in as Trainer</router-link>
         </div>
     </div>
 </template>

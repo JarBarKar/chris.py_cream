@@ -8,6 +8,8 @@ import AssignTrainers from './components/AssignTrainers.vue'
 import ViewEligibleCourses from './components/ViewEligibleCourses.vue'
 import ViewSections from './components/ViewSections.vue'
 import AttendCourses from './components/AttendCourses.vue'
+import Trainer from './components/Trainer.vue'
+import TrainerViewSections from './components/TrainerViewSections.vue'
 
 const routes = [
     {
@@ -63,6 +65,18 @@ const routes = [
         name: 'sections',
         component: ViewSections,
         props: true
+    },
+
+    {
+        path: '/trainer',
+        name: 'trainer',
+        component: Trainer
+    },
+
+    {
+        path: '/trainer/view_sections',
+        name: 'trainer_view_sections',
+        component: TrainerViewSections
     }
 
     
