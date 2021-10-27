@@ -34,25 +34,8 @@ pipeline {
                 pip3 install -r requirements.txt
                 python3 course_integration_tests.py
                 python3 content_integration_tests.py
-                python3 lesson_integration_tests.py
                 python3 quiz_integration_tests.py
-                python3 registration_integration_tests.py
                 python3 section_integration_tests.py
-                '''
-            }
-              post {
-                always {
-                        junit '**/test-reports/*.xml'
-                    }
-                }
-        } 
-        stage('Unit Test 2') {
-              steps {
-                sh '''
-                python3 -m venv env
-                source env/bin/activate
-                pip3 install -r requirements.txt
-                python3 quiz_integration_tests.py
                 '''
             }
               post {
