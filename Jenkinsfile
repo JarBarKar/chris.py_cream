@@ -46,5 +46,20 @@ pipeline {
                     }
                 }
         } 
+        stage('Unit Test 2') {
+              steps {
+                sh '''
+                python3 -m venv env
+                source env/bin/activate
+                pip3 install -r requirements.txt
+                python3 quiz_integration_tests.py
+                '''
+            }
+              post {
+                always {
+                        junit '**/test-reports/*.xml'
+                    }
+                }
+        } 
     }
 }
