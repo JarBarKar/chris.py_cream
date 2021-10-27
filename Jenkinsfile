@@ -32,8 +32,6 @@ pipeline {
                 python3 -m venv env
                 source env/bin/activate
                 pip3 install -r requirements.txt
-                python3 course_integration_tests.py
-                python3 content_integration_tests.py
                 python3 quiz_integration_tests.py
                 python3 section_integration_tests.py
                 '''
