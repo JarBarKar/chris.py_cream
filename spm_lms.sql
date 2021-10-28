@@ -145,7 +145,9 @@ CREATE TABLE IF NOT EXISTS `lesson` (
 INSERT INTO `lesson` (`LID`,`SID`,`CID`, `start`) VALUES
 ('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
 ('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
-('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime))
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime)),
+('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime)),
+('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime))
 ;
 
 -- --------------------------------------------------------
@@ -237,7 +239,14 @@ CREATE TABLE IF NOT EXISTS `content` (
 INSERT INTO `content` (`LID`, `SID`, `CID`, `start`, `content_type`, `content_name`, `link`) VALUES
 ('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides', 'abd.com/shared/fuie894'),
 ('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 slides', 'abd.com/shared/fuie895'),
-('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides part 2', 'abd.com/shared/fuie896')
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides part 2', 'abd.com/shared/fuie896'),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How to train dragons', 'abd.com/shared/fuie896'),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How get free money', 'abd.com/shared/fuie896'),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 Reflections', 'abd.com/shared/fuie896'),
+('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 History of Avarta', 'abd.com/shared/fuie896'),
+('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 Why is machine learning so hard?', 'abd.com/shared/fuie896'),
+('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 Convolution Neural Network', 'abd.com/shared/fuie896'),
+('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 Backward and forward propagation in neural network', 'abd.com/shared/fuie896')
 ;
 
 -- --------------------------------------------------------
@@ -297,7 +306,33 @@ INSERT INTO `quiz_record` (`EID`, `LID`, `SID`, `CID`, `start`, `question`, `ans
 ;
 
 -- --------------------------------------------------------
+--
+-- Table structure for table `progress`
+--
 
+DROP TABLE IF EXISTS `progress`;
+CREATE TABLE IF NOT EXISTS `progress` (
+  `EID` int(10) NOT NULL,
+  `SID` varchar(64) NOT NULL,
+  `CID` varchar(64) NOT NULL,
+  `start` datetime NOT NULL,
+  `latest_lesson_reached` varchar(64) NOT NULL,
+  `recent_content_name` varchar(64) NOT NULL,
+  `viewed_contents` varchar(64) NOT NULL,
+  constraint `progress_fk1` foreign key(`EID`) references `engineer`(`EID`),
+  PRIMARY KEY (`EID`, `SID`, `CID`, `start`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `progress`
+--
+
+INSERT INTO `progress` (`EID`, `SID`, `CID`, `start`, `latest_lesson_reached`, `recent_content_name`, `viewed_contents`) VALUES
+(001, 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), '2', 'Lesson 2 slides', 'Lesson 2 slides'),
+(001, 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), '1', 'Lesson 1 How get free money', 'Lesson 1 How to train dragons|Lesson 1 How get free money')
+;
+
+-- --------------------------------------------------------
 
 
 
