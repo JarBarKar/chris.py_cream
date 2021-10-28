@@ -388,6 +388,44 @@ def view_eligible_courses():
             }
         ), 500
 
+#view on-going and completed courses by EID
+@app.route("/view_current_completed_courses", methods=['POST'])
+def view_current_completed_courses():
+    data = request.get_json()
+    if "EID" not in data.keys():
+        return jsonify(
+        {
+            "message": "EID is missing"
+        }
+    ), 500
+
+    try:
+        completed_courses_retrieved = Academic_record.query.filter_by(EID=data["EID"], status="completed")
+        ongoing_courses_retrieved = Academic_record.query.filter_by(EID=data["EID"], status="ongoing")
+        completed_courses = [course.to_dict() for course in completed_courses_retrieved]
+        ongoing_courses = [course.to_dict() for course in ongoing_courses_retrieved]
+
+        if len(completed_courses) == 0 and len(ongoing_courses)==0:
+            return jsonify(
+            {
+                "message": "No courses found"
+            }), 500
+        else:
+            return jsonify(
+            {
+                "message": "Courses have been query successfully from the database",
+                "data": {
+                    "completed_courses": completed_courses,
+                    "ongoing_courses": ongoing_courses
+                }
+            }), 200
+
+    except Exception as e:
+        return jsonify(
+        {
+            "message": "There are no course retrieved"
+        }
+    ), 500
 
 #create course and add in the prerequisties
 @app.route("/create_course", methods=['POST'])
