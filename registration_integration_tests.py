@@ -2,6 +2,7 @@ import unittest
 import flask_testing
 import json
 from app import app, db, Course, Academic_record, Enrollment
+from datetime import datetime
 
 
 class TestApp(flask_testing.TestCase):
@@ -17,10 +18,10 @@ class TestApp(flask_testing.TestCase):
     def setUp(self):
         self.c1 = Course(CID='IS500', name='Super Mod', prerequisites='')
         self.c2 = Course(CID='IS600', name='Super Hard Mod', prerequisites='IS500')
-        self.er1 = Enrollment(EID=1, SID='G2', CID='IS500')
-        self.er2 = Enrollment(EID=6, SID='G90', CID='IS600')
-        self.cd1 = Academic_record(EID=1, SID="G2", CID="IS500", QID=1, status='ongoing', quiz_result=0)
-        self.cd2 = Academic_record(EID=2, SID="G12", CID="IS600", QID=1, status='ongoing', quiz_result=0)
+        self.er1 = Enrollment(EID=1, SID='G2', CID='IS500', start='2021-04-10 10:09:08')
+        self.er2 = Enrollment(EID=6, SID='G90', CID='IS600', start='2021-04-10 10:09:08')
+        self.cd1 = Academic_record(EID=1, SID="G2", CID="IS500", start='2021-04-10 10:09:08', status='ongoing')
+        self.cd2 = Academic_record(EID=2, SID="G12", CID="IS600", start='2021-04-10 10:09:08', status='ongoing')
         
         db.create_all()
 
@@ -45,7 +46,8 @@ class TestEngineerSignup(TestApp):
         request_body = {
             'EID': self.er1.EID,
             'SID': self.er1.SID,
-            'CID': self.er1.CID
+            'CID': self.er1.CID,
+            'start': self.er1.start
         }
         
         # calling engineer_signup function via flask route
@@ -56,9 +58,10 @@ class TestEngineerSignup(TestApp):
         self.assertEqual(response.json, {
             'data' :
                 {
-                'EID': 1,
-                'SID': 'G2',
-                'CID': 'IS500',
+                'EID': self.er1.EID,
+                'SID': self.er1.SID,
+                'CID': self.er1.CID,
+                'start': self.er1.start
                 }
                 ,
             'message' : f'{self.er1.EID} engineer has been updated successfully in the database'
@@ -71,6 +74,7 @@ class TestEngineerSignup(TestApp):
         request_body = {
             'SID': self.er1.SID,
             'CID': self.er1.CID,
+            'start': self.er1.start
         }
         
         # calling engineer_signup function via flask route
@@ -88,7 +92,8 @@ class TestEngineerSignup(TestApp):
         # creating request body for signup details
         request_body = {
             'EID': self.er1.EID,
-            'CID': self.er1.CID
+            'CID': self.er1.CID,
+            'start': self.er1.start
         }
         
         # calling engineer_signup function via flask route
@@ -106,7 +111,8 @@ class TestEngineerSignup(TestApp):
         # creating request body for signup details
         request_body = {
             'EID': self.er1.EID,
-            'SID': self.er1.SID
+            'SID': self.er1.SID,
+            'start': self.er1.start
         }
         
         # calling engineer_signup function via flask route
@@ -132,7 +138,10 @@ class TestHRViewSignup(TestApp):
 
     # Testing function when database has 1 signups
     def test_hr_view_signup_1(self):
+        t1 = self.er1.start
+
         # adding dummy signups to database
+        self.er1.start = datetime.fromisoformat(self.er1.start)
         db.session.add(self.er1)
         db.session.commit()
         
@@ -143,9 +152,10 @@ class TestHRViewSignup(TestApp):
             'data' :
                 [
                 {
-                'EID': 1,
-                'SID': 'G2',
-                'CID': 'IS500',
+                'EID': self.er1.EID,
+                'SID': self.er1.SID,
+                'CID': self.er1.CID,
+                'start': t1
                 }
                 ]
                 ,
@@ -155,8 +165,12 @@ class TestHRViewSignup(TestApp):
 
     # Testing function when database has 2 signups
     def test_hr_view_signup_2(self):
+        t1 = self.er1.start
+
         # adding dummy signups to database
+        self.er1.start = datetime.fromisoformat(self.er1.start)
         db.session.add(self.er1)
+        self.er2.start = datetime.fromisoformat(self.er2.start)
         db.session.add(self.er2)
         db.session.commit()
         
@@ -167,14 +181,16 @@ class TestHRViewSignup(TestApp):
             'data' :
                 [
                 {
-                'EID': 1,
-                'SID': 'G2',
-                'CID': 'IS500',
+                'EID': self.er1.EID,
+                'SID': self.er1.SID,
+                'CID': self.er1.CID,
+                'start': t1
                 },
                 {
-                'EID': 6,
-                'SID': 'G90',
-                'CID': 'IS600',
+                'EID': self.er2.EID,
+                'SID': self.er2.SID,
+                'CID': self.er2.CID,
+                'start': t1
                 },
                 ]
                 ,
@@ -190,9 +206,7 @@ class TestHRAssignEngineer(TestApp):
             'EID': self.cd1.EID,
             'SID': self.cd1.SID,
             'CID': self.cd1.CID,
-            'QID': self.cd1.QID,
-            'status': self.cd1.status,
-            'quiz_result': self.cd1.quiz_result
+            'start': self.cd1.start
         }
 
         # calling hr_assign_engineer function via flask route
@@ -204,12 +218,11 @@ class TestHRAssignEngineer(TestApp):
         self.assertEqual(response.json, {
             'data' :
                 {
-                'EID': 1,
-                'SID': 'G2',
-                'CID': 'IS500',
-                'QID': 1,
+                'EID': self.cd1.EID,
+                'SID': self.cd1.SID,
+                'CID': self.cd1.CID,
+                'start': self.cd1.start,
                 'status': 'ongoing',
-                'quiz_result': 0
                 },
             'message' : f'{self.cd1.EID} has been inserted successfully into the course details'
             })
@@ -221,9 +234,7 @@ class TestHRAssignEngineer(TestApp):
         request_body = {
             'SID': self.cd1.SID,
             'CID': self.cd1.CID,
-            'QID': self.cd1.QID,
-            'status': self.cd1.status,
-            'quiz_result': self.cd1.quiz_result
+            'start': self.cd1.start
         }
 
         # calling hr_assign_engineer function via flask route
@@ -240,7 +251,9 @@ class TestHRAssignEngineer(TestApp):
 class TestHRWithdrawEngineer(TestApp):
     # Testing positive case where course detail is in database
     def test_hr_withdraw_engineer_in_database(self):
+        t1 = self.cd2.start
         # adding dummy course detail into database
+        self.cd2.start = datetime.fromisoformat(self.cd2.start)
         db.session.add(self.cd2)
         db.session.commit()
 
@@ -249,9 +262,7 @@ class TestHRWithdrawEngineer(TestApp):
             'EID': self.cd2.EID,
             'SID': self.cd2.SID,
             'CID': self.cd2.CID,
-            'QID': self.cd2.QID,
-            'status': self.cd2.status,
-            'quiz_result': self.cd2.quiz_result
+            'start': t1,
         }
 
         # calling hr_withdraw_engineer function via flask route
@@ -272,9 +283,7 @@ class TestHRWithdrawEngineer(TestApp):
             'EID': self.cd2.EID,
             'SID': self.cd2.SID,
             'CID': self.cd2.CID,
-            'QID': self.cd2.QID,
-            'status': self.cd2.status,
-            'quiz_result': self.cd2.quiz_result
+            'start': self.cd2.start
         }
 
         # calling hr_withdraw_engineer function via flask route
@@ -294,9 +303,7 @@ class TestHRWithdrawEngineer(TestApp):
         request_body = {
             'SID': self.cd2.SID,
             'CID': self.cd2.CID,
-            'QID': self.cd2.QID,
-            'status': self.cd2.status,
-            'quiz_result': self.cd2.quiz_result
+            'start': self.cd2.start
         }
 
         # calling hr_withdraw_engineer function via flask route
@@ -316,9 +323,7 @@ class TestHRWithdrawEngineer(TestApp):
         request_body = {
             'EID': self.cd2.EID,
             'SID': self.cd2.SID,
-            'QID': self.cd2.QID,
-            'status': self.cd2.status,
-            'quiz_result': self.cd2.quiz_result
+            'start': self.cd2.start
         }
 
         # calling hr_withdraw_engineer function via flask route
@@ -335,18 +340,19 @@ class TestHRWithdrawEngineer(TestApp):
 class TestHRApproveSignup(TestApp):
     # Testing positive case where enrollment detail is in database
     def test_hr_approve_signup_in_database(self):
+        t1 = self.er1.start
+
         # adding dummy enrollment into database
+        self.er1.start = datetime.fromisoformat(self.er1.start)
         db.session.add(self.er1)
         db.session.commit()
 
         # creating request body for course details
         request_body = {
-            'EID': self.cd1.EID,
-            'SID': self.cd1.SID,
-            'CID': self.cd1.CID,
-            'QID': self.cd1.QID,
-            'status': self.cd1.status,
-            'quiz_result': self.cd1.quiz_result
+            'EID': self.er1.EID,
+            'SID': self.er1.SID,
+            'CID': self.er1.CID,
+            'start': t1,
         }
 
         # calling hr_approve_signup function via flask route
@@ -357,14 +363,13 @@ class TestHRApproveSignup(TestApp):
         self.assertEqual(response.json, {
             'data' : 
                 {
-                'EID': 1,
-                'SID': 'G2',
-                'CID': 'IS500',
-                'QID': 1,
+                'EID': self.er1.EID,
+                'SID': self.er1.SID,
+                'CID': self.er1.CID,
+                'start': t1,
                 'status': 'ongoing',
-                'quiz_result': 0
                 },
-            'message' : f'{self.cd1.EID} prerequisites has been moved successfully from Enrollment to academic_record'
+            'message' : f'{self.er1.EID} prerequisites has been moved successfully from Enrollment to academic_record'
             })
     
 
@@ -372,12 +377,10 @@ class TestHRApproveSignup(TestApp):
     def test_hr_approve_signup_not_in_database(self):
         # creating request body for course details
         request_body = {
-            'EID': self.cd1.EID,
-            'SID': self.cd1.SID,
-            'CID': self.cd1.CID,
-            'QID': self.cd1.QID,
-            'status': self.cd1.status,
-            'quiz_result': self.cd1.quiz_result
+            'EID': self.er1.EID,
+            'SID': self.er1.SID,
+            'CID': self.er1.CID,
+            'start': self.er1.start
         }
 
         # calling hr_approve_signup function via flask route
@@ -392,17 +395,17 @@ class TestHRApproveSignup(TestApp):
 
     # Testing negative case where EID is missing 
     def test_hr_approve_signup_missing_eid(self):
+        t1 = self.er1.start
         # adding dummy enrollment into database
+        self.er1.start = datetime.fromisoformat(self.er1.start)
         db.session.add(self.er1)
         db.session.commit
 
         # creating request body for course details
         request_body = {
-            'SID': self.cd1.SID,
-            'CID': self.cd1.CID,
-            'QID': self.cd1.QID,
-            'status': self.cd1.status,
-            'quiz_result': self.cd1.quiz_result
+            'SID': self.er1.SID,
+            'CID': self.er1.CID,
+            'start': t1
         }
 
         # calling hr_approve_signup function via flask route
@@ -419,7 +422,9 @@ class TestHRApproveSignup(TestApp):
 class TestHRRejectSignup(TestApp):
     # Testing positive case where enrollment detail is in database
     def test_hr_reject_signup_in_database(self):
+        t1 = self.er2.start
         # adding dummy enrollment into database
+        self.er2.start = datetime.fromisoformat(self.er2.start)
         db.session.add(self.er2)
         db.session.commit()
 
@@ -428,6 +433,7 @@ class TestHRRejectSignup(TestApp):
             'EID': self.er2.EID,
             'SID': self.er2.SID,
             'CID': self.er2.CID,
+            'start': t1
         }
 
         # calling hr_reject_signup function via flask route
@@ -450,6 +456,7 @@ class TestHRRejectSignup(TestApp):
             'EID': self.er2.EID,
             'SID': self.er2.SID,
             'CID': self.er2.CID,
+            'start': self.er2.start
         }
 
         # calling hr_reject_signup function via flask route
@@ -466,15 +473,17 @@ class TestHRRejectSignup(TestApp):
 
     # Testing negative case where EID is missing
     def test_hr_reject_signup_missing_eid(self):
+        t1 = self.er2.start
         # adding dummy enrollment into database
+        self.er2.start = datetime.fromisoformat(self.er2.start)
         db.session.add(self.er2)
         db.session.commit()
 
         # creating request body for course details
         request_body = {
-   
             'SID': self.er2.SID,
             'CID': self.er2.CID,
+            'start': t1
         }
 
         # calling hr_reject_signup function via flask route

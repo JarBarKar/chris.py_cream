@@ -76,7 +76,10 @@ class Academic_record(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
         return result
 
     def json(self):
@@ -90,12 +93,14 @@ class Enrollment(db.Model):
     EID = db.Column(db.Integer(), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
+    start = db.Column(db.DateTime, primary_key=True)
 
 
-    def __init__(self, EID, SID, CID):
+    def __init__(self, EID, SID, CID, start):
         self.EID = EID
         self.SID = SID
         self.CID = CID
+        self.start = start
 
     def to_dict(self):
         """
@@ -105,11 +110,14 @@ class Enrollment(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
         return result
 
     def json(self):
-        return {"CID": self.CID, "EID": self.EID, "SID": self.SID}
+        return {"CID": self.CID, "EID": self.EID, "SID": self.SID, "start": self.start}
 ### Enrollment Class ###
 
 
@@ -575,7 +583,7 @@ def delete_course():
 @app.route("/engineer_signup", methods=['POST'])
 def engineer_signup():
     data = request.get_json()
-    expected=["EID", "CID", "SID"]
+    expected=["EID", "CID", "SID", "start"]
     not_present=list()
     #check input
     for expect in expected:
@@ -587,8 +595,9 @@ def engineer_signup():
                 "message": f"Enrollment {not_present} is not present,  engineer is not enrolled"
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        enrollment = Enrollment(EID = data['EID'], SID = data['SID'], CID = data['CID'])
+        enrollment = Enrollment(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start'])
         db.session.add(enrollment)
         db.session.commit()
         return jsonify(
@@ -627,7 +636,7 @@ def hr_view_signup():
 @app.route("/hr_assign_engineer", methods=['POST'])
 def hr_assign_engineer():
     data = request.get_json()
-    expected=["EID", "CID", "SID", "QID"]
+    expected=["EID", "CID", "SID", "start"]
     not_present=list()
     #check input
     for expect in expected:
@@ -639,8 +648,9 @@ def hr_assign_engineer():
                 "message": f"academic record {not_present} is not present,  engineer is not assigned"
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        academic_record = Academic_record(EID = data["EID"], SID = data["SID"], CID = data["CID"], QID = data["QID"], status = "ongoing", quiz_result = 0)
+        academic_record = Academic_record(EID = data["EID"], SID = data["SID"], CID = data["CID"], start = data["start"], status = "ongoing")
         db.session.add(academic_record)
         db.session.commit()
 
@@ -661,7 +671,7 @@ def hr_assign_engineer():
 @app.route("/hr_withdraw_engineer", methods=['POST'])
 def hr_withdraw_engineer():
     data = request.get_json()
-    expected=["EID", "CID", "SID"]
+    expected=["EID", "CID", "SID", "start"]
     not_present=list()
     #check input
     for expect in expected:
@@ -673,10 +683,11 @@ def hr_withdraw_engineer():
                 "message": f"academic_record {not_present} is not present, engineer is not withdrawn"
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        exist = (Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).first() != None)
+        exist = (Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"], start = data["start"]).first() != None)
         if exist:
-            Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"]).delete()
+            Academic_record.query.filter_by(EID = data["EID"], SID = data["SID"], CID = data["CID"], start = data["start"]).delete()
             db.session.commit()
             return jsonify(
                 {
@@ -699,7 +710,7 @@ def hr_withdraw_engineer():
 @app.route("/hr_approve_signup", methods=['POST'])
 def hr_approve_signup():
     data = request.get_json()
-    expected=["EID", "CID", "SID", "QID"]
+    expected=["EID", "CID", "SID", "start"]
     not_present=list()
     #check input
     for expect in expected:
@@ -711,11 +722,12 @@ def hr_approve_signup():
                 "message": f"Academic record {not_present} is not present, engineer is not enrolled"
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).first() != None)
+        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID'], start= data['start']).first() != None)
         if exist:
-            academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], QID = data['QID'], status = "ongoing", quiz_result = 0)
-            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
+            academic_record = Academic_record(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start'], status = "ongoing")
+            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start']).delete()
             db.session.add(academic_record)
             db.session.commit()
             return jsonify(
@@ -742,7 +754,7 @@ def hr_approve_signup():
 @app.route("/hr_reject_signup", methods=['POST'])
 def hr_reject_signup():
     data = request.get_json()
-    expected=["EID", "CID", "SID"]
+    expected=["EID", "CID", "SID", "start"]
     not_present=list()
     #check input
     for expect in expected:
@@ -754,10 +766,11 @@ def hr_reject_signup():
                 "message": f"Academic record {not_present} is not present, signup is not rejected"
             }
         ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
     try:
-        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).first() != None)
+        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start']).first() != None)
         if exist :
-            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID']).delete()
+            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start']).delete()
             db.session.commit()
             return jsonify(
             {
