@@ -1616,6 +1616,7 @@ def delete_quiz_question():
         ), 500
 ### End of API points for Quiz CRUD ###
 
+
 ### Start of API points for Progress ###
 @app.route("/unlock_next_lesson", methods=['POST'])
 #view all courses
@@ -1658,6 +1659,61 @@ def unlock_next_lesson():
             "message": f"Latest lesson reached is not updated"
         }
     ), 500
+
+#View content status of a particular lesson
+@app.route("/view_lesson_content_status", methods=["POST"])
+def view_lesson_content_status():
+    #Getting data from front end
+    data = request.get_json()
+    #Checking if all required field are present
+    fields = ['EID', 'SID', 'CID', 'start', 'LID']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, view lesson content status failed",
+            }
+        ), 500
+    # converting start from string to datetime format
+    data["start"] = datetime.fromisoformat(data["start"])
+    try:
+        # Querying data base for the progress record
+        record = Progress.query.filter_by(EID=data["EID"], SID=data["SID"],CID=data["CID"], start=data["start"]).first()
+        if record == None:
+            return jsonify(
+            {
+                "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} does not exist in the database",
+            }
+        ), 500
+        # check if the lesson being queried is the latest
+        # if queried lesson is latest lesson, return the viewed contents as a list
+        if data["LID"] == record.latest_lesson_reached:
+            contents = record.viewed_contents.split("|")
+            return jsonify(
+            {
+                "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been retrieved successfully",
+                "data": contents
+            }
+            ), 200
+        #queried lesson is not latest lesson, retrieve all contents of the lesson from content table
+        else:
+            records = Content.query.filter_by(LID=data["LID"], SID=data["SID"],CID=data["CID"], start=data["start"])
+            records = [record.to_dict() for record in records]
+            contents = []
+            for record in records:
+                contents.append(record["content_name"])
+            return jsonify(
+                {
+                    "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been retrieved successfully",
+                    "data": contents
+                }
+            ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
 
 ### End of API points for Progress ###
 

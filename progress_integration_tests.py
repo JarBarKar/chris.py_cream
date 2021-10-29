@@ -1,7 +1,7 @@
 import unittest
 import flask_testing
 import json
-from app import app, db, Progress
+from app import Content, app, db, Progress
 from datetime import datetime
 
 
@@ -18,11 +18,19 @@ class TestApp(flask_testing.TestCase):
     def setUp(self):
         self.p1 = Progress(EID=1, SID="G1", CID="IS111", start=datetime.fromisoformat("2021-04-01 09:15:00"),latest_lesson_reached="3",recent_content_name="Lesson 2 slides",viewed_contents="Lesson 2 slides")
         self.p2 = Progress(EID=1, SID="G2", CID="IS112", start=datetime.fromisoformat("2021-05-01 09:15:00"),latest_lesson_reached="1",recent_content_name="Lesson 1 how get free money",viewed_contents="Lesson 1 How get free money', 'Lesson 1 How to train dragons|Lesson 1 How get free money")
+        self.p3 = Progress(EID=1, SID="G1", CID="IS111", start="2021-04-01 09:15:00",latest_lesson_reached="3",recent_content_name="Lesson 2 slides",viewed_contents="Lesson 2 slides")
+        self.p4 = Progress(EID=1, SID="G2", CID="IS112", start="2021-05-01 09:15:00",latest_lesson_reached="1",recent_content_name="Lesson 1 how get free money",viewed_contents="Lesson 1 How to train dragons|Lesson 1 How get free money")
+        self.c1 = Content(LID='1', SID='G1', CID='IS111',start='2021-04-01 09:15:00', content_type='pdf', content_name='Lesson 1 slides', link='abd.com/shared/fuie894')
+        self.c2 = Content(LID='1', SID='G1', CID='IS111',start='2021-04-01 09:15:00', content_type='pdf', content_name='Lesson 1 slides part 2', link='abd.com/shared/fuie894')
         db.create_all()
 
     def tearDown(self):
-        self.gq1q1 = None
-        self.gq1q2 = None
+        self.p1 = None
+        self.p2 = None
+        self.p3 = None
+        self.p4 = None
+        self.c1 = None
+        self.c2 = None
 
         db.session.remove()
         db.drop_all()
@@ -174,6 +182,245 @@ class TestUpdateProgress(TestApp):
             "message": "No lesson found"
         })
 
+
+class TestViewLessonContentStatus(TestApp):
+    # Testing positive case where lesson queried is latest question
+    def test_view_lesson_content_status_latest_lesson(self):
+        t1 = self.p4.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p4.EID,
+            "SID": self.p4.SID,
+            "CID": self.p4.CID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data': ['Lesson 1 How to train dragons', 'Lesson 1 How get free money'],
+            'message': f"Progress record with EID: {self.p4.EID}, SID: {self.p4.SID}, CID: {self.p4.CID}, start: {self.p4.start} has been retrieved successfully"    
+        })
+    
+
+    # Testing negative case where eid missing
+    def test_view_lesson_content_status_latest_lesson_missing_eid(self):
+        t1 = self.p4.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "SID": self.p4.SID,
+            "CID": self.p4.CID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"EID is missing from request body, view lesson content status failed"    
+        })
+    
+
+    # Testing negative case where sid missing
+    def test_view_lesson_content_status_latest_lesson_missing_sid(self):
+        t1 = self.p4.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p4.EID,
+            "CID": self.p4.CID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"SID is missing from request body, view lesson content status failed"    
+        })
+    
+
+    # Testing negative case where cid missing
+    def test_view_lesson_content_status_latest_lesson_missing_cid(self):
+        t1 = self.p4.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p4.EID,
+            "SID": self.p4.SID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"CID is missing from request body, view lesson content status failed"    
+        })
+    
+
+    # Testing negative case where start missing
+    def test_view_lesson_content_status_latest_lesson_missing_start(self):
+        t1 = self.p4.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p4.EID,
+            "SID": self.p4.SID,
+            "CID": self.p4.CID,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"start is missing from request body, view lesson content status failed"    
+        })
+    
+
+    # Testing negative case where LID missing
+    def test_view_lesson_content_status_latest_lesson_missing_lid(self):
+        t1 = self.p4.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p4.EID,
+            "SID": self.p4.SID,
+            "CID": self.p4.CID,
+            "start" : t1
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"LID is missing from request body, view lesson content status failed"    
+        })
+    
+
+    # Testing positive case where lesson queried is not latest question
+    def test_view_lesson_content_status_not_latest_lesson(self):
+        t1 = self.p3.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        # adding two content to database
+        self.c1.start = datetime.fromisoformat(self.c1.start)
+        db.session.add(self.c1)
+        self.c2.start = datetime.fromisoformat(self.c2.start)
+        db.session.add(self.c2)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data': ['Lesson 1 slides', 'Lesson 1 slides part 2'],
+            'message': f"Progress record with EID: {self.p3.EID}, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {self.p3.start} has been retrieved successfully"    
+        })
+    
+
+    # Testing positive case where lesson queried is not latest question
+    def test_view_lesson_content_status_not_in_database(self):
+        t1 = self.p3.start
+        # adding two progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        # adding two content to database
+        self.c1.start = datetime.fromisoformat(self.c1.start)
+        db.session.add(self.c1)
+        self.c2.start = datetime.fromisoformat(self.c2.start)
+        db.session.add(self.c2)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": 4,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling view_lesson_content_status function via flask route
+        response = self.client.post("/view_lesson_content_status",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"Progress record with EID: 4, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {t1} does not exist in the database"    
+        })
 
 if __name__ == '__main__':
     #For jenkins
