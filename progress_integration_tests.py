@@ -424,7 +424,7 @@ class TestViewLessonContentStatus(TestApp):
 
 if __name__ == '__main__':
     #For jenkins
-    # import xmlrunner
-    # unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
+    import xmlrunner
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
     #For local tests
-    unittest.main()
+    # unittest.main()
