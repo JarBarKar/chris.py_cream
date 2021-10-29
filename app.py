@@ -311,9 +311,9 @@ class Progress(db.Model):
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
     start = db.Column(db.DateTime, nullable=False, primary_key=True)
-    latest_lesson_reached = db.Column(db.String(64), primary_key=True)
-    recent_content_name = db.Column(db.String(64), primary_key=True)
-    viewed_contents = db.Column(db.String(64), primary_key=True)
+    latest_lesson_reached = db.Column(db.String(64))
+    recent_content_name = db.Column(db.String(64))
+    viewed_contents = db.Column(db.String(64))
 
 
     def __init__(self, EID, SID, CID, start, latest_lesson_reached,recent_content_name,viewed_contents):
@@ -1708,6 +1708,49 @@ def view_lesson_content_status():
                     "data": contents
                 }
             ), 200
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
+
+
+#View latest content accessed of a particular course
+@app.route("/view_latest_content_accessed", methods=["POST"])
+def view_latest_content_accessed():
+    #Getting data from front end
+    data = request.get_json()
+    #Checking if all required field are present
+    fields = ['EID', 'SID', 'CID', 'start', 'content_name']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, view latest content accessed failed",
+            }
+        ), 500
+    # converting start from string to datetime format
+    data["start"] = datetime.fromisoformat(data["start"])
+    try:
+        # Querying data base for the progress record
+        record = Progress.query.filter_by(EID=data["EID"], SID=data["SID"],CID=data["CID"], start=data["start"])
+        if record.first() == None:
+            return jsonify(
+            {
+                "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} does not exist in the database",
+            }
+            ), 500
+        # replace the recent_content_name with the new value
+        record.update(dict(recent_content_name=data['content_name']))
+        db.session.commit()
+        record = Progress.query.filter_by(EID=data["EID"], SID=data["SID"],CID=data["CID"], start=data["start"]).first()
+        return jsonify(
+        {
+            "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been updated successfully",
+            "data": record.to_dict()
+        }
+        ), 200
     except Exception as e:
         return jsonify(
         {

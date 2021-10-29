@@ -422,6 +422,199 @@ class TestViewLessonContentStatus(TestApp):
             'message': f"Progress record with EID: 4, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {t1} does not exist in the database"    
         })
 
+class TestViewLatestContentAccessed(TestApp):
+    # Testing positive case where all details are given
+    def test_view_latest_content_accessed_all_details(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : self.c1.content_name
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' : {
+                'EID': self.p3.EID,
+                'SID': self.p3.SID,
+                'CID': self.p3.CID,
+                'start': t1,
+                'latest_lesson_reached': self.p3.latest_lesson_reached,
+                'recent_content_name': self.c1.content_name,
+                'viewed_contents': self.p3.viewed_contents
+            },
+            'message': f"Progress record with EID: {self.p3.EID}, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {t1} has been updated successfully"    
+        })
+    
+
+    # Testing negative case where EID missing
+    def test_view_latest_content_accessed_missing_eid(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : self.c1.content_name
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"EID is missing from request body, view latest content accessed failed"    
+        })
+    
+
+    # Testing negative case where SID missing
+    def test_view_latest_content_accessed_missing_sid(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : self.c1.content_name
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"SID is missing from request body, view latest content accessed failed"    
+        })
+    
+
+    # Testing negative case where CID missing
+    def test_view_latest_content_accessed_missing_cid(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "start": t1,
+            "content_name" : self.c1.content_name
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"CID is missing from request body, view latest content accessed failed"    
+        })
+    
+
+    # Testing negative case where start missing
+    def test_view_latest_content_accessed_missing_start(self):
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "content_name" : self.c1.content_name
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"start is missing from request body, view latest content accessed failed"    
+        })
+    
+
+    # Testing negative case where content name missing
+    def test_view_latest_content_accessed_missing_content_name(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"content_name is missing from request body, view latest content accessed failed"    
+        })
+
+
+    # Testing negative case where record not in database
+    def test_view_latest_content_accessed_not_in_database(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": 2,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : self.c1.content_name
+        }
+
+        # calling view_latest_content_accessed function via flask route
+        response = self.client.post("/view_latest_content_accessed",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"Progress record with EID: 2, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {self.p3.start} does not exist in the database"    
+        })
+
+
 if __name__ == '__main__':
     #For jenkins
     import xmlrunner
