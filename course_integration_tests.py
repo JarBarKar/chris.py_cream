@@ -251,7 +251,7 @@ class TestViewEligibleCourses(TestApp):
         )
 class TestViewOngoingCompletedCourses(TestApp):
     # Testing function when it is success case
-    def test_view_courses_0(self):
+    def test_view_current_completed_courses(self):
         # calling view_current_completed_courses function via flask route
         db.session.add(self.c1)
         db.session.add(self.c2)
@@ -268,51 +268,51 @@ class TestViewOngoingCompletedCourses(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            "message": "Courses have been query successfully from the database",
+            "message": "Courses have been queried successfully from the database",
             "data" : 
             {
-            'completed_courses': [{'CID': 'IS500', 'EID': 1, 'SID': 'G1', 'start': 'Thu, 01 Apr 2021 09:15:00 GMT', 'status': 'completed'}], 
-            'ongoing_courses': [{'CID': 'IS600', 'EID': 1, 'SID': 'G1', 'start': 'Thu, 01 Apr 2021 09:15:00 GMT', 'status': 'ongoing'}]
+            'completed_courses': [{'CID': 'IS500', 'EID': 1, 'SID': 'G1', 'start': '2021-04-01 09:15:00', 'status': 'completed'}], 
+            'ongoing_courses': [{'CID': 'IS600', 'EID': 1, 'SID': 'G1', 'start': '2021-04-01 09:15:00', 'status': 'ongoing'}]
             }
         })
 
-    # Testing function when eid is not inserted
-    def test_view_courses_no_EID(self):
-        # calling view_eligible_courses function via flask route
+    def test_view_current_completed_courses_no_EID(self):
+        # calling view_current_completed_courses function via flask route
         db.session.add(self.c1)
         db.session.add(self.c2)
         db.session.add(self.c3)
         db.session.add(self.a1)
+        db.session.add(self.a2)
         db.session.commit()
 
         request_body = {
         }
-
-        response = self.client.post("/view_eligible_courses",
+        response = self.client.post("/view_current_completed_courses",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
-
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            "message": "EID is missing"
-            }
-        )
+            "message": "EID is missing",
+        })
 
-    # Testing function when database does not exist
-    def test_view_eligible_courses_EID_fail(self):
-        # calling view_eligible_courses function via flask route
+    def test_view_current_completed_courses_empty(self):
+        # calling view_current_completed_courses function via flask route
+        db.session.add(self.c1)
+        db.session.add(self.c2)
+        db.session.add(self.c3)
+        db.session.commit()
+
         request_body = {
-            "EID" : 1
+            'EID' : 1
         }
-        response = self.client.post("/view_eligible_courses",
+        response = self.client.post("/view_current_completed_courses",
                                     data=json.dumps(request_body),
                                     content_type='application/json')
-
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            "message": "There are no course retrieved"
-            }
-        )
+            "message": "No courses found",
+        })
+
 
 class TestUpdateCourse(TestApp):
     # Testing positive case where course is in database
@@ -629,4 +629,4 @@ if __name__ == '__main__':
     import xmlrunner
     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
     #For local tests
-    # unittest.main()
+    #unittest.main()

@@ -421,7 +421,7 @@ def view_current_completed_courses():
         else:
             return jsonify(
             {
-                "message": "Courses have been query successfully from the database",
+                "message": "Courses have been queried successfully from the database",
                 "data": {
                     "completed_courses": completed_courses,
                     "ongoing_courses": ongoing_courses
