@@ -34,7 +34,6 @@ pipeline {
                 pip3 install -r requirements.txt
                 python3 quiz_integration_tests.py
                 python3 section_integration_tests.py
-                python3 course_integration_tests.py
                 python3 registration_integration_tests.py
                 '''
             }
