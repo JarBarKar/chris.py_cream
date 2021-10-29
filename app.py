@@ -304,6 +304,46 @@ class Quiz_questions(db.Model):
                 "answer":self.answer, "options":self.options, "duration":self.duration, "type": self.type}
 ### Quiz Questions Class ###
 
+### Progress Class ###
+class Progress(db.Model):
+    __tablename__ = 'progress'
+    EID = db.Column(db.Integer(), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    start = db.Column(db.DateTime, nullable=False, primary_key=True)
+    latest_lesson_reached = db.Column(db.String(64), primary_key=True)
+    recent_content_name = db.Column(db.String(64), primary_key=True)
+    viewed_contents = db.Column(db.String(64), primary_key=True)
+
+
+    def __init__(self, EID, SID, CID, start, latest_lesson_reached,recent_content_name,viewed_contents):
+        self.EID = EID
+        self.SID = SID
+        self.CID = CID
+        self.start = start
+        self.latest_lesson_reached = latest_lesson_reached
+        self.recent_content_name = recent_content_name
+        self.viewed_contents = viewed_contents
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"EID": self.EID, "SID": self.SID, "CID": self.CID, "start": self.start,
+         "latest_lesson_reached":self.latest_lesson_reached, "recent_content_name":self.recent_content_name,
+         "viewed_contents":self.viewed_contents}
+### Progress Class ###
 
 ### Start of API points for Course CRUD ###
 @app.route("/view_courses", methods=['GET'])
@@ -1576,6 +1616,50 @@ def delete_quiz_question():
         ), 500
 ### End of API points for Quiz CRUD ###
 
+### Start of API points for Progress ###
+@app.route("/unlock_next_lesson", methods=['POST'])
+#view all courses
+def unlock_next_lesson():
+    data = request.get_json()
+    fields = ['EID', 'SID', 'CID', 'start']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing",
+            }
+        ), 500
+
+    try:
+        data["start"] = datetime.fromisoformat(data["start"])
+        retrieved_progress = Progress.query.filter_by(EID=data["EID"], SID=data["SID"], CID=data["CID"], start=data["start"])
+        if retrieved_progress.first():
+            progress = [progress.to_dict() for progress in retrieved_progress]
+            new_lesson = str(int(progress[0]["latest_lesson_reached"])+1)
+            retrieved_progress.update(dict(latest_lesson_reached=new_lesson, viewed_contents=""))
+            db.session.commit()
+            progress = Progress.query.filter_by(EID=data["EID"], SID=data["SID"], CID=data["CID"], start=data["start"]).first()
+            return jsonify(
+                {
+                    "message": f"Latest lesson reached updated to lesson {new_lesson}",
+                    "data": progress.to_dict()
+                }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "message": f"No lesson found"
+                }
+            ), 500
+
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Latest lesson reached is not updated"
+        }
+    ), 500
+
+### End of API points for Progress ###
 
 
 if __name__ == '__main__':
