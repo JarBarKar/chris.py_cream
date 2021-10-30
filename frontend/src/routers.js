@@ -5,6 +5,11 @@ import SignUpCourses from './components/SignUpCourses.vue'
 import HR from './components/HR.vue'
 import ViewSignUps from './components/ViewSignUps.vue'
 import AssignTrainers from './components/AssignTrainers.vue'
+import ViewEligibleCourses from './components/ViewEligibleCourses.vue'
+import ViewSections from './components/ViewSections.vue'
+import AttendCourses from './components/AttendCourses.vue'
+import Trainer from './components/Trainer.vue'
+import TrainerViewSections from './components/TrainerViewSections.vue'
 
 const routes = [
     {
@@ -26,6 +31,18 @@ const routes = [
     },
 
     {
+        path: '/engineer/attend_courses',
+        name: 'attend_courses',
+        component: AttendCourses
+    },
+
+    {
+        path: '/engineer/view_eligible_courses',
+        name: 'view_eligible_courses',
+        component: ViewEligibleCourses
+    },
+
+    {
         path: '/hr',
         name: 'hr',
         component: HR
@@ -41,7 +58,28 @@ const routes = [
         path: '/hr/assign_trainers',
         name: 'assign_trainers',
         component: AssignTrainers
+    },
+
+    {
+        path: '/sections',
+        name: 'sections',
+        component: ViewSections,
+        props: true
+    },
+
+    {
+        path: '/trainer',
+        name: 'trainer',
+        component: Trainer
+    },
+
+    {
+        path: '/trainer/view_sections',
+        name: 'trainer_view_sections',
+        component: TrainerViewSections
     }
+
+    
 ]
 const router = createRouter({
     history: createWebHistory(),

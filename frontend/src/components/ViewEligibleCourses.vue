@@ -1,20 +1,21 @@
 <template>
     <div class="container mt-3">
-        <h1>Sign Up for Courses</h1>
+        <h1>View Eligible Courses</h1>
         <div class="container">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">All Courses</button>
+                    <router-link class="nav-link" type="button" role="tab" to="/engineer/signup">All Courses</router-link>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <router-link class="nav-link" type="button" role="tab" to="/engineer/view_eligible_courses">Eligible Courses</router-link>
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Eligible Courses</button>
                 </li>
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
-                <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="tab-pane" id="home" role="tabpanel" aria-labelledby="home-tab">...</div>
+                <div class="tab-pane active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                     <div class="container mt-5">
                         <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="course in eligible_courses" :key="course.CID">
                             <div>
@@ -24,19 +25,8 @@
                                 <router-link type="button" class="btn btn-outline-primary" :to="{name: 'sections', params:{CID:course.CID}}">View Section</router-link>
                             </div>
                         </div>
-
-                        <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="course in non_eligible_courses" :key="course.CID">
-                            <div>
-                                {{course.name}}
-                            </div>
-                            
-                            <div>
-                                <button type="button" class="btn btn-outline-primary disabled">View Section</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab"></div>
             </div>
         </div>
     </div>
@@ -80,6 +70,7 @@ export default {
     created() {
         this.getEligibleCourses()
     }
+    
 }
 </script>
 
