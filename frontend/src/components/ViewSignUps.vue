@@ -3,13 +3,15 @@
         <h1>View Sign Ups</h1>
         <div class="container">
             <div class="container mt-5">
-                <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="signup in sign_ups" :key="[signup.EID, signup.SID, signup.CID]">
+                <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="signup in sign_ups" :key="[signup.EID, signup.SID, signup.CID,signup.start]">
                     <div>
                         {{signup.EID}} {{signup.CID}} {{signup.SID}}
                     </div>
 
-                    <div><button type="button" class="btn btn-outline-primary">Accept</button>
-                    <span class="float-right"><button type="button" class="btn btn-outline-primary">Reject</button></span></div>
+                    <div>
+                        <router-link type="button" class="btn btn-outline-primary" :to="{name: 'hr_signup_approved', params:{EID:signup.EID, SID:signup.SID, CID:signup.CID, start:signup.start}}">Accept</router-link>
+                        <span class="float-right"><button type="button" class="btn btn-outline-primary">Reject</button></span>
+                    </div>
                 </div>
             </div>
         </div>
