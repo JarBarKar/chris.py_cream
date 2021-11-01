@@ -221,7 +221,10 @@ class Content(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
         return result
 
     def json(self):
@@ -1086,7 +1089,7 @@ def create_content():
             }
         ), 500
     try:
-        data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+        data["start"] = datetime.fromisoformat(data["start"])
         content = Content(SID=data["SID"], CID=data["CID"], LID=data["LID"], start=data["start"], content_name=data["content_name"], content_type=data["content_type"], link=data["link"])
         db.session.add(content)
         db.session.commit()
@@ -1120,7 +1123,7 @@ def view_all_section_content():
                 "message": f"Section content {not_present} is not present, no section content is retrieved from database"
             }
         ), 500
-    data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+    data["start"] = datetime.fromisoformat(data["start"])
     retrieved_section_content = Content.query.filter_by(SID = data['SID'], CID = data['CID'], start = data['start'])
     section_contents = [section_content.to_dict() for section_content in retrieved_section_content]
     if section_contents:
@@ -1152,7 +1155,7 @@ def view_lesson_content():
                 "message": f"Content {not_present} is not present, no content is retrieved from database"
             }
         ), 500
-    data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+    data["start"] = datetime.fromisoformat(data["start"])
     retrieved_content = Content.query.filter_by(SID = data['SID'], CID = data['CID'], LID = data['LID'], start = data['start'])
     contents = [content.to_dict() for content in retrieved_content]
     if contents:
@@ -1188,8 +1191,8 @@ def update_content():
     for change in potential_changes:
         if change not in data.keys():
             data[change] = data[str('old_'+change)]
-    data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
-    data['old_start'] = datetime.strptime(data['old_start'], "%d/%m/%Y %H:%M:%S")
+    data["start"] = datetime.fromisoformat(data["start"])
+    data["old_start"] = datetime.fromisoformat(data["old_start"])
     exist = (Content.query.filter_by(SID = data["old_SID"], CID = data["old_CID"], LID = data["old_LID"], start = data["old_start"], content_name = data["old_content_name"]).first() != None)
     if exist:
         try:
@@ -1234,7 +1237,7 @@ def delete_content():
                 "message": f"Content {not_present} is not present, content is not successfully deleted"
             }
         ), 500
-    data['start'] = datetime.strptime(data['start'], "%d/%m/%Y %H:%M:%S")
+    data["start"] = datetime.fromisoformat(data["start"])
     exist = (Content.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"], content_name = data["content_name"]).first() != None)
     if exist:
         try:

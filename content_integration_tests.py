@@ -1,4 +1,3 @@
-from typing import ContextManager
 import unittest
 import flask_testing
 import json
@@ -16,9 +15,9 @@ class TestApp(flask_testing.TestCase):
         return app
 
     def setUp(self):
-        self.s1 = Content(SID='G1', CID='IS111', LID='1',start=datetime.min, content_name='Lesson slides', content_type='pdf', link='slidelink')
-        self.s2 = Content(SID='G1', CID='IS111', LID='1',start=datetime.min, content_name='Lesson video', content_type='video', link='videolink')
-        self.s3 = Content(SID='G1', CID='IS111', LID='2',start=datetime.min, content_name='', content_type='video', link='videolink')
+        self.s1 = Content(SID='G1', CID='IS111', LID='1',start='2021-10-21 09:15:00', content_name='Lesson slides', content_type='pdf', link='slidelink')
+        self.s2 = Content(SID='G1', CID='IS111', LID='1',start='2021-10-21 09:15:00', content_name='Lesson video', content_type='video', link='videolink')
+        self.s3 = Content(SID='G1', CID='IS111', LID='2',start='2021-10-21 09:15:00', content_name='', content_type='video', link='videolink')
         
         db.create_all()
 
@@ -38,9 +37,11 @@ class TestViewAllSectionContent(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00"
+            'start': self.s1.start
         }
         # adding two sections to database
+        self.s1.start = datetime.fromisoformat(self.s1.start)
+        self.s2.start = datetime.fromisoformat(self.s2.start)
         db.session.add(self.s1)
         db.session.add(self.s2)
         db.session.commit()
@@ -54,7 +55,7 @@ class TestViewAllSectionContent(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'LID': '1',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'start': '2021-10-21 09:15:00',
                 'content_name': 'Lesson slides',
                 'content_type': 'pdf',
                 'link': 'slidelink'
@@ -63,7 +64,7 @@ class TestViewAllSectionContent(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'LID': '1',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'start': '2021-10-21 09:15:00',
                 'content_name': 'Lesson video',
                 'content_type': 'video',
                 'link': 'videolink'
@@ -78,7 +79,7 @@ class TestViewAllSectionContent(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00"
+            'start': self.s1.start
         }
 
         response = self.client.post("/view_all_section_content",
@@ -111,7 +112,7 @@ class TestViewAllSectionContent(TestApp):
         request_body = {
             "SID": "GOOD EVENING",
             'CID': self.s1.CID,
-            'start': "01/01/0001 00:00:00"
+            'start': self.s1.start
         }
 
         response = self.client.post("/view_all_section_content",
@@ -131,9 +132,11 @@ class TestViewLessonContent(TestApp):
             'SID': self.s1.SID,
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00"
+            'start': self.s1.start
         }
         # adding two content to database
+        self.s1.start = datetime.fromisoformat(self.s1.start)
+        self.s2.start = datetime.fromisoformat(self.s2.start)
         db.session.add(self.s1)
         db.session.add(self.s2)
         db.session.commit()
@@ -150,7 +153,7 @@ class TestViewLessonContent(TestApp):
                 'content_name': 'Lesson slides',
                 'content_type': 'pdf',
                 'link': 'slidelink',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT'
+                'start': '2021-10-21 09:15:00'
                 },
                 {
                 'CID': 'IS111',
@@ -159,7 +162,7 @@ class TestViewLessonContent(TestApp):
                 'content_name': 'Lesson video',
                 'content_type': 'video',
                 'link': 'videolink',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT'
+                'start': '2021-10-21 09:15:00'
                 }
             ],
             'message' : f"All content are retrieved for lesson {self.s1.CID, self.s1.SID, self.s1.LID}"
@@ -172,7 +175,7 @@ class TestViewLessonContent(TestApp):
             'SID': self.s1.SID,
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00"
+            'start': self.s1.start
         }
 
         response = self.client.post("/view_lesson_content",
@@ -206,7 +209,7 @@ class TestViewLessonContent(TestApp):
             "SID": "GOOD EVENING",
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00"
+            'start': self.s1.start
         }
 
         response = self.client.post("/view_lesson_content",
@@ -226,7 +229,7 @@ class TestCreateContent(TestApp):
             'SID': self.s1.SID,
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00",
+            'start': self.s1.start,
             'content_name': self.s1.content_name,
             'content_type': self.s1.content_type,
             'link': self.s1.link
@@ -239,7 +242,7 @@ class TestCreateContent(TestApp):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            'data': {'CID': 'IS111','LID': '1','SID': 'G1','content_name': 'Lesson slides','content_type': 'pdf', 'link': 'slidelink','start': 'Mon, 01 Jan 0001 00:00:00 GMT'},
+            'data': {'CID': 'IS111','LID': '1','SID': 'G1','content_name': 'Lesson slides','content_type': 'pdf', 'link': 'slidelink','start': '2021-10-21 09:15:00'},
             'message': f"Content {self.s1.content_name} has been inserted successfully into the database"
             
         })
@@ -250,7 +253,7 @@ class TestCreateContent(TestApp):
         request_body = {
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00",
+            'start': self.s1.start,
             'content_name': self.s1.content_name,
             'content_type': self.s1.content_type,
             'link': self.s1.link
@@ -287,6 +290,8 @@ class TestUpdateContent(TestApp):
     # Testing positive case where content name is updated
     def test_update_content(self):
         # adding one content to database
+        t1 = self.s1.start
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         db.session.add(self.s1)
         db.session.commit()
 
@@ -295,7 +300,7 @@ class TestUpdateContent(TestApp):
             'old_SID': self.s1.SID,
             'old_CID': self.s1.CID,
             'old_LID': self.s1.LID,
-            'old_start': "01/01/0001 00:00:00",
+            'old_start': t1,
             'old_content_name': self.s1.content_name,
             'old_content_type': self.s1.content_type,
             'old_link': self.s1.link,
@@ -312,7 +317,7 @@ class TestUpdateContent(TestApp):
                 'SID': 'G1',
                 'CID': 'IS111',
                 'LID': '1',
-                'start': 'Mon, 01 Jan 0001 00:00:00 GMT',
+                'start': '2021-10-21 09:15:00',
                 'content_name': 'new lesson slides',
                 'content_type': 'pdf',
                 'link': 'slidelink'
@@ -326,6 +331,8 @@ class TestUpdateContent(TestApp):
     # Testing negative case where SID is not in database
     def test_update_content_SID_not_in_database(self):
         # adding one content to database
+        t1 = self.s1.start
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         db.session.add(self.s1)
         db.session.commit()
 
@@ -334,7 +341,7 @@ class TestUpdateContent(TestApp):
             'old_SID': 'do not exist',
             'old_CID': self.s1.CID,
             'old_LID': self.s1.LID,
-            'old_start': "01/01/0001 00:00:00",
+            'old_start': t1,
             'old_content_name': self.s1.content_name,
             'old_content_type': self.s1.content_type,
             'old_link': self.s1.link,
@@ -352,11 +359,13 @@ class TestUpdateContent(TestApp):
 
     
     def test_update_content_missing_SID(self):
+        t1 = self.s1.start
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         # setting content details
         request_body = {
             'old_CID': self.s1.CID,
             'old_LID': self.s1.LID,
-            'old_start': "01/01/0001 00:00:00",
+            'old_start': t1,
             'old_content_name': self.s1.content_name,
             'old_content_type': self.s1.content_type,
             'old_link': self.s1.link,
@@ -373,6 +382,7 @@ class TestUpdateContent(TestApp):
         })
     
     def test_update_content_empty_request(self):
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         # setting content details
         request_body = {
         }
@@ -391,6 +401,8 @@ class TestDeleteMateria(TestApp):
     # Testing positive case where content name is updated
     def test_delete_content(self):
         # adding one content to database
+        t1 = self.s1.start
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         db.session.add(self.s1)
         db.session.commit()
 
@@ -399,7 +411,7 @@ class TestDeleteMateria(TestApp):
             'SID': self.s1.SID,
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00",
+            'start': t1,
             'content_name': self.s1.content_name,
         }
 
@@ -414,6 +426,8 @@ class TestDeleteMateria(TestApp):
 
     def test_delete_content_missing_CID(self):
         # adding one content to database
+        t1 = self.s1.start
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         db.session.add(self.s1)
         db.session.commit()
 
@@ -421,7 +435,7 @@ class TestDeleteMateria(TestApp):
         request_body = {
             'SID': self.s1.SID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00",
+            'start': t1,
             'content_name': self.s1.content_name,
         }
 
@@ -436,13 +450,14 @@ class TestDeleteMateria(TestApp):
 
     def test_delete_content_not_in_database(self):
         # adding no content to database
-
+        t1 = self.s1.start
+        self.s1.start = datetime.fromisoformat(self.s1.start)
         # setting content details
         request_body = {
             'SID': self.s1.SID,
             'CID': self.s1.CID,
             'LID': self.s1.LID,
-            'start': "01/01/0001 00:00:00",
+            'start': t1,
             'content_name': self.s1.content_name,
         }
 
@@ -463,5 +478,6 @@ if __name__ == '__main__':
     #For jenkins
     import xmlrunner
     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
-    #For local tests
+    
+    # For local tests
     # unittest.main()
