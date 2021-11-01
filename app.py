@@ -266,7 +266,7 @@ class Lesson(db.Model):
 ### Quiz Questions Class ###
 class Quiz_questions(db.Model):
     __tablename__ = 'Quiz_questions'
-    LID = db.Column(db.Integer(), primary_key=True)
+    LID = db.Column(db.String(64), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
     start = db.Column(db.DateTime, nullable=False, primary_key=True)
