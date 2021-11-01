@@ -18,7 +18,7 @@ class TestApp(flask_testing.TestCase):
     def setUp(self):
         self.p1 = Progress(EID=1, SID="G1", CID="IS111", start=datetime.fromisoformat("2021-04-01 09:15:00"),latest_lesson_reached="3",recent_content_name="Lesson 2 slides",viewed_contents="Lesson 2 slides")
         self.p2 = Progress(EID=1, SID="G2", CID="IS112", start=datetime.fromisoformat("2021-05-01 09:15:00"),latest_lesson_reached="1",recent_content_name="Lesson 1 how get free money",viewed_contents="Lesson 1 How get free money', 'Lesson 1 How to train dragons|Lesson 1 How get free money")
-        self.p3 = Progress(EID=1, SID="G1", CID="IS111", start="2021-04-01 09:15:00",latest_lesson_reached="3",recent_content_name="Lesson 2 slides",viewed_contents="Lesson 2 slides")
+        self.p3 = Progress(EID=1, SID="G1", CID="IS111", start="2021-04-01 09:15:00",latest_lesson_reached="2",recent_content_name="Lesson 2 slides",viewed_contents="Lesson 2 slides")
         self.p4 = Progress(EID=1, SID="G2", CID="IS112", start="2021-05-01 09:15:00",latest_lesson_reached="1",recent_content_name="Lesson 1 how get free money",viewed_contents="Lesson 1 How to train dragons|Lesson 1 How get free money")
         self.c1 = Content(LID='1', SID='G1', CID='IS111',start='2021-04-01 09:15:00', content_type='pdf', content_name='Lesson 1 slides', link='abd.com/shared/fuie894')
         self.c2 = Content(LID='1', SID='G1', CID='IS111',start='2021-04-01 09:15:00', content_type='pdf', content_name='Lesson 1 slides part 2', link='abd.com/shared/fuie894')
@@ -615,9 +615,192 @@ class TestViewLatestContentAccessed(TestApp):
         })
 
 
+class TestUpdateViewedContents(TestApp):
+    # Testing positive case where all details are given, example 1
+    def test_update_viewed_contents_latest_lesson_new_content(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : "How are you",
+            "LID" : "2"
+        }
+
+        # calling update_viewed_contents function via flask route
+        response = self.client.post("/update_viewed_contents",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' : {
+                'EID': self.p3.EID,
+                'SID': self.p3.SID,
+                'CID': self.p3.CID,
+                'start': t1,
+                'latest_lesson_reached': self.p3.latest_lesson_reached,
+                'recent_content_name': self.p3.recent_content_name,
+                'viewed_contents':  "Lesson 2 slides|How are you"
+            },
+            'message': f"Progress record with EID: {self.p3.EID}, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {self.p3.start} has been updated successfully"    
+        })
+    
+    # Testing positive case where all details are given, example 2
+    def test_update_viewed_contents_latest_lesson_new_content_2(self):
+        t1 = self.p4.start
+        # adding one progress to database
+        self.p4.start = datetime.fromisoformat(self.p4.start)
+        db.session.add(self.p4)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p4.EID,
+            "SID": self.p4.SID,
+            "CID": self.p4.CID,
+            "start": t1,
+            "content_name" : "Try This",
+            "LID" : "1"
+        }
+
+        # calling update_viewed_contents function via flask route
+        response = self.client.post("/update_viewed_contents",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' : {
+                'EID': self.p4.EID,
+                'SID': self.p4.SID,
+                'CID': self.p4.CID,
+                'start': t1,
+                'latest_lesson_reached': self.p4.latest_lesson_reached,
+                'recent_content_name': self.p4.recent_content_name,
+                'viewed_contents':  "Lesson 1 How to train dragons|Lesson 1 How get free money|Try This"
+            },
+            'message': f"Progress record with EID: {self.p4.EID}, SID: {self.p4.SID}, CID: {self.p4.CID}, start: {self.p4.start} has been updated successfully"    
+        })
+
+
+    # Testing negative case where lesson is not latest lesson
+    def test_update_viewed_contents_not_latest_lesson(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : "How are you",
+            "LID" : "1"
+        }
+
+        # calling update_viewed_contents function via flask route
+        response = self.client.post("/update_viewed_contents",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"LID 1 is not the latest lesson, no update is needed."    
+        })
+    
+
+    # Testing negative case where EID missing
+    def test_update_viewed_contents_missing_eid(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : "How are you",
+            "LID" : "1"
+        }
+
+        # calling update_viewed_contents function via flask route
+        response = self.client.post("/update_viewed_contents",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"EID is missing from request body, update viewed contents failed"    
+        })
+    
+
+    # Testing negative case where content_name missing
+    def test_update_viewed_contents_missing_content_name(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": self.p3.EID,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "LID" : "1"
+        }
+
+        # calling update_viewed_contents function via flask route
+        response = self.client.post("/update_viewed_contents",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"content_name is missing from request body, update viewed contents failed"    
+        })
+
+
+    # Testing negative case where record not in database
+    def test_update_viewed_contents_not_in_database(self):
+        t1 = self.p3.start
+        # adding one progress to database
+        self.p3.start = datetime.fromisoformat(self.p3.start)
+        db.session.add(self.p3)
+        db.session.commit()
+
+        # setting query details
+        request_body = {
+            "EID": 10,
+            "SID": self.p3.SID,
+            "CID": self.p3.CID,
+            "start": t1,
+            "content_name" : "How are you",
+            "LID" : "1"
+        }
+
+        # calling update_viewed_contents function via flask route
+        response = self.client.post("/update_viewed_contents",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message': f"Progress record with EID: 10, SID: {self.p3.SID}, CID: {self.p3.CID}, start: {t1} does not exist in the database"    
+        })
+
 if __name__ == '__main__':
     #For jenkins
-    import xmlrunner
-    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
+    # import xmlrunner
+    # unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
     #For local tests
-    # unittest.main()
+    unittest.main()
