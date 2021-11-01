@@ -1761,6 +1761,64 @@ def view_latest_content_accessed():
         }
         ), 500
 
+
+#View update viewed contents in progress table
+@app.route("/update_viewed_contents", methods=["POST"])
+def update_viewed_contents():
+    #Getting data from front end
+    data = request.get_json()
+    #Checking if all required field are present
+    fields = ['EID', 'SID', 'CID', 'start', 'content_name', 'LID']
+    for key in fields:
+        if key not in data.keys():
+            return jsonify(
+            {
+                "message": f"{key} is missing from request body, update viewed contents failed",
+            }
+        ), 500
+    # converting start from string to datetime format
+    data["start"] = datetime.fromisoformat(data["start"])
+    try:
+        # Querying data base for the progress record
+        record = Progress.query.filter_by(EID=data["EID"], SID=data["SID"],CID=data["CID"], start=data["start"]).first()
+        # Checking if record exists
+        if record == None:
+            return jsonify(
+            {
+                "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} does not exist in the database",
+            }
+            ), 500
+        # checking if lesson queried is latest lesson
+        if data["LID"] == record.latest_lesson_reached:
+            contents = record.viewed_contents.split("|")
+            if data["content_name"] not in contents:
+                contents.append(data["content_name"])
+            contents = "|".join(contents)
+
+            # replace the viewed_contents with the new value
+            record = Progress.query.filter_by(EID=data["EID"], SID=data["SID"],CID=data["CID"], start=data["start"])
+            record.update(dict(viewed_contents=contents))
+            db.session.commit()
+            
+            return jsonify(
+            {
+                "message": f"Progress record with EID: {data['EID']}, SID: {data['SID']}, CID: {data['CID']}, start: {data['start']} has been updated successfully",
+                "data": record.first().to_dict()
+            }
+            ), 200
+        else:
+            return jsonify(
+            {
+                "message": f"LID {data['LID']} is not the latest lesson, no update is needed."
+            }
+            ), 500
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"Error! {e}",
+        }
+        ), 500
+
 ### End of API points for Progress ###
 
 
