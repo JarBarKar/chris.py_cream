@@ -16,18 +16,18 @@ class TestApp(flask_testing.TestCase):
 
 
     def setUp(self):
-        self.ugq1q1 = Quiz_questions(LID=1, SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is the moon round?', 
+        self.ugq1q1 = Quiz_questions(LID='1', SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is the moon round?', 
                                     answer='YES', options='YES|NO', duration=2, type='ungraded')
-        self.ugq1q2 = Quiz_questions(LID=1, SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is the sun round?',
+        self.ugq1q2 = Quiz_questions(LID='1', SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is the sun round?',
                                     answer='YES', options='YES|NO', duration=2, type='ungraded')
-        self.ugq1q3 = Quiz_questions(LID=1, SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Which of these is not a planet?',
+        self.ugq1q3 = Quiz_questions(LID='1', SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Which of these is not a planet?',
                                     answer='Pluto', options='EARTH|MARS|JUPITER|PLUTO|VENUS', duration=2, type='ungraded')
         
-        self.gq1q1 = Quiz_questions(LID=2, SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is Computational Thinking a hard module?', 
+        self.gq1q1 = Quiz_questions(LID='2', SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is Computational Thinking a hard module?', 
                                     answer='YES', options='YES|NO', duration=2, type='graded')
-        self.gq1q2 = Quiz_questions(LID=2, SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is Intro to Machine Learning hard?',
+        self.gq1q2 = Quiz_questions(LID='2', SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='Is Intro to Machine Learning hard?',
                                     answer='YES', options='YES|NO', duration=2, type='graded')
-        self.gq1q3 = Quiz_questions(LID=2, SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='What course is this code for?',
+        self.gq1q3 = Quiz_questions(LID='2', SID='G2', CID='IS500', start='2021-10-21 09:15:00', question='What course is this code for?',
                                     answer='SPM', options='SPM|PMS|MPS|SMP|PSM', duration=2, type='graded')
         self.maxDiff = None
         db.create_all()
