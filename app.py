@@ -348,6 +348,49 @@ class Progress(db.Model):
          "viewed_contents":self.viewed_contents}
 ### Progress Class ###
 
+
+### Quiz Record Class ###
+class Quiz_record(db.Model):
+    __tablename__ = 'quiz_record'
+    EID = db.Column(db.Integer(), primary_key=True)
+    SID = db.Column(db.String(64), primary_key=True)
+    CID = db.Column(db.String(64), primary_key=True)
+    LID = db.Column(db.String(64), primary_key=True)
+    start = db.Column(db.DateTime, nullable=False, primary_key=True)
+    question = db.Column(db.String(64), primary_key=True)
+    answer_given = db.Column(db.String(64), nullable=False)
+    marks = db.Column(db.Integer(), nullable=False)
+
+    def __init__(self, EID, LID, SID, CID, start, question, answer_given, marks):
+        self.EID = EID
+        self.LID = LID
+        self.SID = SID
+        self.CID = CID
+        self.start = start
+        self.question = question
+        self.answer_given = answer_given
+        self.marks = marks
+
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"EID": self.EID, "LID": self.LID, "SID": self.SID, "CID": self.CID, "start": self.start , "question": self.question,
+                "answer_given":self.answer_given, "marks": self.marks}
+### Quiz record Class ###
+
 ### Start of API points for Course CRUD ###
 @app.route("/view_courses", methods=['GET'])
 #view all courses
@@ -1617,6 +1660,112 @@ def delete_quiz_question():
             "message": f"Error! {e}",
         }
         ), 500
+
+
+
+@app.route("/check_quiz_result", methods=['POST'])
+def check_quiz_result():
+    data = request.get_json()
+    expected=["EID", "SID", "CID", "LID", "start"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Request {not_present} is not present, request is not query successfully"
+            }
+        ), 500
+
+    data["start"] = datetime.fromisoformat(data["start"])
+    record_exist = (Quiz_record.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"], EID = data["EID"]).first() != None)
+    quiz_exist= (Quiz_questions.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"]).first() != None)
+    if record_exist and quiz_exist:
+        student_answer=Quiz_record.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"], EID = data["EID"])
+        quiz_question=Quiz_questions.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"])
+        answers = [answer.to_dict() for answer in student_answer]
+        questions = [question.to_dict() for question in quiz_question]
+        for answer in answers:
+            for question in questions:
+                if question['question'] == answer['question']:
+                    answer['correct_answer'] = question['answer']
+                    answer['options'] = question['options']
+                    if answer['answer_given'] == answer['correct_answer']:
+                        answer['right_wrong'] = 'right'
+                    else:
+                        answer['right_wrong'] = 'wrong'
+        return jsonify(
+        {
+            "message": f"Quiz record { data['CID'], data['SID'], data['LID'], data['EID']} has been retrieved successfully from the database",
+            "data": answers
+        }
+        ), 200
+    else:
+        if record_exist:
+            return jsonify(
+            {
+                "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID']} do not exist"
+            }), 500
+        elif quiz_exist:
+            return jsonify(
+            {
+                "message": f"Quiz question {data['CID'], data['SID'], data['LID'], data['EID']} do not exist"
+            }), 500
+        else:
+            return jsonify(
+            {
+                "message": f"Both quiz question and record {data['CID'], data['SID'], data['LID'], data['EID']} do not exist"
+            }), 500
+
+
+@app.route("/submit_quiz", methods=['POST'])
+def submit_quiz():
+    data = request.get_json()
+    expected=["EID", "SID", "CID", "LID", "start", "QAMarks"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Quiz record {not_present} is not present, quiz submittion is not successfully"
+            }
+        ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
+    exist = (Quiz_record.query.filter_by(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"], EID = data["EID"]).first() != None)
+    if exist:
+        return jsonify(
+        {
+            "message": f"Record {data['CID'], data['SID'], data['LID'], data['EID']} already exist, submission fail"
+        }), 500
+    else:
+        try:
+            varlist = list()
+            counter = 0
+            for question in data['QAMarks']:
+                counter+=1
+                globals()[f"entry_{counter}"]=Quiz_record(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"], EID = data["EID"], question = question['question'], answer_given = question['answer'], marks = question['marks'])
+                varlist.append(globals()[f"entry_{counter}"])
+            for var in varlist:
+                db.session.add(var)
+            db.session.commit()
+            return jsonify(
+                {
+                    "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID']} has been inserted successfully into the database",
+                }
+            ), 200
+        except Exception as e:
+            return jsonify(
+            {
+                "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID']} fail to submit",
+            }
+        ), 500
+
+
 ### End of API points for Quiz CRUD ###
 
 
