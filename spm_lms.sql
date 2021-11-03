@@ -14,6 +14,35 @@ USE `spm_lms`;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `employee`
+--
+
+DROP TABLE IF EXISTS `employee`;
+CREATE TABLE IF NOT EXISTS `employee` (
+  `username` varchar(64) NOT NULL,
+  `name` varchar(64) NOT NULL,
+  `current_designation` varchar(64) NOT NULL,
+  `department` varchar(64) NOT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `employee`
+--
+
+INSERT INTO `employee` (`username`, `name`, `current_designation`, `department`) VALUES
+('Winnie.2021', 'Winnie', 'worker', 'sales'),
+('Mary.2021', 'Mary', 'worker', 'sales'),
+('Luke.2021', 'Luke', 'manager', 'sales'),
+('Chris.2021', 'Chris', 'manager', 'sales'),
+('Joseph.2021', 'Joseph', 'manager', 'sales'),
+('God.2021', 'God', 'manager', 'sales')
+;
+
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `engineer`
 --
 
@@ -25,6 +54,8 @@ CREATE TABLE IF NOT EXISTS `engineer` (
   `phone` int(8) NOT NULL,
   `email` varchar(64) NOT NULL,
   `address` varchar(64) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  constraint `engineer_fk1` foreign key(`username`) references `employee`(`username`),
   PRIMARY KEY (`EID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -32,10 +63,10 @@ CREATE TABLE IF NOT EXISTS `engineer` (
 -- Dumping data for table `engineer`
 --
 
-INSERT INTO `engineer` (`name`, `password`, `phone`, `email`, `address`) VALUES
-('Winnie', 'ILOVEHONEY', 999, "winnie@gmail.com", "81 Victoria St, Singapore 188065"),
-('Mary', 'WHERESMYLAMB', 911, "mary@gmail.com", "81 Victoria St, Singapore 188065"),
-('Luke', 'NOTMYFATHER', 995, "luke@gmail.com", "81 Victoria St, Singapore 188065")
+INSERT INTO `engineer` (`name`, `password`, `phone`, `email`, `address`, `username`) VALUES
+('Winnie', 'ILOVEHONEY', 999, "winnie@gmail.com", "81 Victoria St, Singapore 188065", 'Winnie.2021'),
+('Mary', 'WHERESMYLAMB', 911, "mary@gmail.com", "81 Victoria St, Singapore 188065", 'Mary.2021'),
+('Luke', 'NOTMYFATHER', 995, "luke@gmail.com", "81 Victoria St, Singapore 188065", 'Luke.2021')
 ;
 
 -- --------------------------------------------------------
@@ -51,6 +82,8 @@ CREATE TABLE IF NOT EXISTS `trainer` (
   `phone` int(8) NOT NULL,
   `email` varchar(64) NOT NULL,
   `address` varchar(64) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  constraint `trainer_fk1` foreign key(`username`) references `employee`(`username`),
   PRIMARY KEY (`TID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -58,10 +91,10 @@ CREATE TABLE IF NOT EXISTS `trainer` (
 -- Dumping data for table `trainer`
 --
 
-INSERT INTO `trainer` (`TID`, `name`, `password`, `phone`, `email`, `address`) VALUES
-(001, 'Chris', 'flat white', 888, "chris@gmail.com", "81 Victoria St, Singapore 188065"),
-(002, 'Joseph', 'product manager', 123, "joseph@gmail.com", "81 Victoria St, Singapore 188065"),
-(003, 'God', 'GPA 4', 444, "god@gmail.com", "81 Victoria St, Singapore 188065")
+INSERT INTO `trainer` (`TID`, `name`, `password`, `phone`, `email`, `address`, `username`) VALUES
+(001, 'Chris', 'flat white', 888, "chris@gmail.com", "81 Victoria St, Singapore 188065", 'Chris.2021'),
+(002, 'Joseph', 'product manager', 123, "joseph@gmail.com", "81 Victoria St, Singapore 188065", 'Joseph.2021'),
+(003, 'God', 'GPA 4', 444, "god@gmail.com", "81 Victoria St, Singapore 188065", 'God.2021')
 ;
 
 -- --------------------------------------------------------
