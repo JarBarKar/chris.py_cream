@@ -9,14 +9,20 @@
         </div>
 
         <div class="container my-2">
-            <router-link type="button" class="btn btn-outline-primary" to="/engineer/attend_courses">Attend Courses</router-link>
+            <router-link type="button" class="btn btn-outline-primary" :to="{name: 'attend_courses', params: {EID:this.EID}}">Attend Courses</router-link>
         </div>
+
     </div>
 </template>
 
 <script>
 export default {
 
+    data() {
+        return{
+            "EID" : 1
+        }
+    }
 }
 </script>
 

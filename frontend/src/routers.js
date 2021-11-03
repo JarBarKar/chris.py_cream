@@ -10,6 +10,7 @@ import ViewSections from './components/ViewSections.vue'
 import AttendCourses from './components/AttendCourses.vue'
 import Trainer from './components/Trainer.vue'
 import TrainerViewSections from './components/TrainerViewSections.vue'
+import HRSignUpApp from './components/HRSignUpApp.vue'
 
 const routes = [
     {
@@ -31,9 +32,10 @@ const routes = [
     },
 
     {
-        path: '/engineer/attend_courses',
+        path: '/engineer/attend_courses/:EID',
         name: 'attend_courses',
-        component: AttendCourses
+        component: AttendCourses,
+        props: true
     },
 
     {
@@ -55,13 +57,20 @@ const routes = [
     },
 
     {
+        path: '/hr/signup_approved/:EID/:CID/:SID/:start',
+        name: 'hr_signup_approved',
+        component: HRSignUpApp,
+        props: true
+    },
+
+    {
         path: '/hr/assign_trainers',
         name: 'assign_trainers',
         component: AssignTrainers
     },
 
     {
-        path: '/sections',
+        path: '/sections/:CID',
         name: 'sections',
         component: ViewSections,
         props: true
