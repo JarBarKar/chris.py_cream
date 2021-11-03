@@ -4,7 +4,7 @@ import json
 from app import app, db, Quiz_questions
 from datetime import datetime
 
-
+#Group member in-charge: Alvan Tan
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
