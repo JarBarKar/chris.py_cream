@@ -53,16 +53,16 @@ class TestViewSections(TestApp):
                 {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 50,
                 'TID': 1
                 },
                 {
                 'SID': 'G2',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 50,
                 'TID': 1
                 }
@@ -146,8 +146,8 @@ class TestCreateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 50,
                 'TID': 1
             },
@@ -295,16 +295,16 @@ class TestQuerySections(TestApp):
                 {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 50,
                 'TID': 1
                 },
                 {
                 'SID': 'G2',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 50,
                 'TID': 1
                 }
@@ -492,8 +492,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 10,
                 'TID': 1
             },
@@ -526,8 +526,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sat, 01 May 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-05-01 09:15:00',
                 'vacancy': 50,
                 'TID': 100
             },
@@ -560,8 +560,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sun, 01 Aug 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-08-01 09:15:00',
                 'vacancy': 50,
                 'TID': 1
             },
@@ -594,8 +594,8 @@ class TestUpdateSection(TestApp):
             'data': {
                 'SID': 'G1',
                 'CID': 'IS111',
-                'start': 'Thu, 01 Apr 2021 09:15:00 GMT',
-                'end': 'Sun, 01 Aug 2021 09:15:00 GMT',
+                'start': '2021-04-01 09:15:00',
+                'end': '2021-08-01 09:15:00',
                 'vacancy': 1,
                 'TID': 1000
             },
