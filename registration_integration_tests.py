@@ -1,7 +1,9 @@
 import unittest
 import flask_testing
 import json
-from app import app, db, Course, Academic_record, Enrollment
+
+from sqlalchemy.sql.elements import Null
+from app import app, db, Course, Academic_record, Enrollment, Section
 from datetime import datetime
 
 
@@ -22,6 +24,8 @@ class TestApp(flask_testing.TestCase):
         self.er2 = Enrollment(EID=6, SID='G90', CID='IS600', start='2021-04-10 10:09:08')
         self.cd1 = Academic_record(EID=1, SID="G2", CID="IS500", start='2021-04-10 10:09:08', status='ongoing')
         self.cd2 = Academic_record(EID=2, SID="G12", CID="IS600", start='2021-04-10 10:09:08', status='ongoing')
+        self.s1 = Section(SID="G1", CID="IS500", start="2021-04-01 09:15:00", end="2021-05-01 09:15:00", vacancy=50, TID=1)
+        self.s2 = Section(SID="G12", CID="IS600", start="2021-04-01 09:15:00", end="2021-05-01 09:15:00", vacancy=50, TID=0)
         
         db.create_all()
 
@@ -34,6 +38,8 @@ class TestApp(flask_testing.TestCase):
         self.er2 = None
         self.cd1 = None
         self.cd2 = None
+        self.s1 = None
+        self.s2 = None
         db.session.remove()
         db.drop_all()
 
@@ -498,36 +504,123 @@ class TestHRRejectSignup(TestApp):
             })
 
 
-# class TestHRAssignTrainer(TestApp):
-#     def test_hr_assign_trainer(self):
-#         # adding dummy course into database
-#         db.session.add(self.c2)
-#         db.session.commit()
+class TestHRAssignTrainer(TestApp):
+    def test_hr_assign_trainer(self):
+        t1 = self.s1.start
+        # adding dummy course into database
+        self.s1.start = datetime.fromisoformat(self.s1.start)
+        self.s1.end = datetime.fromisoformat(self.s1.end)
+        db.session.add(self.s1)
+        db.session.commit()
 
-#         # creating request body for course 
-#         request_body = {
-#             'CID' : self.c2.CID, 
-#             'name' : self.c2.name, 
-#             'prerequisites' : self.c2.prerequisites, 
-#             'TID' : '12,14'
-#         }
+        # creating request body for course 
+        request_body = {
+            'CID' : self.s1.CID, 
+            'SID' : self.s1.SID, 
+            'start' : t1, 
+            'TID' : self.s1.TID
+        }
 
-#         # calling hr_assign_trainer function via flask route
-#         response = self.client.post("/hr_assign_trainer",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         # self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.json, {
-#             'data' : 
-#                 {
-#                 'CID': 'IS600',
-#                 'name' : 'Super Hard Mod',
-#                 'prerequisites': 'IS500',
-#                 'trainers': '12,14'
-#                 },
-#             'message' : f'Trainers 12,14 has been updated successfully in the database'
+        # calling hr_assign_trainer function via flask route
+        response = self.client.post("/hr_assign_trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' : 
+                {
+                'CID' : self.s1.CID, 
+                'SID' : self.s1.SID, 
+                'TID' : self.s1.TID,
+                'end': '2021-05-01 09:15:00',
+                'start': '2021-04-01 09:15:00',
+                'vacancy': 50
+                },
+            "message": f"TID {self.s1.TID} has been assigned to section"
+            })
+
+    def test_hr_assign_trainer_no_overwrite(self):
+        t1 = self.s2.start
+        # adding dummy course into database
+        self.s2.start = datetime.fromisoformat(self.s2.start)
+        self.s2.end = datetime.fromisoformat(self.s2.end)
+        db.session.add(self.s2)
+        db.session.commit()
+
+        # creating request body for course 
+        request_body = {
+            'CID' : self.s2.CID, 
+            'SID' : self.s2.SID, 
+            'start' : t1, 
+            'TID' : self.s2.TID
+        }
+
+        # calling hr_assign_trainer function via flask route
+        response = self.client.post("/hr_assign_trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' : 
+                {
+                'CID' : self.s2.CID, 
+                'SID' : self.s2.SID, 
+                'TID' : self.s2.TID,
+                'end': '2021-05-01 09:15:00',
+                'start': '2021-04-01 09:15:00',
+                'vacancy': 50
+                },
+            "message": f"TID {self.s2.TID} has been assigned to section"
             
-#             })
+            })
+
+    def test_hr_assign_trainer_no_tid(self):
+        t1 = self.s2.start
+        # adding dummy course into database
+        self.s2.start = datetime.fromisoformat(self.s2.start)
+        self.s2.end = datetime.fromisoformat(self.s2.end)
+        db.session.add(self.s2)
+        db.session.commit()
+
+        # creating request body for course 
+        request_body = {
+            'CID' : self.s2.CID, 
+            'SID' : self.s2.SID, 
+            'start' : t1, 
+        }
+
+        # calling hr_assign_trainer function via flask route
+        response = self.client.post("/hr_assign_trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Section ['TID'] is not present, trainer is not assigned"
+            
+            })
+
+    def test_hr_assign_trainer_no_tid(self):
+        t1 = self.s2.start
+        # adding dummy course into database
+        self.s2.start = datetime.fromisoformat(self.s2.start)
+        self.s2.end = datetime.fromisoformat(self.s2.end)
+        db.session.add(self.s2)
+        db.session.commit()
+
+        # creating request body for course 
+        request_body = {
+        }
+
+        # calling hr_assign_trainer function via flask route
+        response = self.client.post("/hr_assign_trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Section ['CID', 'SID', 'TID', 'start'] is not present, trainer is not assigned"
+            
+            })
+
 
 
 ### Registration TEST CASES ###
