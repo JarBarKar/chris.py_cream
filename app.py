@@ -149,7 +149,12 @@ class Section(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            if column == 'start':
+                result[column] = str(getattr(self, column))
+            elif column == 'end':
+                result[column] = str(getattr(self, column))
+            else:
+                result[column] = getattr(self, column)
         return result
 
     def json(self):
@@ -877,49 +882,50 @@ def hr_reject_signup():
 
 
 
-# @app.route("/hr_assign_trainer", methods=['POST'])
-# def hr_assign_trainer():
-#     data = request.get_json()
-#     expected=["CID", "TID"]
-#     not_present=list()
-#     #check input
-#     for expect in expected:
-#         if expect not in data.keys():
-#             not_present.append(expect)
-#     if len(not_present)>0:
-#         return jsonify(
-#             {
-#                 "message": f"Course {not_present} is not present, trainer is not assigned"
-#             }
-#         ), 500
-#     try:
-#         course = db.session.query(Course).get(data['CID'])
-#         if len(course.trainers) == 0:
-#             course.trainers = data['TID']
-#         else:
-#             current_trainer = course.trainers.split(',')
-#             if data['TID'] not in current_trainer:
-#                 course.trainers = course.trainers +','+ data['TID']
-#             else:
-#                 return jsonify(
-#                 {
-#                     "message": f"Trainers {data['TID']} is already in database"
-#                 }
-#             ), 500
-            
-#         db.session.commit()
-#         return jsonify(
-#         {
-#            "message": f"Trainers {data['TID']} has been updated successfully in the database",
-#            "data": course.to_dict()
-#         }
-#         ), 200
-#     except Exception as e:
-#         return jsonify(
-#         {
-#             "message": f"Trainers {data['TID']} are not updated"
-#         }
-#     ), 500
+@app.route("/hr_assign_trainer", methods=['POST'])
+def hr_assign_trainer():
+    data = request.get_json()
+    expected=["CID", "SID", "TID", "start"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Section {not_present} is not present, trainer is not assigned"
+            }
+        ), 500
+    else:
+        data["start"] = datetime.fromisoformat(data["start"])
+        exist = (Section.query.filter_by(SID = data['SID'], CID = data['CID'], start = data["start"]).first() != None)
+        if exist:
+            try:
+                section = Section.query.filter_by(SID = data['SID'], CID = data['CID'], start = data["start"])
+                section.update(dict(TID = data['TID']))
+                section = Section.query.filter_by(SID = data['SID'], CID = data['CID'], start = data["start"]).first()
+                db.session.commit()
+                return jsonify(
+                    {
+                    "message": f"TID {data['TID']} has been assigned to section",
+                    "data": section.to_dict()
+                }
+                ), 200
+            except Exception as e:
+                return jsonify(
+                {
+                    "message": f"TID {data['TID']} are not updated due to {e}",
+                }
+            ), 500
+        else:
+            return jsonify(
+                {
+                    "message": f"Section {data['CID'], data['SID']} does not exist"
+                }
+                ), 500
+
+
     ### End of API points for Registration functions ###
     
     
