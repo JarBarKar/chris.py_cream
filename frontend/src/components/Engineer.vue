@@ -5,7 +5,7 @@
         </div>
 
         <div class="container my-2">
-            <router-link type="button" class="btn btn-outline-primary" to="/engineer/signup">Sign Up for Courses</router-link>
+            <router-link type="button" class="btn btn-outline-primary" :to="{name: 'engineer_signup', params: {EID:this.EID}}">Sign Up for Courses</router-link>
         </div>
 
         <div class="container my-2">
@@ -20,7 +20,14 @@ export default {
 
     data() {
         return{
-            "EID" : 1
+            
+        }
+    },
+
+    props: {
+        EID : {
+            type: [Number, String],
+			required: true
         }
     }
 }

@@ -11,6 +11,9 @@ import AttendCourses from './components/AttendCourses.vue'
 import Trainer from './components/Trainer.vue'
 import TrainerViewSections from './components/TrainerViewSections.vue'
 import HRSignUpApp from './components/HRSignUpApp.vue'
+import CompletedCourses from './components/CompletedCourses.vue'
+import EngineerSignUp from './components/EngineerSignUp'
+import HRSignupRej from './components/HRRejectSignUp'
 
 const routes = [
     {
@@ -20,15 +23,17 @@ const routes = [
     },
 
     {
-        path: '/engineer',
+        path: '/engineer/:EID',
         name: 'engineer',
-        component: Engineer
+        component: Engineer,
+        props:true
     },
 
     {
-        path: '/engineer/signup',
+        path: '/engineer/signup/:EID',
         name: 'engineer_signup',
-        component: SignUpCourses
+        component: SignUpCourses,
+        props: true
     },
 
     {
@@ -39,9 +44,24 @@ const routes = [
     },
 
     {
-        path: '/engineer/view_eligible_courses',
+        path: '/engineer/completed_courses/:EID',
+        name: 'completed_courses',
+        component: CompletedCourses,
+        props: true
+    },
+
+    {
+        path: '/engineer/view_eligible_courses/:EID',
         name: 'view_eligible_courses',
-        component: ViewEligibleCourses
+        component: ViewEligibleCourses,
+        props: true
+    },
+
+    {
+        path: '/engineer/sign_up/:EID/:CID/:SID/',
+        name: 'engineer_sign_up_action',
+        component: EngineerSignUp,
+        props: true
     },
 
     {
@@ -64,13 +84,20 @@ const routes = [
     },
 
     {
+        path: '/hr/signup_rejected/:EID/:CID/:SID/:start',
+        name: 'hr_signup_rejected',
+        component: HRSignupRej,
+        props: true
+    },
+    
+    {
         path: '/hr/assign_trainers',
         name: 'assign_trainers',
         component: AssignTrainers
     },
 
     {
-        path: '/sections/:CID',
+        path: '/sections/:EID/:CID',
         name: 'sections',
         component: ViewSections,
         props: true

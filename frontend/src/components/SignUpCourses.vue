@@ -8,7 +8,7 @@
                     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">All Courses</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <router-link class="nav-link" type="button" role="tab" to="/engineer/view_eligible_courses">Eligible Courses</router-link>
+                    <router-link class="nav-link" type="button" role="tab" :to="{name: 'view_eligible_courses', params: {EID: this.EID}}">Eligible Courses</router-link>
                 </li>
             </ul>
 
@@ -21,7 +21,7 @@
                                 {{course.name}}
                             </div>
                             <div>
-                                <router-link type="button" class="btn btn-outline-primary" :to="{name: 'sections', params:{CID:course.CID}}">View Section</router-link>
+                                <router-link type="button" class="btn btn-outline-primary" :to="{name: 'sections', params:{CID:course.CID, EID:this.EID}}">View Section</router-link>
                             </div>
                         </div>
 
@@ -47,9 +47,16 @@ export default {
 
     data() {
         return {
-            EID : 2,
+            
             eligible_courses : null,
             non_eligible_courses : null
+        }
+    },
+
+    props:{
+        EID: {
+			type: [Number, String],
+			required: true
         }
     },
 
