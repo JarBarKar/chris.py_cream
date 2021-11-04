@@ -6,7 +6,7 @@ from app import app, db, Lesson
 from datetime import datetime
 
 
-
+#Group member in-charge: Kenneth
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
