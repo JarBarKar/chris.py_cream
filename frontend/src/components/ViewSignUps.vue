@@ -10,7 +10,7 @@
 
                     <div>
                         <router-link type="button" class="btn btn-outline-primary" :to="{name: 'hr_signup_approved', params:{EID:signup.EID, SID:signup.SID, CID:signup.CID, start:signup.start}}">Accept</router-link>
-                        <span class="float-right"><button type="button" class="btn btn-outline-primary">Reject</button></span>
+                        <span class="float-right"><router-link type="button" class="btn btn-outline-primary" :to="{name: 'hr_signup_rejected', params:{EID:signup.EID, SID:signup.SID, CID:signup.CID, start:signup.start}}">Reject</router-link></span>
                     </div>
                 </div>
             </div>

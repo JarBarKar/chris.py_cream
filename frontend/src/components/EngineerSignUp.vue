@@ -2,7 +2,7 @@
     <div v-if="data" class="alert alert-success d-flex align-items-center" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
         <div>
-            Sign Up Approved! (:
+            Sign up successful! (:
         </div>
     </div>
     <div v-else class="alert alert-danger d-flex align-items-center" role="alert">
@@ -15,38 +15,37 @@
 
 <script>
 export default {
-    data(){
+    data() {
         return{
-            data : [],
-            message: ""
+            data: [],
+            start: "2021-04-01 09:15:00",
+            message: "",
+            
         }
     },
 
     props: {
-        EID: {
-            type: [Number,String],
-            required: true
+        CID: {
+			type: [Number, String],
+			required: true
+		},
+		EID: {
+			type: [Number, String],
+			required: true
         },
-
         SID: {
-			type: [Number, String],
+            type: [Number, String],
 			required: true
-		},
-		
-		CID: {
-			type: [Number, String],
-			required: true
-		},
-
-		start: {
-			type: [Number, String],
-			required: true
-		}
+        }
+        // start: {
+        //     type: [Number, String],
+		// 	required: true
+        // }
     },
 
     methods: {
-		approveSignUp() {
-			fetch('http://localhost:5001/hr_approve_signup', {
+        EngineerSignUp() {
+			fetch('http://localhost:5001/engineer_signup', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -67,13 +66,14 @@ export default {
 				console.log(data)
             })
             .catch(error => {
-                console.log(error)
+                this.error_message = error
+                console.error("There was an error!", error)
             })
 		}
-	},
+    },
 
-    created(){
-        this.approveSignUp()
+    created() {
+        this.EngineerSignUp()
     }
 }
 </script>

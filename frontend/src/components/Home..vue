@@ -5,7 +5,7 @@
         </div>
 
         <div class="container-fluid my-2">
-            <router-link type="button" class="btn btn-outline-primary" to="/engineer">Log in as Engineer</router-link>
+            <router-link type="button" class="btn btn-outline-primary" :to="{name: 'engineer', params: {EID: this.EID}}">Log in as Engineer</router-link>
         </div>
 
         <div class="container-fluid my-2">
@@ -20,6 +20,12 @@
 
 <script>
 export default {
+
+    data() {
+        return{
+            EID: 2
+        }
+    }
 
 }
 </script>

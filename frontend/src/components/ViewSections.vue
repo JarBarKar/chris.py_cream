@@ -14,7 +14,7 @@
 					<td>{{section.SID}}</td>
 					<td>{{section.vacancy}}</td>
 					<td>
-						<button type="button" class="btn btn-outline-primary">Sign Up</button>
+						<router-link type="button" class="btn btn-outline-primary" :to="{name: 'engineer_sign_up_action', params: {EID: this.EID, CID: this.CID, SID: section.SID, start: section.start}}">Sign Up</router-link>
 					</td>
 				</tr>
 			</tbody>
@@ -34,7 +34,11 @@ export default {
 		CID: {
 			type: [Number, String],
 			required: true
-		}
+		},
+		EID: {
+			type: [Number, String],
+			required: true
+        }
 	},
 
 	methods: {
