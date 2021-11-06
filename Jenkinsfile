@@ -39,6 +39,7 @@ pipeline {
                 python3 progress_integration_tests.py
                 python3 content_integration_tests.py
                 python3 quiz_record_integration_tests.py
+                python3 trainer_integration_tests.py
                 '''
             }
               post {
