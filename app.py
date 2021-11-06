@@ -810,6 +810,43 @@ def engineer_signup():
         }
     ), 500    
 
+@app.route("/engineer_withdraw", methods=['POST'])
+def engineer_withdraw():
+    data = request.get_json()
+    expected=["EID", "CID", "SID", "start"]
+    not_present=list()
+    #check input
+    for expect in expected:
+        if expect not in data.keys():
+            not_present.append(expect)
+    if len(not_present)>0:
+        return jsonify(
+            {
+                "message": f"Academic record {not_present} is not present, signup is not withdraw"
+            }
+        ), 500
+    data["start"] = datetime.fromisoformat(data["start"])
+    try:
+        exist = (Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start']).first() != None)
+        if exist :
+            Enrollment.query.filter_by(EID = data['EID'], SID = data['SID'], CID = data['CID'], start = data['start']).delete()
+            db.session.commit()
+            return jsonify(
+            {
+                "message": f"{data['EID']} has been deleted successfully from Enrollment"
+            }
+            ), 200
+        else:
+            return jsonify(
+                {
+                    "message": f"Enrollment {data['EID']} is not present in database, engineer is not withdraw",
+                }), 500
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"{data['EID']} is not withdraw"
+        }
+    ), 500
 
 @app.route("/hr_view_signup", methods=['GET'])
 def hr_view_signup():
@@ -1032,10 +1069,10 @@ def hr_assign_trainer():
                 ), 500
 
 
-    ### End of API points for Registration functions ###
+### End of API points for Registration functions ###
     
     
-    ### Start of API points for Section CRUD ###
+### Start of API points for Section CRUD ###
 @app.route("/view_sections", methods=['POST'])
 #view all sections by using TID
 def view_all_sections():
