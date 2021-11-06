@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy.sql.elements import Null
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://g2t4@127.0.0.1:3306/spm_lms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -270,7 +270,7 @@ class Lesson(db.Model):
 
 ### Quiz Questions Class ###
 class Quiz_questions(db.Model):
-    __tablename__ = 'Quiz_questions'
+    __tablename__ = 'quiz_questions'
     LID = db.Column(db.String(64), primary_key=True)
     SID = db.Column(db.String(64), primary_key=True)
     CID = db.Column(db.String(64), primary_key=True)
