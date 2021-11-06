@@ -77,7 +77,7 @@ class TestCheckQuizResult(TestApp):
             'SID': self.a1.SID,
             'CID': self.a1.CID,
             'start' : t1,
-            'EID': self.a1.EID,
+            'EID': self.a1.EID
         }
         # calling create_quiz_question function via flask route
         response = self.client.post("/check_quiz_result",
@@ -301,7 +301,7 @@ class TestCheckQuizResult(TestApp):
 
 class TestCheckSubmitQuiz(TestApp):
     # Testing positive case where all details are present in request body
-    def test_submit_quiz_details(self):
+    def test_submit_quiz_details_ungraded(self):
         t1 = self.a1.start
         #add dummy ungraded quizzes into database
         # Preparing request body
@@ -326,7 +326,8 @@ class TestCheckSubmitQuiz(TestApp):
                 'answer': self.a3.answer_given,
                 'marks': self.a3.marks
             },
-            ]
+            ],
+            'type': 'ungraded'
         }
         # calling create_quiz_question function via flask route
         response = self.client.post("/submit_quiz",
@@ -334,10 +335,87 @@ class TestCheckSubmitQuiz(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            'message' : f"Quiz record { self.a1.CID, self.a1.SID, self.a1.LID, self.a1.EID} has been inserted successfully into the database"
+            'message' : f"Quiz record { self.a1.CID, self.a1.SID, self.a1.LID, self.a1.EID} has been inserted successfully into the database."
         })
 
-    def test_submit_quiz_already_present(self):
+
+
+    def test_submit_quiz_details_graded_pass(self):
+        t1 = self.a1.start
+        #add dummy ungraded quizzes into database
+        # Preparing request body
+        request_body = {
+            'LID': self.a1.LID,
+            'SID': self.a1.SID,
+            'CID': self.a1.CID,
+            'start' : t1,
+            'EID': self.a1.EID,
+            'QAMarks': [{
+                'question': self.a1.question,
+                'answer': self.a1.answer_given,
+                'marks': 1
+            },
+            {
+                'question': self.a2.question,
+                'answer': self.a2.answer_given,
+                'marks': 1
+            },
+            {
+                'question': self.a3.question,
+                'answer': self.a3.answer_given,
+                'marks': 1
+            },
+            ],
+            'type': 'graded'
+        }
+        # calling create_quiz_question function via flask route
+        response = self.client.post("/submit_quiz",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'message' : f"Quiz record { self.a1.CID, self.a1.SID, self.a1.LID, self.a1.EID} has been inserted successfully into the database.Engineer passed the course"
+        })
+
+
+    def test_submit_quiz_details_graded_fail(self):
+        t1 = self.a1.start
+        #add dummy ungraded quizzes into database
+        # Preparing request body
+        request_body = {
+            'LID': self.a1.LID,
+            'SID': self.a1.SID,
+            'CID': self.a1.CID,
+            'start' : t1,
+            'EID': self.a1.EID,
+            'QAMarks': [{
+                'question': self.a1.question,
+                'answer': self.a1.answer_given,
+                'marks': self.a1.marks
+            },
+            {
+                'question': self.a2.question,
+                'answer': self.a2.answer_given,
+                'marks': self.a2.marks
+            },
+            {
+                'question': self.a3.question,
+                'answer': self.a3.answer_given,
+                'marks': self.a3.marks
+            },
+            ],
+            'type': 'graded'
+        }
+        # calling create_quiz_question function via flask route
+        response = self.client.post("/submit_quiz",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'message' : f"Quiz record { self.a1.CID, self.a1.SID, self.a1.LID, self.a1.EID} has been inserted successfully into the database.Engineer failed the course"
+        })
+
+    def test_submit_quiz_already_present_ungraded(self):
         t1 = self.b1.start
         #add dummy ungraded quizzes into database
         self.a1.start = datetime.fromisoformat(self.a1.start)
@@ -369,7 +447,8 @@ class TestCheckSubmitQuiz(TestApp):
                 'answer': self.a3.answer_given,
                 'marks': self.a3.marks
             },
-            ]
+            ],
+            'type': 'ungraded'
         }
         # calling create_quiz_question function via flask route
         response = self.client.post("/submit_quiz",
@@ -381,7 +460,7 @@ class TestCheckSubmitQuiz(TestApp):
         })
 
 
-    def test_submit_quiz_no_SID(self):
+    def test_submit_quiz_no_SID_ungraded(self):
         t1 = self.a1.start
         #add dummy ungraded quizzes into database
         # Preparing request body
@@ -405,7 +484,8 @@ class TestCheckSubmitQuiz(TestApp):
                 'answer': self.a3.answer_given,
                 'marks': self.a3.marks
             },
-            ]
+            ],
+            'type': 'ungraded'
         }
         # calling create_quiz_question function via flask route
         response = self.client.post("/submit_quiz",
@@ -440,7 +520,8 @@ class TestCheckSubmitQuiz(TestApp):
                 'answer': self.a3.answer_given,
                 'marks': self.a3.marks
             },
-            ]
+            ],
+            'type': 'ungraded'
         }
         # calling create_quiz_question function via flask route
         response = self.client.post("/submit_quiz",
@@ -464,7 +545,7 @@ class TestCheckSubmitQuiz(TestApp):
                                     content_type='application/json')
         self.assertEqual(response.status_code, 500)
         self.assertEqual(response.json, {
-            'message' : f"Quiz record ['EID', 'SID', 'CID', 'LID', 'start', 'QAMarks'] is not present, quiz submittion is not successfully"
+            'message' : f"Quiz record ['EID', 'SID', 'CID', 'LID', 'start', 'QAMarks', 'type'] is not present, quiz submittion is not successfully"
         })
 ### QUIZ TEST CASES ###
 

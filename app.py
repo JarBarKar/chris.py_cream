@@ -8,7 +8,8 @@ from datetime import datetime
 from sqlalchemy.sql.elements import Null
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://g2t4@127.0.0.1:3306/spm_lms' or 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://g2t4@127.0.0.1:3306/spm_lms' or 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -1872,7 +1873,7 @@ def check_quiz_result():
 @app.route("/submit_quiz", methods=['POST'])
 def submit_quiz():
     data = request.get_json()
-    expected=["EID", "SID", "CID", "LID", "start", "QAMarks"]
+    expected=["EID", "SID", "CID", "LID", "start", "QAMarks", "type"]
     not_present=list()
     #check input
     for expect in expected:
@@ -1894,23 +1895,35 @@ def submit_quiz():
     else:
         try:
             varlist = list()
+            text=''
             counter = 0
+            score = 0
             for question in data['QAMarks']:
                 counter+=1
+                if question["marks"]>0:
+                    score+=1
                 globals()[f"entry_{counter}"]=Quiz_record(SID = data["SID"], CID = data["CID"], LID = data["LID"], start = data["start"], EID = data["EID"], question = question['question'], answer_given = question['answer'], marks = question['marks'])
                 varlist.append(globals()[f"entry_{counter}"])
+            if data['type'] =='graded':
+                if score/counter < 0.85:
+                    Academic_record.query.filter_by(SID = data["SID"], CID = data["CID"], start = data["start"], EID = data["EID"]).delete()
+                    text='Engineer failed the course'
+                else:
+                    record = Academic_record.query.filter_by(SID = data["SID"], CID = data["CID"], start = data["start"], EID = data["EID"])
+                    record.update(dict(status = 'completed'))
+                    text='Engineer passed the course'
             for var in varlist:
                 db.session.add(var)
             db.session.commit()
             return jsonify(
                 {
-                    "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID']} has been inserted successfully into the database",
+                    "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID']} has been inserted successfully into the database."+text,
                 }
             ), 200
         except Exception as e:
             return jsonify(
             {
-                "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID']} fail to submit",
+                "message": f"Quiz record {data['CID'], data['SID'], data['LID'], data['EID'], e} fail to submit",
             }
         ), 500
 
