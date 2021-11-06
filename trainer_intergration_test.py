@@ -48,7 +48,6 @@ class TestViewTrainers(TestApp):
         # calling view_courses function via flask route
         response = self.client.get("/view_trainers")
         self.assertEqual(response.status_code, 200)
-        #print(response.json)
         self.assertEqual(response.json, {
             'message' : 'All trainers are retrieved',
             'data' :[
