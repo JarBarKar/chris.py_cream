@@ -2119,6 +2119,26 @@ def update_viewed_contents():
 
 ### End of API points for Progress ###
 
+### API points for Trainer ###
+@app.route("/view_trainers", methods=['GET'])
+#view all courses
+def view_all_trainers():
+    retrieved_trainers = Trainer.query.all()
+    trainers = [trainer.to_dict() for trainer in retrieved_trainers]
+    if trainers:
+        return jsonify(
+            {
+                "message": "All trainers are retrieved",
+                "data": trainers
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no trainer retrieved"
+        }
+    ), 500
+### End of API points for Trainer ###
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
