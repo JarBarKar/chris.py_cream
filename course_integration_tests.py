@@ -1,7 +1,7 @@
 import unittest
 import flask_testing
 import json
-from app import app, db, Course, Academic_record
+from app import Engineer, app, db, Course, Academic_record, Engineer
 from datetime import datetime
 
 #Group member in-charge: Ivan Tan
@@ -21,7 +21,8 @@ class TestApp(flask_testing.TestCase):
         self.c3 = Course(CID='IS700', name='Super Super Hard Mod', prerequisites='IS500,IS600')
         self.a1 = Academic_record(EID=1, SID="G1", CID="IS500", start=datetime.fromisoformat("2021-04-01 09:15:00"), status="completed")
         self.a2 = Academic_record(EID=1, SID="G1", CID="IS600", start= datetime.fromisoformat("2021-04-01 09:15:00"), status="ongoing")
-        
+        self.e1 = Engineer(EID=1, name='dude1', password='123',phone=123, email='abc@abc.com', address='SCIS')
+        self.e2 = Engineer(EID=2, name='dude2', password='123',phone=123, email='abc@abc.com', address='SCIS')
         db.create_all()
 
 
@@ -31,6 +32,8 @@ class TestApp(flask_testing.TestCase):
         self.c3 = None
         self.a1 = None
         self.a2 = None
+        self.e1 = None
+        self.e2 = None
         db.session.remove()
         db.drop_all()
 
@@ -622,6 +625,134 @@ class TestDeleteCourse(TestApp):
             'message': f'CID is missing'
         })
 
+
+class TestViewQualifiedLearner(TestApp):
+    # Testing function when it is success case
+    def test_view_qualified_learner_1(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.c1)
+        db.session.add(self.a1)
+        db.session.add(self.a2)
+        db.session.add(self.e1)
+        db.session.add(self.e2)
+        db.session.commit()
+
+        request_body = {
+            'CID': self.c1.CID
+        }
+        response = self.client.post("/view_qualified_learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "data" : 
+            {
+            'completed': [1],
+            'eligible': [2],
+            'ineligible': [],
+            'ongoing': []
+            },
+            "message": f"Engineer is classified according to course {self.c1.CID}",
+
+        })
+
+    def test_view_qualified_learner_2(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.c2)
+        db.session.add(self.a1)
+        db.session.add(self.a2)
+        db.session.add(self.e1)
+        db.session.add(self.e2)
+        db.session.commit()
+
+        request_body = {
+            'CID': self.c2.CID
+        }
+        response = self.client.post("/view_qualified_learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "data" : 
+            {
+            'completed': [],
+            'eligible': [],
+            'ineligible': [2],
+            'ongoing': [1]
+            },
+            "message": f"Engineer is classified according to course {self.c2.CID}",
+
+        })
+
+    def test_view_qualified_learner_3(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.c3)
+        db.session.add(self.a1)
+        db.session.add(self.a2)
+        db.session.add(self.e1)
+        db.session.add(self.e2)
+        db.session.commit()
+
+        request_body = {
+            'CID': self.c3.CID
+        }
+        response = self.client.post("/view_qualified_learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "data" : 
+            {
+            'completed': [],
+            'eligible': [],
+            'ineligible': [1, 2],
+            'ongoing': []
+            },
+            "message": f"Engineer is classified according to course {self.c3.CID}",
+
+        })
+
+
+    def test_view_qualified_learner_no_CID(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.a1)
+        db.session.add(self.a2)
+        db.session.add(self.e1)
+        db.session.add(self.e2)
+        db.session.commit()
+
+        request_body = {
+        }
+        response = self.client.post("/view_qualified_learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": "CID is missing"
+
+        })
+
+    def test_view_qualified_learner_CID_no_exist(self):
+        # calling view_eligible_courses function via flask route
+        db.session.add(self.a1)
+        db.session.add(self.a2)
+        db.session.add(self.e1)
+        db.session.add(self.e2)
+        db.session.commit()
+
+        request_body = {
+            'CID': self.c3.CID
+        }
+        response = self.client.post("/view_qualified_learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            "message": f"Course {self.c3.CID} does not exist"
+
+        })
+    
+
 ### COURSE TEST CASES ###
 
 if __name__ == '__main__':
@@ -629,4 +760,4 @@ if __name__ == '__main__':
     import xmlrunner
     unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
     #For local tests
-    #unittest.main()
+    # unittest.main()

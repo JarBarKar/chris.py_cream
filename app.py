@@ -51,6 +51,41 @@ class Course(db.Model):
 ### Course Class ###
 
 
+### Engineer Class ###
+class Engineer(db.Model):
+    __tablename__ = 'engineer'
+    EID = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    password = db.Column(db.String(64), nullable=False)
+    phone = db.Column(db.Integer(), nullable=False)
+    email = db.Column(db.String(64), nullable=False)
+    address = db.Column(db.String(64), nullable=False)
+
+
+    def __init__(self, EID, name, password, phone, email, address):
+        self.EID = EID
+        self.name = name
+        self.password = password
+        self.phone = phone
+        self.email = email
+        self.address = address
+
+    def to_dict(self):
+        """
+        'to_dict' converts the object into a dictionary,
+        in which the keys correspond to database columns
+        """
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+    def json(self):
+        return {"EID": self.EID, "name": self.name, "password": self.password, "phone": self.phone, "email": self.email, "address": self.address}
+### Engineer Class ###
+
+
 ### Academic record Class ###
 class Academic_record(db.Model):
     __tablename__ = 'academic_record'
@@ -486,6 +521,77 @@ def view_eligible_courses():
                 "message": "There are no course retrieved"
             }
         ), 500
+
+
+
+#view qualified EID by CID
+@app.route("/view_qualified_learner", methods=['POST'])
+def view_qualified_learner():
+    data = request.get_json()
+    if "CID" not in data.keys():
+        return jsonify(
+            {
+                "message": "CID is missing"
+            }
+        ), 500
+
+    try:
+        exist = Course.query.filter_by(CID=data['CID']).first()!= None
+        if exist:
+            selected_course = Course.query.filter_by(CID=data['CID']).first()
+            prerequisites_list = selected_course.list_of_prerequisites()
+            eligible = list()
+            ineligible = list()
+            ongoing = list()
+            completed = list()
+
+            #retrieve all completed course, ongoing course by EID
+            all_EID_retrieved = Engineer.query.all()
+            all_EID = [engineer.to_dict() for engineer in all_EID_retrieved]
+
+            for dude in all_EID:
+                can_take=True
+                completed_courses_retrieved = Academic_record.query.filter_by(EID=dude["EID"], status="completed")
+                ongoing_courses_retrieved = Academic_record.query.filter_by(EID=dude["EID"], status="ongoing")
+                completed_courses = [course.to_dict() for course in completed_courses_retrieved]
+                completed_courses_list = [course['CID'] for course in completed_courses]
+                ongoing_courses = [ongoing_course.to_dict() for ongoing_course in ongoing_courses_retrieved]
+                ongoing_courses_list = [ongoing_courses['CID']  for ongoing_courses in ongoing_courses]
+                for CID in prerequisites_list:
+                    if (CID not in completed_courses) and (CID not in ongoing_courses):
+                        can_take=False
+                if data['CID'] in completed_courses_list:
+                    completed.append(dude['EID'])
+                elif data['CID'] in ongoing_courses_list:
+                    ongoing.append(dude['EID'])
+                elif can_take:
+                    eligible.append(dude['EID'])
+                else:
+                    ineligible.append(dude['EID'])
+            result = {'ongoing' : ongoing, 'completed' : completed, 'ineligible' : ineligible, 'eligible' : eligible}
+
+            return jsonify(
+                {       "message": f"Engineer is classified according to course {data['CID']}",
+                        "data": result
+                }
+            ), 200
+        else:
+            return jsonify(
+            {
+                "message": f"Course {data['CID']} does not exist"
+            }
+        ), 500
+    except Exception as e:
+        return jsonify(
+            {
+                "message": f"There are no engineer retrieved due to {e}"
+            }
+        ), 500
+
+
+
+
+
 
 #view on-going and completed courses by EID
 @app.route("/view_current_completed_courses", methods=['POST'])
