@@ -621,6 +621,83 @@ class TestHRAssignTrainer(TestApp):
             
             })
 
+class TestEngineerWithdraw(TestApp):
+    # Testing positive case where enrollment detail is in database
+    def test_engineer_withdraw(self):
+        t1 = self.er2.start
+        # adding dummy enrollment into database
+        self.er2.start = datetime.fromisoformat(self.er2.start)
+        db.session.add(self.er2)
+        db.session.commit()
+
+        # creating request body for course details
+        request_body = {
+            'EID': self.er2.EID,
+            'SID': self.er2.SID,
+            'CID': self.er2.CID,
+            'start': t1
+        }
+
+        # calling hr_reject_signup function via flask route
+        response = self.client.post("/engineer_withdraw",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+
+            'message' : f'{self.er2.EID} has been deleted successfully from Enrollment'
+            
+            })
+
+
+    # Testing negative case where enrollment detail is not in database
+    def test_hr_reject_signup_not_in_database(self):
+
+        #creating request body for course details
+        request_body = {
+            'EID': self.er2.EID,
+            'SID': self.er2.SID,
+            'CID': self.er2.CID,
+            'start': self.er2.start
+        }
+
+        # calling hr_reject_signup function via flask route
+        response = self.client.post("/engineer_withdraw",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+
+            'message' : f'Enrollment {self.er2.EID} is not present in database, engineer is not withdraw'
+            
+            })
+
+
+    # Testing negative case where EID is missing
+    def test_hr_reject_signup_missing_eid(self):
+        t1 = self.er2.start
+        # adding dummy enrollment into database
+        self.er2.start = datetime.fromisoformat(self.er2.start)
+        db.session.add(self.er2)
+        db.session.commit()
+
+        # creating request body for course details
+        request_body = {
+            'SID': self.er2.SID,
+            'CID': self.er2.CID,
+            'start': t1
+        }
+
+        # calling hr_reject_signup function via flask route
+        response = self.client.post("/engineer_withdraw",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+
+            'message' : f"Academic record ['EID'] is not present, signup is not withdraw"
+            
+            })
 
 
 ### Registration TEST CASES ###
