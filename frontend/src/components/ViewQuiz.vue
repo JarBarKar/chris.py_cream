@@ -1,0 +1,154 @@
+<template>
+    <div>
+        <table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Question</th>
+					<th scope="col"></th>
+                    <th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="question in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
+					<td>{{question.question}}</td>
+					<td>
+                        <button type="button" class="btn btn-outline-primary">Update</button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuestion(question.question)">Delete</button>
+                    </td>
+				</tr>
+			</tbody>
+		</table>
+        <div>
+            <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuiz()">Delete Quiz</button>
+        </div>
+        
+    </div>
+</template>
+
+<script>
+export default {
+
+    data() {
+        return{
+            questions: []
+        }
+    },
+
+    props: {
+        CID: {
+			type: [Number, String],
+			required: true
+		},
+		TID: {
+			type: [Number, String],
+			required: true
+        },
+        SID: {
+            type: [Number, String],
+			required: true
+        },
+        start: {
+            type: [Number, String],
+			required: true
+        },
+        LID: {
+            type: [Number, String],
+			required: true
+        }
+    },
+
+    methods: {
+        readQuiz() {
+			fetch('http://localhost:5001/read_quiz', {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        LID: this.LID,
+                        SID : this.SID,
+                        CID : this.CID,
+                        start: this.start
+                    }
+                )
+            })
+            .then(resp => resp.json())
+            .then(data => {
+				console.log(data)
+                this.questions = data.data
+            })
+            .catch(error => {
+                this.error_message = error
+                console.error("There was an error!", error)
+            })
+		},
+
+        deleteQuestion(question){
+            fetch('http://localhost:5001/delete_quiz_question', {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        LID: this.LID,
+                        SID : this.SID,
+                        CID : this.CID,
+                        start: this.start,
+                        question: question
+                    }
+                )
+            })
+            .then(resp => resp.json())
+            .then(data => {
+				console.log(data)
+                
+            })
+            .catch(error => {
+                
+                console.error("There was an error!", error)
+            })
+        },
+
+        deleteQuiz(){
+            fetch('http://localhost:5001/delete_quiz', {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        LID: this.LID,
+                        SID : this.SID,
+                        CID : this.CID,
+                        start: this.start
+                        
+                    }
+                )
+            })
+            .then(resp => resp.json())
+            .then(data => {
+				console.log(data)
+                
+            })
+            .catch(error => {
+                
+                console.error("There was an error!", error)
+            })
+        }
+
+        
+    },
+
+    created(){
+        this.readQuiz()
+    }
+}
+</script>
+
+<style>
+
+</style>

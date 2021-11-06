@@ -18,8 +18,8 @@ export default {
     data() {
         return{
             data: [],
-            start: "2021-04-01 09:15:00",
-            message: "",
+            // start: "2021-04-01 09:15:00",
+            message: ""
             
         }
     },
@@ -36,11 +36,11 @@ export default {
         SID: {
             type: [Number, String],
 			required: true
+        },
+        start: {
+            type: [Number, String],
+			required: true
         }
-        // start: {
-        //     type: [Number, String],
-		// 	required: true
-        // }
     },
 
     methods: {

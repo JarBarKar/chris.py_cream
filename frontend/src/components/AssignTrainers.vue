@@ -8,7 +8,7 @@
                     {{course.name}}
                 </div>
                 <div>
-                    <button type="button" class="btn btn-outline-primary">Assign Trainer</button>
+                    <router-link type="button" class="btn btn-outline-primary" :to="{name:'hr_view_sections', params:{CID:course.CID}}">View Sections</router-link>
                 </div>
             </div>
         </div>

@@ -24,17 +24,7 @@
 								{{course.SID}}
 							</div>
                             <div>
-                                <router-link type="button" class="btn btn-outline-primary" :to="{name: 'sections', params:{CID:course.CID}}">View Section</router-link>
-                            </div>
-                        </div>
-
-                        <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="course in non_eligible_courses" :key="course.CID">
-                            <div>
-                                {{course.name}}
-                            </div>
-                            
-                            <div>
-                                <button type="button" class="btn btn-outline-primary disabled">View Section</button>
+                                <router-link type="button" class="btn btn-outline-primary" :to="{name: 'view_lessons', params:{CID:course.CID, SID:course.SID, start:course.start, EID:this.EID}}">View Lessons</router-link>
                             </div>
                         </div>
                     </div>
