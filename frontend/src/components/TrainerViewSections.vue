@@ -6,12 +6,16 @@
                 <tr>
                     <th scope="col">CID</th>
                     <th scope="col">SID</th>
+                    <th scope= "col"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="section in trainer_sections" :key="[section.CID, section.start, section.SID]">
                     <td>{{section.CID}}</td>
                     <td>{{section.SID}}</td>
+                    <td>
+                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_view_section_content', params:{TID:this.TID, CID:section.CID, SID: section.SID, start: section.start}}">View Content</router-link>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -23,10 +27,17 @@ export default {
 
     data() {
         return {
-            TID : 1,
+            
             trainer_sections: []
         }
     },
+
+    props: {
+		TID: {
+			type: [Number,String],
+            required: true
+		}
+	},
 
     methods: {
         getTrainerSections() {

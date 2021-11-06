@@ -5,14 +5,19 @@
         </div>
 
         <div class="container">
-            <router-link type="button" class="btn btn-outline-primary" to="/trainer/view_sections">View my courses and sections</router-link>
+            <router-link type="button" class="btn btn-outline-primary" :to="{name: 'trainer_view_sections', params:{TID: this.TID}}">View my courses and sections</router-link>
         </div>
   </div>
 </template>
 
 <script>
 export default {
-
+    props: {
+		TID: {
+			type: [Number,String],
+            required: true
+		}
+	}
 }
 </script>
 

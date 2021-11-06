@@ -13,7 +13,7 @@
         </div>
 
         <div class="container-fluid my-2">
-            <router-link type="button" class="btn btn-outline-primary" to="/trainer">Log in as Trainer</router-link>
+            <router-link type="button" class="btn btn-outline-primary" :to="{name: 'trainer', params: {TID: this.TID}}">Log in as Trainer</router-link>
         </div>
     </div>
 </template>
@@ -23,7 +23,8 @@ export default {
 
     data() {
         return{
-            EID: 2
+            EID: 1,
+            TID: 1
         }
     }
 

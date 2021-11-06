@@ -24,9 +24,7 @@
                             <div>
                                 {{course.SID}}
                             </div>
-                            <div>
-                                <router-link type="button" class="btn btn-outline-primary" :to="{name: 'sections', params:{CID:course.CID}}">View Section</router-link>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
