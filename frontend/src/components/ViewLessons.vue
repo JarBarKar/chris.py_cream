@@ -1,32 +1,19 @@
 <template>
     <div class="container mt-3">
-        <h1>Lessons</h1>
+        <h1>{{this.CID}} Section {{this.SID}}</h1>
         <div class="container">
             <div class="d-flex flex-row bd-highlight mb-3 justify-content-evenly h4">
-                <div class="container">CID</div>
-                <div class="container">SID</div>
-                <div class="container">LID</div>
-                <div class="container">Content</div>
-                <div class="container">Link</div>
                 <div class="container"></div>
                 <div class="container"></div>
             </div>
         </div>
 
         <div class="container">
-            <div class="d-flex flex-row bd-highlight mb-3 justify-content-evenly" v-for="lesson in lessons" :key="[lesson.SID, lessons.CID, lesson.LID, lesson.start, lesson.content_name]">
-                <div class="container">{{lesson.CID}}</div>
-                <div class="container">{{lesson.SID}}</div>
-                <div class="container">{{lesson.LID}}</div>
-                <div class="container">{{lesson.content_name}}</div>
+            <div class="d-flex flex-row bd-highlight mb-3 justify-content-evenly" v-for="lesson in lessons" :key="[lesson.SID, lessons.CID, lesson.LID, lesson.start]">
+                <div class="container">Lesson {{lesson.LID}}</div>
                 <div class="container">
-                    <a v-bind:href="lesson.link">View</a>
-                </div>
-                <div class="container">
-                    <router-link type="button" class="btn btn-outline-primary" :to="{name:'take_quiz', params:{EID:this.EID, CID:lesson.CID,SID:lesson.SID,LID:lesson.LID}}">Take Quiz</router-link>
-                </div>
-                <div class="container">
-                    <router-link type="button" class="btn btn-outline-primary" :to="{name:'check_quiz_results', params:{EID:this.EID, CID:lesson.CID,SID:lesson.SID,LID:lesson.LID,start:lesson.start}}">View Results</router-link>
+                    <router-link type="button" class="btn btn-outline-primary" :to="{name:'view_lesson_content', params:{EID:this.EID,SID:lesson.SID,CID:lesson.CID,LID:lesson.LID,start:this.start}}">View Content</router-link>
+                    
                 </div>
             </div>
         </div>
@@ -39,7 +26,8 @@ export default {
 
     data() {
         return{
-            lessons: []
+            lessons: [],
+            latest_lesson_reached : ""
         }
     },
 
@@ -64,7 +52,7 @@ export default {
 
     methods: {
         ViewLessons() {
-			fetch('http://localhost:5001/view_all_section_content', {
+			fetch('http://localhost:5001/query_lessons', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -74,7 +62,7 @@ export default {
                         
                         SID : this.SID,
                         CID : this.CID,
-                        start: this.start
+                    
                     }
                 )
             })
@@ -87,6 +75,8 @@ export default {
                 console.error("There was an error!", error)
             })
 		}
+
+        
     },
 
     created(){

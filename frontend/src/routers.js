@@ -16,10 +16,14 @@ import EngineerSignUp from './components/EngineerSignUp'
 import HRSignupRej from './components/HRRejectSignUp'
 import ViewLessons from './components/ViewLessons'
 import HRViewSections from './components/HRViewSections'
-import ViewSectionContent from './components/ViewSectionContent'
+import TrainerViewLessons from './components/TrainerViewLessons'
 import TakeQuiz from './components/TakeQuiz'
 import CheckQuizResults from './components/CheckQuizResults'
 import ViewQuiz from './components/ViewQuiz'
+import ViewLessonContent from './components/ViewLessonContent.vue'
+import TrainerViewContent from './components/TrainerViewContent.vue'
+import TrainerUpdateQuizQuestion from './components/TrainerUpdateQuizQuestion.vue'
+import HRAvailableTrainers from './components/HRAvailableTrainers.vue'
 
 const routes = [
     {
@@ -67,6 +71,13 @@ const routes = [
         path: '/engineer/view_lessons/:EID/:CID/:SID/:start',
         name: 'view_lessons',
         component: ViewLessons,
+        props: true
+    },
+
+    {
+        path: '/engineer/view_lesson_content/:EID/:CID/:SID/:start/:LID',
+        name: 'view_lesson_content',
+        component: ViewLessonContent,
         props: true
     },
 
@@ -131,6 +142,13 @@ const routes = [
     },
 
     {
+        path: '/hr/available_trainers/:CID/:SID',
+        name: 'hr_available_trainers',
+        component: HRAvailableTrainers,
+        props: true
+    },
+
+    {
         path: '/sections/:EID/:CID',
         name: 'sections',
         component: ViewSections,
@@ -152,9 +170,16 @@ const routes = [
     },
 
     {
-        path: '/trainer/view_section_content/:TID/:CID/:SID/:start',
-        name: 'trainer_view_section_content',
-        component: ViewSectionContent,
+        path: '/trainer/view_lessons/:TID/:CID/:SID/:start',
+        name: 'trainer_view_lessons',
+        component: TrainerViewLessons,
+        props: true
+    },
+
+    {
+        path: '/trainer/view_content/:TID/:CID/:SID/:start/:LID',
+        name: 'trainer_view_content',
+        component: TrainerViewContent,
         props: true
     },
 
@@ -162,6 +187,13 @@ const routes = [
         path: '/trainer/view_quiz/:TID/:CID/:SID/:LID/:start',
         name: 'trainer_view_quiz',
         component: ViewQuiz,
+        props: true
+    },
+
+    {
+        path: '/trainer/update_quiz_question/:TID/:CID/:SID/:LID/:start/:question',
+        name: 'trainer_update_quiz_question',
+        component: TrainerUpdateQuizQuestion,
         props: true
     }
 
