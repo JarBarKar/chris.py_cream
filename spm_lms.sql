@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `course` (
 INSERT INTO `course` (`CID`,`name`, `prerequisites`) VALUES
 ('IS111', 'Intro to Prog', ''),
 ('IS112', 'Data Management', ''),
-('IS113', 'WAD 1', 'IS111'),
+('IS113', 'WAD 1', ''),
 ('IS216', 'WAD 2', 'IS111, IS113')
 
 ;
@@ -304,7 +304,6 @@ CREATE TABLE IF NOT EXISTS `enrollment` (
 --
 
 INSERT INTO `enrollment` (`EID`,`SID`, `CID`, `start`) VALUES
-(001, 'G1', 'IS113', CAST('2021-04-01 09:15:00' AS datetime)),
 (001, 'G2', 'IS216', CAST('2021-05-01 09:15:00' AS datetime))
 ;
 
