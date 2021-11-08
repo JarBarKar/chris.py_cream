@@ -700,6 +700,74 @@ class TestEngineerWithdraw(TestApp):
             })
 
 
+class TestViewEnrollmentByEID(TestApp):
+    # Testing function when database has no signups
+    def test_view_enrollment_no_EID(self):
+        # calling hr_view_signup function via flask route
+
+        request_body = {
+        }
+        response = self.client.post("/view_enrollment_by_EID",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : 'EID is missing'
+        })
+
+
+    # Testing function when database has 1 signups
+    def test_view_enrollment_by_EID(self):
+        t1 = self.er1.start
+
+        # adding dummy signups to database
+        self.er1.start = datetime.fromisoformat(self.er1.start)
+        db.session.add(self.er1)
+        db.session.commit()
+
+        request_body = {
+            'EID': self.er1.EID
+            }
+        
+        # calling hr_view_signup function via flask route
+        response = self.client.post("/view_enrollment_by_EID",
+                            data=json.dumps(request_body),
+                            content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data' :
+                [
+                {
+                'EID': self.er1.EID,
+                'SID': self.er1.SID,
+                'CID': self.er1.CID,
+                'start': t1
+                }
+                ]
+                ,
+            'message' : 'All enrolled sections are retrieved'
+            })
+
+
+    # Testing function when database has 2 signups
+    def test_view_enrollment_by_EID_no_enrollment(self):
+        t1 = self.er1.start
+
+        # adding dummy signups to database
+
+        request_body = {
+            'EID': self.er1.EID
+            }
+        
+        # calling hr_view_signup function via flask route
+        response = self.client.post("/view_enrollment_by_EID",
+                            data=json.dumps(request_body),
+                            content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+            'message' : 'There are no section enrolled'
+            })
+
 ### Registration TEST CASES ###
 
 if __name__ == '__main__':

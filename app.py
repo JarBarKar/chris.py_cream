@@ -590,7 +590,41 @@ def view_qualified_learner():
         ), 500
 
 
+#view on-going and completed courses by EID
+@app.route("/view_enrollment_by_EID", methods=['POST'])
+def view_enrollment_by_EID():
+    data = request.get_json()
+    if "EID" not in data.keys():
+        return jsonify(
+        {
+            "message": "EID is missing"
+        }
+    ), 500
 
+    try:
+        enrolled_sections = Enrollment.query.filter_by(EID=data["EID"])
+        sections = [section.to_dict() for section in enrolled_sections]
+        
+
+        if sections:
+            return jsonify(
+                {
+                    "message": "All enrolled sections are retrieved",
+                    "data": sections
+                }
+            ), 200
+        return jsonify(
+            {
+                "message": "There are no section enrolled"
+            }
+        ), 500
+
+    except Exception as e:
+        return jsonify(
+        {
+            "message": f"There are no section retrieved due to {e}"
+        }
+    ), 500
 
 
 
