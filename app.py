@@ -604,9 +604,10 @@ def view_enrollment_by_EID():
     try:
         enrolled_sections = Enrollment.query.filter_by(EID=data["EID"])
         sections = [section.to_dict() for section in enrolled_sections]
-        
-
         if sections:
+            for enrolled_section in sections:
+                course_detail = Course.query.filter_by(CID=enrolled_section["CID"]).first()
+                enrolled_section['course_name'] = course_detail.to_dict()['name']
             return jsonify(
                 {
                     "message": "All enrolled sections are retrieved",
