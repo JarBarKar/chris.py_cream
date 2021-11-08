@@ -178,6 +178,7 @@ CREATE TABLE IF NOT EXISTS `lesson` (
 INSERT INTO `lesson` (`LID`,`SID`,`CID`, `start`) VALUES
 ('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
 ('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
+('3', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime)),
 ('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime)),
 ('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime)),
 ('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime))
@@ -209,12 +210,14 @@ CREATE TABLE IF NOT EXISTS `quiz_questions` (
 -- --
 
 INSERT INTO `quiz_questions` (`LID`, `SID`,  `CID`, `start`, `question`, `answer`, `options`, `duration`, `type`) VALUES
-('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the moon round?', 'YES', 'YES|NO',  0, 'ungraded'),
-('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the sun round?', 'YES', 'YES|NO',  0, 'ungraded'),
-('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Which of these is not a planet ?', 'PLUTO', 'EARTH|MARS|JUPITER|PLUTO|VENUS',  0, 'ungraded'),
-('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Bla bla black sheep have you any ?', 'WOLF', 'FOOD|WOLF|CAT|HUMAN',  0, 'graded'),
-('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Mary had a little ?', 'LAMB', 'COW|LAMP|LAMB',  0, 'graded'),
-('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Do you want to pass ?', 'YES', 'YES|NO',  0, 'graded')
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the moon round?', 'YES', 'YES|NO',  60, 'ungraded'),
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is the sun round?', 'YES', 'YES|NO',  60, 'ungraded'),
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Which of these is not a planet ?', 'PLUTO', 'EARTH|MARS|JUPITER|PLUTO|VENUS',  60, 'ungraded'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Bla bla black sheep have you any ?', 'WOLF', 'FOOD|WOLF|CAT|HUMAN',  60, 'ungraded'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Mary had a little ?', 'LAMB', 'COW|LAMP|LAMB',  60, 'ungraded'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Do you want to pass ?', 'YES', 'YES|NO',  60, 'ungraded'),
+('3', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is Aaron a boy ?', 'YES', 'YES|NO',  30, 'graded'),
+('3', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'Is Ivan a boy ?', 'YES', 'YES|NO',  30, 'graded')
 ;
 
 
@@ -272,6 +275,7 @@ CREATE TABLE IF NOT EXISTS `content` (
 INSERT INTO `content` (`LID`, `SID`, `CID`, `start`, `content_type`, `content_name`, `link`) VALUES
 ('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
 ('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 slides', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
+('3', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 slides', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
 ('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides part 2', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
 ('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How to train dragons', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
 ('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How get free money', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
