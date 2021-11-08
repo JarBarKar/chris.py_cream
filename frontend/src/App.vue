@@ -12,7 +12,8 @@ export default {
 	name: 'App',
 	components: {
 		Navbar
-	}
+	},
+	
 }
 </script>
 
@@ -27,6 +28,7 @@ export default {
 	text-align: center;
 	color: #2c3e50;
 	
-}
+};
+
 
 </style>

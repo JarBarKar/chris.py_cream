@@ -20,7 +20,7 @@
                 </div>
             </div>
             <router-link  type="button" class="btn btn-outline-primary" :to="{name:'trainer_view_quiz', params:{TID:this.TID,SID:this.SID,CID:this.CID,LID:this.LID,start:this.start}}">View Quiz</router-link>
-            <button  type="button" class="btn btn-outline-primary" :to="{name:'take_quiz', params:{EID:this.EID,SID:this.SID,CID:this.CID,LID:this.LID,start:this.start}}">Delete Quiz</button>
+            
         </div>
     </div>
 </template>
