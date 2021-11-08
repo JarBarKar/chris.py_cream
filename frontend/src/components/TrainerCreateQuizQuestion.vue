@@ -93,7 +93,7 @@ export default {
 
     methods: {
         submitQuestion() {
-			fetch('http://localhost:5001/create_quiz_question', {
+			fetch('http://18.118.224.235:5001/create_quiz_question', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

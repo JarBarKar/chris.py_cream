@@ -52,7 +52,7 @@ export default {
 
     methods: {
         ViewLessons() {
-			fetch('http://localhost:5001/query_lessons', {
+			fetch('http://18.118.224.235:5001/query_lessons', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

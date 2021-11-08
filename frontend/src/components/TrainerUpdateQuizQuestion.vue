@@ -32,6 +32,9 @@
                 <button type="button" class="btn btn-primary" v-on:click="submitUpdate()">Submit</button>
             </div>
         </form>
+        <div v-if="updated == true" class="alert alert-success" role="alert">
+            Question has been updated
+        </div>
     </div>
 </template>
 
@@ -44,7 +47,8 @@ export default {
             option: null,
             duration: null,
             type: null,
-            error_message: null
+            error_message: null,
+            updated: null
         }
     },
 
@@ -77,7 +81,7 @@ export default {
 
     methods: {
         submitUpdate() {
-			fetch('http://localhost:5001/update_quiz_question', {
+			fetch('http://18.118.224.235:5001/update_quiz_question', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -99,6 +103,7 @@ export default {
             .then(resp => resp.json())
             .then(data => {
 				console.log(data)
+                this.updated = true
                 
             })
             .catch(error => {

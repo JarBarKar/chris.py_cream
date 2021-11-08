@@ -10,6 +10,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Eligible Courses</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <router-link class="nav-link" type="button" role="tab" :to="{name: 'view_pending_courses', params: {EID: this.EID}}">Pending Courses</router-link>
+                </li>
             </ul>
 
             <!-- Tab panes -->
@@ -52,7 +55,7 @@ export default {
 
     methods: {
         getEligibleCourses() {
-            fetch('http://localhost:5001/view_eligible_courses', {
+            fetch('http://18.118.224.235:5001/view_eligible_courses', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

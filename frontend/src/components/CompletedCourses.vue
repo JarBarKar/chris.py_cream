@@ -52,7 +52,7 @@ export default {
 
 	methods: {
 		getOngoingCourses() {
-			fetch('http://localhost:5001/view_current_completed_courses', {
+			fetch('http://18.118.224.235:5001/view_current_completed_courses', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

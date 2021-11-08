@@ -57,7 +57,7 @@ export default {
 
     methods: {
         ViewLessons() {
-			fetch('http://localhost:5001/check_quiz_result', {
+			fetch('http://18.118.224.235:5001/check_quiz_result', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

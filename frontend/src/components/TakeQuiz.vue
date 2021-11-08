@@ -17,7 +17,7 @@
                 {{QAMarks.answer}}
             </form>
         </div>
-        <button type="button" class="btn btn-primary" v-on:click="checkAnswers();submitQuiz();unlockNextLesson()" >Submit</button>
+        <button type="button" class="btn btn-primary mb-3" v-on:click="checkAnswers();submitQuiz();unlockNextLesson()" >Submit</button>
         <br>
         
         <div v-if="passed == true & type == 'graded'" class="alert alert-success" role="alert">
@@ -41,7 +41,7 @@ export default {
     data() {
         return{
             questions: [],
-            timerCount: 120,
+            timerCount: 0,
             type: null,
             QAMarks: [],
             correct_answers: [],
@@ -88,7 +88,7 @@ export default {
 
     methods: {
         readQuiz() {
-			fetch('http://localhost:5001/read_quiz', {
+			fetch('http://18.118.224.235:5001/read_quiz', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -116,6 +116,7 @@ export default {
                         }
                     );
                     this.correct_answers.push(data.data[i].answer)
+                    this.timerCount += data.data[i].duration
                 }
             })
             .catch(error => {
@@ -133,7 +134,7 @@ export default {
         },
 
         submitQuiz() {
-			fetch('http://localhost:5001/submit_quiz', {
+			fetch('http://18.118.224.235:5001/submit_quiz', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -174,7 +175,7 @@ export default {
 		},
 
         unlockNextLesson() {
-			fetch('http://localhost:5001/unlock_next_lesson', {
+			fetch('http://18.118.224.235:5001/unlock_next_lesson', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

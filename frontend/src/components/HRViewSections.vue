@@ -5,12 +5,14 @@
 			<thead>
 				<tr>
 					<th scope="col">Section</th>
+                    <th scope="col">TID</th>
 					<th scope="col"></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="section in sections" :key="[section.CID, section.start, section.SID]">
 					<td>{{section.SID}}</td>
+                    <td>{{section.TID}}</td>
 					<td>
                         <router-link type="button" class="btn btn-outline-primary" :to="{name:'hr_available_trainers', params:{CID:this.CID, SID: section.SID, start: section.start}}">Assign Trainer</router-link>
                     </td>
@@ -38,7 +40,7 @@ export default {
 
     methods: {
 		getSections() {
-			fetch('http://localhost:5001/query_section', {
+			fetch('http://18.118.224.235:5001/query_section', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
