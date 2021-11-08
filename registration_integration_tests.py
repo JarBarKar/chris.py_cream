@@ -599,7 +599,7 @@ class TestHRAssignTrainer(TestApp):
             
             })
 
-    def test_hr_assign_trainer_no_tid(self):
+    def test_hr_assign_trainer_nothing(self):
         t1 = self.s2.start
         # adding dummy course into database
         self.s2.start = datetime.fromisoformat(self.s2.start)
@@ -651,7 +651,7 @@ class TestEngineerWithdraw(TestApp):
 
 
     # Testing negative case where enrollment detail is not in database
-    def test_hr_reject_signup_not_in_database(self):
+    def test_engineer_withdraw_not_in_database(self):
 
         #creating request body for course details
         request_body = {
@@ -674,7 +674,7 @@ class TestEngineerWithdraw(TestApp):
 
 
     # Testing negative case where EID is missing
-    def test_hr_reject_signup_missing_eid(self):
+    def test_engineer_withdraw_missing_eid(self):
         t1 = self.er2.start
         # adding dummy enrollment into database
         self.er2.start = datetime.fromisoformat(self.er2.start)
