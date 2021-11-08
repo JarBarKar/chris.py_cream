@@ -1481,7 +1481,8 @@ def view_all_lessons():
 def query_lessons():
     data = request.get_json()
     try:
-        retrieved_lessons = Lesson.query.filter_by(SID=data['SID'] ,CID=data["CID"])
+        date_object_start = datetime.fromisoformat(data["start"])
+        retrieved_lessons = Lesson.query.filter_by(SID=data['SID'] ,CID=data["CID"], start=date_object_start)
         lessons = [lesson.to_dict() for lesson in retrieved_lessons]
 
         if len(lessons) == 0:
@@ -1534,8 +1535,7 @@ def create_lesson():
     except Exception as e:
         return jsonify(
         {
-            "message": "Lesson is not inserted successfully into the database",
-            "e" : e
+            "message": "Lesson is not inserted successfully into the database"
         }
     ), 500
 
