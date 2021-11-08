@@ -61,12 +61,14 @@ export default {
                         
                         SID : this.SID,
                         CID : this.CID,
+                        start: this.start
                     
                     }
                 )
             })
             .then(resp => resp.json())
             .then(data => {
+                console.log(data)
 				this.lessons = data.data
             })
             .catch(error => {
