@@ -23,7 +23,7 @@
                     <div class="container mt-5">
                         <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="course in pending" :key="course.CID">
                             <div>
-                                {{course.CID}}
+                                {{course.course_name}}
                             </div>
                             <div>
                                 <button type="button" class="btn btn-outline-primary" v-on:click="withdrawEngineer(course.CID,course.SID,course.start)">Withdraw</button>
