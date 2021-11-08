@@ -7,7 +7,7 @@
                 <label for="staticEmail" class="col-sm-2 col-form-label">
                     <strong>{{question.question}}</strong>
                     
-                    {{index}}
+                    
                 </label>
                 <br>
                 <div class="form-check form-check-inline" v-for="option in (question.options.split('|'))" :key="option">
@@ -17,14 +17,19 @@
                 {{QAMarks.answer}}
             </form>
         </div>
-        <button type="button" class="btn btn-primary" v-on:click="checkAnswers();submitQuiz()" >Submit</button>
+        <button type="button" class="btn btn-primary" v-on:click="checkAnswers();submitQuiz();unlockNextLesson()" >Submit</button>
         <br>
-        <button v-if="passed == true" type="button" class="btn btn-primary mt-2" v-on:click="unlockNextLesson()">Unlock Next Lesson</button>
-        <div v-else-if="passed == false" class="alert alert-danger" role="alert">
+        
+        <div v-if="passed == true & type == 'graded'" class="alert alert-success" role="alert">
+            You passed!
+        </div>
+
+        <div v-else-if="passed == false & type == 'graded'" class="alert alert-danger" role="alert">
             You failed!
         </div>
-        <div v-else-if="passed == 'error'" class="alert alert-danger" role="alert">
-            An error occurred!
+
+        <div v-if="type == 'ungraded' & submitted == true" class="alert alert-success" role="alert">
+            You may proceed onto the next class!
         </div>
         
     </div>
@@ -40,7 +45,8 @@ export default {
             type: null,
             QAMarks: [],
             correct_answers: [],
-            passed: null
+            passed: null,
+            submitted : null
         }
     },
 
@@ -147,11 +153,15 @@ export default {
             .then(resp => resp.json())
             .then(data => {
 				console.log(data)
+                this.submitted = true
                 if (data.message.includes("passed")){
                     this.passed = true
                 }
                 else if (data.message.includes("failed")){
                     this.passed = false
+                }
+                else if (data.message.includes("successfully")){
+                    this.passed = true
                 }
                 else {
                     this.passed = "error"
