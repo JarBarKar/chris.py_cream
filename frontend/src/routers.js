@@ -29,6 +29,7 @@ import HRAssignEngineersSection from './components/HRAssignEngineersSection.vue'
 import HRQualifiedLearners from './components/HRQualifiedLearners.vue'
 import TrainerCreateQuizQuestion from './components/TrainerCreateQuizQuestion.vue'
 import SubmitQuiz from './components/SubmitQuiz.vue'
+import PendingCourses from './components/PendingCourses.vue'
 
 const routes = [
     {
@@ -69,6 +70,13 @@ const routes = [
         path: '/engineer/view_eligible_courses/:EID',
         name: 'view_eligible_courses',
         component: ViewEligibleCourses,
+        props: true
+    },
+
+    {
+        path: '/engineer/view_pending_courses/:EID',
+        name: 'view_pending_courses',
+        component: PendingCourses,
         props: true
     },
 

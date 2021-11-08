@@ -10,6 +10,9 @@
                 <li class="nav-item" role="presentation">
                     <router-link class="nav-link" type="button" role="tab" :to="{name: 'view_eligible_courses', params: {EID: this.EID}}">Eligible Courses</router-link>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <router-link class="nav-link" type="button" role="tab" :to="{name: 'view_pending_courses', params: {EID: this.EID}}">Pending Courses</router-link>
+                </li>
             </ul>
 
             <!-- Tab panes -->
