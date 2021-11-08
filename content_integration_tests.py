@@ -92,7 +92,7 @@ class TestViewAllSectionContent(TestApp):
         })
 
     # Testing failed case when there are no TID inserted
-    def test_view_all_section_content_missing_SID_CID(self):
+    def test_view_all_section_content_missing_input(self):
         # calling view_section_content function via flask route
         request_body = {
         }
