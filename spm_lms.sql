@@ -307,9 +307,7 @@ CREATE TABLE IF NOT EXISTS `enrollment` (
 -- Dumping data for table `enrollment`
 --
 
-INSERT INTO `enrollment` (`EID`,`SID`, `CID`, `start`) VALUES
-(001, 'G2', 'IS216', CAST('2021-05-01 09:15:00' AS datetime))
-;
+
 
 -- --------------------------------------------------------
 --

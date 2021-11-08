@@ -9,7 +9,7 @@ from sqlalchemy.sql.elements import Null
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://g2t4@127.0.0.1:3306/spm_lms' or 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@127.0.0.1:3306/spm_lms'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://g2t4@127.0.0.1:3306/spm_lms'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
