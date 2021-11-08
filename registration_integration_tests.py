@@ -723,6 +723,7 @@ class TestViewEnrollmentByEID(TestApp):
         # adding dummy signups to database
         self.er1.start = datetime.fromisoformat(self.er1.start)
         db.session.add(self.er1)
+        db.session.add(self.c1)
         db.session.commit()
 
         request_body = {
@@ -741,7 +742,8 @@ class TestViewEnrollmentByEID(TestApp):
                 'EID': self.er1.EID,
                 'SID': self.er1.SID,
                 'CID': self.er1.CID,
-                'start': t1
+                'start': t1,
+                'course_name': self.c1.name
                 }
                 ]
                 ,
