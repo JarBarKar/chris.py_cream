@@ -24,6 +24,11 @@ import ViewLessonContent from './components/ViewLessonContent.vue'
 import TrainerViewContent from './components/TrainerViewContent.vue'
 import TrainerUpdateQuizQuestion from './components/TrainerUpdateQuizQuestion.vue'
 import HRAvailableTrainers from './components/HRAvailableTrainers.vue'
+import HRAssignEngineers from './components/HRAssignEngineers.vue'
+import HRAssignEngineersSection from './components/HRAssignEngineersSection.vue'
+import HRQualifiedLearners from './components/HRQualifiedLearners.vue'
+import TrainerCreateQuizQuestion from './components/TrainerCreateQuizQuestion.vue'
+import SubmitQuiz from './components/SubmitQuiz.vue'
 
 const routes = [
     {
@@ -89,6 +94,13 @@ const routes = [
     },
 
     {
+        path: '/engineer/submit_quiz/:EID/:CID/:SID/:LID/:start',
+        name: 'submit_quiz',
+        component: SubmitQuiz,
+        props: true
+    },
+
+    {
         path: '/engineer/check_quiz_results/:EID/:CID/:SID/:LID/:start',
         name: 'check_quiz_results',
         component: CheckQuizResults,
@@ -149,6 +161,26 @@ const routes = [
     },
 
     {
+        path: '/hr/assign_engineers',
+        name: 'hr_assign_engineers',
+        component: HRAssignEngineers
+    },
+
+    {
+        path: '/hr/assign_engineers/sections/:CID',
+        name: 'hr_assign_engineers_sections',
+        component: HRAssignEngineersSection,
+        props: true
+    },
+
+    {
+        path: '/hr/qualified_learners/:CID/:SID/:start',
+        name: 'hr_qualified_learners',
+        component: HRQualifiedLearners,
+        props: true
+    },
+
+    {
         path: '/sections/:EID/:CID',
         name: 'sections',
         component: ViewSections,
@@ -194,6 +226,13 @@ const routes = [
         path: '/trainer/update_quiz_question/:TID/:CID/:SID/:LID/:start/:question',
         name: 'trainer_update_quiz_question',
         component: TrainerUpdateQuizQuestion,
+        props: true
+    },
+
+    {
+        path: '/trainer/create_quiz_question/:TID/:CID/:SID/:LID/:start/',
+        name: 'trainer_create_quiz_question',
+        component: TrainerCreateQuizQuestion,
         props: true
     }
 

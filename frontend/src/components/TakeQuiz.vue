@@ -3,18 +3,29 @@
         <h1>Questions</h1>
         <div>{{timerCount}}</div>
         <div class="mb-3 row justify-content-center" >
-            <form v-for="question in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
+            <form v-for="(question,  index) in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
                 <label for="staticEmail" class="col-sm-2 col-form-label">
-                    {{question.question}}
+                    <strong>{{question.question}}</strong>
+                    
+                    {{index}}
                 </label>
                 <br>
                 <div class="form-check form-check-inline" v-for="option in (question.options.split('|'))" :key="option">
-                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                    <input class="form-check-input" type="radio" id="inlineCheckbox1" :value="option" v-model="QAMarks[index].answer">
                     <label class="form-check-label" for="inlineCheckbox1">{{option}}</label>
                 </div>
+                {{QAMarks.answer}}
             </form>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" v-on:click="checkAnswers();submitQuiz()" >Submit</button>
+        <br>
+        <button v-if="passed == true" type="button" class="btn btn-primary mt-2" v-on:click="unlockNextLesson()">Unlock Next Lesson</button>
+        <div v-else-if="passed == false" class="alert alert-danger" role="alert">
+            You failed!
+        </div>
+        <div v-else-if="passed == 'error'" class="alert alert-danger" role="alert">
+            An error occurred!
+        </div>
         
     </div>
 </template>
@@ -25,7 +36,11 @@ export default {
     data() {
         return{
             questions: [],
-            timerCount: 120
+            timerCount: 120,
+            type: null,
+            QAMarks: [],
+            correct_answers: [],
+            passed: null
         }
     },
 
@@ -85,6 +100,90 @@ export default {
             .then(data => {
 				console.log(data)
                 this.questions = data.data
+                this.type = data.data[0].type
+                for (let i = 0; i < data.data.length; i++){
+                    this.QAMarks.push(
+                        {
+                            question: data.data[i].question,
+                            answer: null,
+                            marks: 0
+                        }
+                    );
+                    this.correct_answers.push(data.data[i].answer)
+                }
+            })
+            .catch(error => {
+                this.error_message = error
+                console.error("There was an error!", error)
+            })
+		},
+
+        checkAnswers(){
+            for (let i =0; i<this.QAMarks.length; i++){
+                if (this.QAMarks[i].answer == this.correct_answers[i]){
+                    this.QAMarks[i].marks = 1
+                }
+            }
+        },
+
+        submitQuiz() {
+			fetch('http://localhost:5001/submit_quiz', {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        LID: this.LID,
+                        SID : this.SID,
+                        CID : this.CID,
+                        start: this.start,
+                        EID: this.EID,
+                        QAMarks: this.QAMarks,
+                        type: this.type
+                    }
+                )
+            })
+            .then(resp => resp.json())
+            .then(data => {
+				console.log(data)
+                if (data.message.includes("passed")){
+                    this.passed = true
+                }
+                else if (data.message.includes("failed")){
+                    this.passed = false
+                }
+                else {
+                    this.passed = "error"
+                }
+            })
+            .catch(error => {
+                this.error_message = error
+                console.error("There was an error!", error)
+            })
+		},
+
+        unlockNextLesson() {
+			fetch('http://localhost:5001/unlock_next_lesson', {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        
+                        SID : this.SID,
+                        CID : this.CID,
+                        start: this.start,
+                        EID: this.EID,
+                        
+                    }
+                )
+            })
+            .then(resp => resp.json())
+            .then(data => {
+				console.log(data)
+                // this.questions = data.data
             })
             .catch(error => {
                 this.error_message = error

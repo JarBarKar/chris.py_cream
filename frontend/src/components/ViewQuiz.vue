@@ -12,7 +12,7 @@
 				<tr v-for="question in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
 					<td>{{question.question}}</td>
 					<td>
-                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_update_quiz_question', params:{TID: this.TID, CID: question.CID, SID: question.SID, start: question.start, question: question.question}}">Update</router-link>
+                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_update_quiz_question', params:{TID: this.TID, CID: question.CID, SID: question.SID, start: question.start, question: question.question, LID: question.LID}}">Update</router-link>
                     </td>
                     <td>
                         <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuestion(question.question)">Delete</button>
@@ -20,12 +20,25 @@
 				</tr>
 			</tbody>
 		</table>
+        
         <div>
+            <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_create_quiz_question', params:{TID: this.TID, CID: this.CID, SID: this.SID, start: this.start, LID: this.LID}}">
+                Create Question
+            </router-link>
+        </div>
+        <div class="container mt-3">
             <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuiz()">
                 Delete Quiz
             </button>
         </div>
         
+        <div v-if="qn_deleted" class="alert alert-success" role="alert">
+            Question was deleted
+        </div>
+
+        <div v-if="quiz_deleted" class="alert alert-success" role="alert">
+            Quiz was deleted
+        </div>
     </div>
 </template>
 
@@ -34,7 +47,9 @@ export default {
 
     data() {
         return{
-            questions: []
+            questions: [],
+            qn_deleted: null,
+            quiz_deleted: null
         }
     },
 
@@ -107,6 +122,7 @@ export default {
             .then(resp => resp.json())
             .then(data => {
 				console.log(data)
+                this.qn_deleted = true
                 
             })
             .catch(error => {
@@ -134,6 +150,7 @@ export default {
             .then(resp => resp.json())
             .then(data => {
 				console.log(data)
+                this.quiz_deleted = true
                 
             })
             .catch(error => {
