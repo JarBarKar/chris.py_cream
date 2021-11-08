@@ -14,7 +14,7 @@
                     <td>{{section.CID}}</td>
                     <td>{{section.SID}}</td>
                     <td>
-                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_view_section_content', params:{TID:this.TID, CID:section.CID, SID: section.SID, start: section.start}}">View Content</router-link>
+                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_view_lessons', params:{TID:this.TID, CID:section.CID, SID: section.SID, start: section.start}}">View Content</router-link>
                     </td>
                 </tr>
             </tbody>

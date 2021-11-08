@@ -1,8 +1,9 @@
 <template>
     <div class="container mt-3">
         <h1>Questions</h1>
-        <div class="mb-3 row justify-content-center" v-for="question in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
-            <form>
+        <div>{{timerCount}}</div>
+        <div class="mb-3 row justify-content-center" >
+            <form v-for="question in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
                 <label for="staticEmail" class="col-sm-2 col-form-label">
                     {{question.question}}
                 </label>
@@ -23,7 +24,21 @@ export default {
 
     data() {
         return{
-            questions: []
+            questions: [],
+            timerCount: 120
+        }
+    },
+
+    watch: {
+        timerCount: {
+            handler(value) {
+                if (value > 0) {
+                    setTimeout(()=>{
+                        this.timerCount--;
+                    },1000)
+                }
+            },
+            immediate: true
         }
     },
 
@@ -75,11 +90,13 @@ export default {
                 this.error_message = error
                 console.error("There was an error!", error)
             })
-		}
+		},
+
     },
 
     created(){
         this.readQuiz()
+        
     }
 }
 </script>

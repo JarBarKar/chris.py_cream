@@ -12,7 +12,7 @@
 				<tr v-for="question in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
 					<td>{{question.question}}</td>
 					<td>
-                        <button type="button" class="btn btn-outline-primary">Update</button>
+                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'trainer_update_quiz_question', params:{TID: this.TID, CID: question.CID, SID: question.SID, start: question.start, question: question.question}}">Update</router-link>
                     </td>
                     <td>
                         <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuestion(question.question)">Delete</button>
@@ -21,7 +21,9 @@
 			</tbody>
 		</table>
         <div>
-            <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuiz()">Delete Quiz</button>
+            <button type="button" class="btn btn-outline-primary" v-on:click="deleteQuiz()">
+                Delete Quiz
+            </button>
         </div>
         
     </div>

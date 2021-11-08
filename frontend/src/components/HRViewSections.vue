@@ -12,7 +12,7 @@
 				<tr v-for="section in sections" :key="[section.CID, section.start, section.SID]">
 					<td>{{section.SID}}</td>
 					<td>
-                        <button type="button" class="btn btn-outline-primary">Assign Trainer</button>
+                        <router-link type="button" class="btn btn-outline-primary" :to="{name:'hr_available_trainers', params:{CID:this.CID, SID: section.SID, start: section.start}}">Assign Trainer</router-link>
                     </td>
 				</tr>
 			</tbody>
@@ -46,6 +46,7 @@ export default {
                 body: JSON.stringify(
                     {
                         CID : this.CID
+                        
                     }
                 )
             })
