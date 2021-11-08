@@ -18,7 +18,7 @@ class TestApp(flask_testing.TestCase):
 
     def setUp(self):
         self.l1 = Lesson(LID='1', CID='IS111', SID='G1', start=datetime.fromisoformat("2021-04-01 09:15:00"))
-        self.l2 = Lesson(LID='2', CID='IS111', SID='G1', start=datetime.fromisoformat("2021-04-08 09:15:00"))
+        self.l2 = Lesson(LID='2', CID='IS111', SID='G1', start=datetime.fromisoformat("2021-04-01 09:15:00"))
         self.l3 = Lesson(LID='1', CID='IS212', SID='G4', start=datetime.fromisoformat("2021-04-01 09:15:00"))
         
         db.create_all()
@@ -71,7 +71,7 @@ class TestViewLessons(TestApp):
                 "LID":"2",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Thu, 08 Apr 2021 09:15:00 GMT"
+                "start":"Thu, 01 Apr 2021 09:15:00 GMT"
                 }
             ]
         })
@@ -95,13 +95,13 @@ class TestQueryLessons(TestApp):
 
         request_body = {
             "SID": self.l1.SID,
-            "CID": self.l1.CID
+            "CID": self.l1.CID,
+            "start": datetime.isoformat(self.l1.start)
         }
 
         response = self.client.post("/query_lessons",
                                     data=json.dumps(request_body),
                                     content_type='application/json')   
-        
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             'data': [
@@ -115,7 +115,7 @@ class TestQueryLessons(TestApp):
                 "LID":"2",
                 "CID":"IS111",
                 "SID":"G1",
-                "start":"Thu, 08 Apr 2021 09:15:00 GMT"
+                "start":"Thu, 01 Apr 2021 09:15:00 GMT"
                 }
             ],
             'message' : 'Lessons have been query successfully from the database'
@@ -248,7 +248,7 @@ class TestQueryLessons(TestApp):
 
 
 
-class TestCreateCourse(TestApp):
+class TestCreateLesson(TestApp):
     # Testing positive case where all details are present in request body
     def test_create_lesson_all_details_0(self):
         # setting course details
@@ -489,7 +489,7 @@ class TestDeleteLesson(TestApp):
 
 if __name__ == '__main__':
     #For jenkins
-    import xmlrunner
-    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
+    # import xmlrunner
+    # unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test-reports'))
     #For local tests
-    # unittest.main()
+    unittest.main()
