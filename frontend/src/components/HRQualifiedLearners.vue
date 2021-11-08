@@ -95,7 +95,7 @@ export default {
 
     methods: {
 		getQualifiedLearners() {
-			fetch('http://localhost:5001/view_qualified_learner', {
+			fetch('http://18.118.224.235:5001/view_qualified_learner', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -127,7 +127,7 @@ export default {
 		},
 
         assignEngineer(EID) {
-			fetch('http://localhost:5001/hr_assign_engineer', {
+			fetch('http://18.118.224.235:5001/hr_assign_engineer', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -152,7 +152,7 @@ export default {
 		},
 
         withdrawEngineer(EID) {
-			fetch('http://localhost:5001/hr_withdraw_engineer', {
+			fetch('http://18.118.224.235:5001/hr_withdraw_engineer', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

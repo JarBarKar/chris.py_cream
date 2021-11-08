@@ -55,7 +55,7 @@ export default {
 
     methods: {
 		getTrainers() {
-			fetch('http://localhost:5001/view_trainers', {
+			fetch('http://18.118.224.235:5001/view_trainers', {
                 method: "GET",
                 headers: {
                     "Content-Type" : "application/json"
@@ -72,7 +72,7 @@ export default {
 		},
 
         assignTrainer(TID) {
-			fetch('http://localhost:5001/hr_assign_trainer', {
+			fetch('http://18.118.224.235:5001/hr_assign_trainer', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

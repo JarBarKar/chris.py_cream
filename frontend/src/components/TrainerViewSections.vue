@@ -41,7 +41,7 @@ export default {
 
     methods: {
         getTrainerSections() {
-            fetch('http://localhost:5001/view_sections', {
+            fetch('http://18.118.224.235:5001/view_sections', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

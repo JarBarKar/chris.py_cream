@@ -30,6 +30,7 @@ import HRQualifiedLearners from './components/HRQualifiedLearners.vue'
 import TrainerCreateQuizQuestion from './components/TrainerCreateQuizQuestion.vue'
 import SubmitQuiz from './components/SubmitQuiz.vue'
 import PendingCourses from './components/PendingCourses.vue'
+import TrainerUpdateContent from './components/TrainerUpdateContent.vue'
 
 const routes = [
     {
@@ -220,6 +221,13 @@ const routes = [
         path: '/trainer/view_content/:TID/:CID/:SID/:start/:LID',
         name: 'trainer_view_content',
         component: TrainerViewContent,
+        props: true
+    },
+
+    {
+        path: '/trainer/update_content/:TID/:CID/:SID/:start/:LID/content_name/content_type/link',
+        name: 'trainer_update_content',
+        component: TrainerUpdateContent,
         props: true
     },
 

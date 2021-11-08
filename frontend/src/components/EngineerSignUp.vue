@@ -45,7 +45,7 @@ export default {
 
     methods: {
         EngineerSignUp() {
-			fetch('http://localhost:5001/engineer_signup', {
+			fetch('http://18.118.224.235:5001/engineer_signup', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

@@ -78,7 +78,7 @@ export default {
 
     methods: {
         readQuiz() {
-			fetch('http://localhost:5001/read_quiz', {
+			fetch('http://18.118.224.235:5001/read_quiz', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -104,7 +104,7 @@ export default {
 		},
 
         deleteQuestion(question){
-            fetch('http://localhost:5001/delete_quiz_question', {
+            fetch('http://18.118.224.235:5001/delete_quiz_question', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -132,7 +132,7 @@ export default {
         },
 
         deleteQuiz(){
-            fetch('http://localhost:5001/delete_quiz', {
+            fetch('http://18.118.224.235:5001/delete_quiz', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

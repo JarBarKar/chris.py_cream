@@ -38,7 +38,7 @@ export default {
 
     methods: {
 		getSections() {
-			fetch('http://localhost:5001/query_section', {
+			fetch('http://18.118.224.235:5001/query_section', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

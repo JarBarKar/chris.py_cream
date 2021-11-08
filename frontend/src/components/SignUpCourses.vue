@@ -65,7 +65,7 @@ export default {
 
     methods: {
         getEligibleCourses() {
-            fetch('http://localhost:5001/view_eligible_courses', {
+            fetch('http://18.118.224.235:5001/view_eligible_courses', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"

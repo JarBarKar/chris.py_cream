@@ -68,7 +68,7 @@ export default {
 
     methods: {
         ViewLessonContent() {
-			fetch('http://localhost:5001/view_lesson_content', {
+			fetch('http://18.118.224.235:5001/view_lesson_content', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -94,7 +94,7 @@ export default {
 		},
 
         LatestContentAccessed() {
-			fetch('http://localhost:5001/view_latest_content_accessed', {
+			fetch('http://18.118.224.235:5001/view_latest_content_accessed', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
@@ -122,7 +122,7 @@ export default {
 		},
 
         takenQuiz() {
-			fetch('http://localhost:5001/check_quiz_result', {
+			fetch('http://18.118.224.235:5001/check_quiz_result', {
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
