@@ -14,6 +14,7 @@ export default {
 		Navbar
 	},
 	
+	
 }
 </script>
 
@@ -22,6 +23,10 @@ export default {
 	text-align: center;
 	
 };
+
+.bg {
+        background-image: url('./assets/photo_2021-11-06_15-38-19.jpg');
+    }
 
 
 

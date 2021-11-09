@@ -3,7 +3,7 @@
 		<h1>Ongoing Courses</h1>
 		<div class="container">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <ul class="nav nav-pills" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Ongoing Courses</button>
                 </li>

@@ -5,7 +5,7 @@
         <div class="mb-3 row justify-content-center" >
             <form v-for="(question,  index) in questions" :key="[question.LID, question.CID, question.SID, question.start, question.question]">
                 <label for="staticEmail" class="col-sm-2 col-form-label">
-                    <strong>{{question.question}}</strong>
+                    <strong>{{index+1}}.{{question.question}}</strong>
                     
                     
                 </label>
@@ -14,7 +14,7 @@
                     <input class="form-check-input" type="radio" id="inlineCheckbox1" :value="option" v-model="QAMarks[index].answer">
                     <label class="form-check-label" for="inlineCheckbox1">{{option}}</label>
                 </div>
-                {{QAMarks.answer}}
+                
             </form>
         </div>
         <button type="button" class="btn btn-primary mb-3" v-on:click="checkAnswers();submitQuiz();unlockNextLesson()" >Submit</button>

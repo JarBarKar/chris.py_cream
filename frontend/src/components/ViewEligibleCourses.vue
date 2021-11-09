@@ -3,7 +3,7 @@
         <h1>View Eligible Courses</h1>
         <div class="container">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <ul class="nav nav-pills" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <router-link class="nav-link" type="button" role="tab" :to="{name: 'engineer_signup', params: {EID:this.EID}}">All Courses</router-link>
                 </li>

@@ -3,7 +3,7 @@
 		<h1>Completed Courses</h1>
 		<div class="container">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <ul class="nav nav-pills" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                      <router-link class="nav-link" type="button" role="tab" :to="{name:'attend_courses', params:{EID: this.EID}}">Ongoing Courses</router-link>
                 </li>

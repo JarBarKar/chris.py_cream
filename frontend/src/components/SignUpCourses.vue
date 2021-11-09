@@ -1,9 +1,9 @@
 <template>
-    <div class="container mt-3">
+    <div class="container mt-3 ">
         <h1>Sign Up for Courses</h1>
         <div class="container">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <ul class="nav nav-pills" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">All Courses</button>
                 </li>
@@ -94,5 +94,10 @@ export default {
 </script>
 
 <style>
-
+    .bg{
+        background-image: url('../assets/photo_2021-11-06_15-38-19.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        height: 100vh;
+    }
 </style>

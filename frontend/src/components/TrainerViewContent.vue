@@ -18,7 +18,7 @@
                 <div class="d-flex flex-row bd-highlight mb-3 justify-content-evenly" v-for="content in contents" :key="[content.SID, content.CID, content.LID, content.start, content.content_name]">
                     <div class="container">{{content.content_name}}</div>
                     <div class="container">
-                        <a href="https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1" class="link-primary">Click me</a>
+                        <a :href="content.link" class="link-primary">Click me</a>
                     </div>    
                     <div class="container">
                         <router-link type="button" class="btn btn-outline-primary" :to="{name: 'trainer_update_content', params:{TID:this.TID,SID:this.SID,CID:this.CID,LID:this.LID,start:this.start, content_name: content.content_name, content_type: content.content_type, link: content.link}}">Update Content</router-link>
@@ -32,11 +32,11 @@
             
         </div>
 
-        <div v-if="deleted == true" class="alert alert-success" role="alert">
+        <div v-if="deleted == true" class="alert alert-success mt-3" role="alert">
             Content has been deleted
         </div>
 
-        <div v-else-if="deleted == false" class="alert alert-danger" role="alert">
+        <div v-else-if="deleted == false" class="alert alert-danger mt-3" role="alert">
             An error occurred
         </div>
     </div>
