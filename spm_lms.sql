@@ -273,17 +273,17 @@ CREATE TABLE IF NOT EXISTS `content` (
 --
 
 INSERT INTO `content` (`LID`, `SID`, `CID`, `start`, `content_type`, `content_name`, `link`) VALUES
-('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 slides', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('3', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 slides', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides part 2', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How to train dragons', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How get free money', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 Reflections', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 History of Avarta', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 Why is machine learning so hard?', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 Convolution Neural Network', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1'),
-('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 Backward and forward propagation in neural network', 'https://docs.google.com/presentation/d/1z5DzoSjp4CL6VMfxIvHFlkTPUr8QoJxs/edit#slide=id.p1')
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides', 'https://tinyurl.com/3yr5dnus'),
+('2', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 slides', 'https://tinyurl.com/3yr5dnus'),
+('3', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 slides', 'https://tinyurl.com/3yr5dnus'),
+('1', 'G1', 'IS111', CAST('2021-04-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 slides part 2', 'https://tinyurl.com/3yr5dnus'),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How to train dragons', 'https://tinyurl.com/3yr5dnus'),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 How get free money', 'https://tinyurl.com/3yr5dnus'),
+('1', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 1 Reflections', 'https://tinyurl.com/3yr5dnus'),
+('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 History of Avarta', 'https://tinyurl.com/3yr5dnus'),
+('2', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 2 Why is machine learning so hard?', 'https://tinyurl.com/3yr5dnus'),
+('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 Convolution Neural Network', 'https://tinyurl.com/3yr5dnus'),
+('3', 'G2', 'IS112', CAST('2021-05-01 09:15:00' AS datetime), 'pdf', 'Lesson 3 Backward and forward propagation in neural network', 'https://tinyurl.com/3yr5dnus')
 ;
 
 -- --------------------------------------------------------
