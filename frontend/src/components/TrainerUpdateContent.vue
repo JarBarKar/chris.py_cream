@@ -22,11 +22,11 @@
             </div>
         </form>
 
-        <div v-if="updated == true" class="alert alert-success" role="alert">
+        <div v-if="updated == true" class="alert alert-success mt-3" role="alert">
             Content has been updated
         </div>
 
-        <div v-else-if="updated == false" class="alert alert-danger" role="alert">
+        <div v-else-if="updated == false" class="alert alert-danger mt-3" role="alert">
             An error occurred
         </div>
     </div>

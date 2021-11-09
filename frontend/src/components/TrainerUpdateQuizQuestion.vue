@@ -32,7 +32,7 @@
                 <button type="button" class="btn btn-primary" v-on:click="submitUpdate()">Submit</button>
             </div>
         </form>
-        <div v-if="updated == true" class="alert alert-success" role="alert">
+        <div v-if="updated == true" class="alert alert-success mt-3" role="alert">
             Question has been updated
         </div>
     </div>

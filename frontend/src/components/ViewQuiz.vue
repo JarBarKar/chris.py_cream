@@ -32,11 +32,11 @@
             </button>
         </div>
         
-        <div v-if="qn_deleted" class="alert alert-success" role="alert">
+        <div v-if="qn_deleted" class="alert alert-success mt-3" role="alert">
             Question was deleted
         </div>
 
-        <div v-if="quiz_deleted" class="alert alert-success" role="alert">
+        <div v-if="quiz_deleted" class="alert alert-success mt-3" role="alert">
             Quiz was deleted
         </div>
     </div>

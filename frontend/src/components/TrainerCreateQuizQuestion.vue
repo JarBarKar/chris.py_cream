@@ -39,11 +39,11 @@
             </div>
         </form>
 
-        <div v-if="created" class="alert alert-success" role="alert">
+        <div v-if="created" class="alert alert-success mt-3" role="alert">
             Question has been added
         </div>
 
-        <div v-else-if="created == false" class="alert alert-danger" role="alert">
+        <div v-else-if="created == false" class="alert alert-danger mt-3" role="alert">
             An error occurred
         </div>
     </div>

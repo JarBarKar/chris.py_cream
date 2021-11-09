@@ -1,10 +1,10 @@
 <template>
-    <div>
-        <div class="container my-5">
+    <div >
+        <div class="container mt-5">
             <h1>Engineer</h1>
         </div>
 
-        <div class="container my-2">
+        <div class="container mt-5">
             <router-link type="button" class="btn btn-outline-primary" :to="{name: 'engineer_signup', params: {EID:this.EID}}">Sign Up for Courses</router-link>
         </div>
 
@@ -34,5 +34,5 @@ export default {
 </script>
 
 <style>
-
+    
 </style>

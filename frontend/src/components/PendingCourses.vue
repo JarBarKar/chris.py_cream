@@ -3,7 +3,7 @@
         <h1>Pending Courses</h1>
         <div class="container">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <ul class="nav nav-pills" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <router-link class="nav-link" type="button" role="tab" :to="{name: 'engineer_signup', params: {EID:this.EID}}">All Courses</router-link>
                 </li>
@@ -23,7 +23,7 @@
                     <div class="container mt-5">
                         <div class="d-flex flex-row bd-highlight mb-3 justify-content-between" v-for="course in pending" :key="course.CID">
                             <div>
-                                {{course.CID}}
+                                {{course.course_name}}
                             </div>
                             <div>
                                 <button type="button" class="btn btn-outline-primary" v-on:click="withdrawEngineer(course.CID,course.SID,course.start)">Withdraw</button>

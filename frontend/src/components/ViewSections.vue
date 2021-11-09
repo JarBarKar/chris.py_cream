@@ -1,7 +1,7 @@
 <template>
 	<div class="container mt-3">
 		<h1>{{CID}}</h1>
-		<table class="table">
+		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th scope="col">Section</th>
